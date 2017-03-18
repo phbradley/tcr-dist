@@ -8,6 +8,7 @@ import math
 from math import floor,sqrt
 from sys import stderr,argv,exit
 import random
+import paths
 from blargs import Parser
 from parse_tsv import *
 

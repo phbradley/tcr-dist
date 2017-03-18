@@ -47,7 +47,7 @@ numpy:
 convert:
 	from Imagemagick is used to convert svg files to png files
 	if you have an alternative you can modify the function
-	"convert_png_to_svg" in basic.py
+	"convert_svg_to_png" in basic.py
 
 wget:
 	for downloading database and other files
