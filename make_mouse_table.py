@@ -252,11 +252,11 @@ for ii,epitope in enumerate( all_epitopes ):
 
 
 
-pngfile = outfile_prefix+'_mouse_table.png'
+pngfile = outfile_prefix+'_subject_table.png'
 print 'making:',pngfile
 plt.savefig(pngfile)
 
-util.readme(pngfile,"""This mouse-table plot shows all the successfully parsed, paired reads, split by mouse/subject (the rows)
+util.readme(pngfile,"""This subject-table plot shows all the successfully parsed, paired reads, split by mouse/subject (the rows)
 and epitope (the columns, labeled at the bottom). The epitope column labels include in parentheses the number of clones followed by
 the total number of TCRs. Each pie shows the paired reads for a single mouse/epitope combination, with each wedge corresponding to
 a clone. The size of the top clone is shown in red near the red wedge, and the total number of reads is shown below the pie in black.

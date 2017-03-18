@@ -278,7 +278,7 @@ if force or not distfiles: run(cmd)
 
 
 ## plot nbr-distance histograms
-cmd = 'python {}/plot_nbrdist_distributions.py --clones_file {} --nbrdist_percentiles 5 10 25 > {}_pad.log 2> {}_pad.err'\
+cmd = 'python {}/plot_nbrdist_distributions.py --clones_file {} --nbrdist_percentiles 5 10 25 > {}_pnd.log 2> {}_pnd.err'\
     .format( path_to_scripts, clones_file, clones_file, clones_file )
 run(cmd)
 
@@ -460,9 +460,9 @@ color_schemes.sort()
 
 
 tree_pages = []
-mouse_tree_suffixes = []
+subject_tree_suffixes = []
 for epitope in epitopes:
-    mouse_tree_suffixes.append( '_{}_mouse_tree.png'.format( epitope ) )
+    subject_tree_suffixes.append( '_{}_subject_tree.png'.format( epitope ) )
     for ab in ['A','B','AB']:
         pagename = '{} trees {}'.format( epitope, ab )
         pages = {}
@@ -539,8 +539,8 @@ pngfile_suffixes = """
 _cdr3_distributions.png
 _kpca.png
 _sharing_diversity.png
-_mouse_heterogeneity.png
-_mouse_table.png
+_subject_heterogeneity.png
+_subject_table.png
 _gene_segment_pies.png
 _cdr3lens.png
 _gene_entropies_and_mi.png
@@ -556,12 +556,12 @@ _epitope_correlations_10.png
 _epitope_epitope_avg_nbrdist_rank_scores.png
 _epitope_distances.png
 _sharing.png
-_mouse_trees.png
+_subject_trees.png
 _vj_pairings.png
 _motif_summary_ngbig.png
 _tall_tree_AB.png
 _tall_tree_A.png,_tall_tree_B.png
-""".split('\n') + mouse_tree_suffixes
+""".split('\n') + subject_tree_suffixes
 
 # _random_nbrdists_nbrdists_A.png
 # _random_nbrdists_nbrdists_B.png
@@ -780,6 +780,7 @@ for sufs in pngfile_suffixes:
     for file in files:
         if not exists(file):
             print 'missing:',file
+            out.write("<br><br>The image file is missing. If there is just a single subject, then some of the subject_tree and subject_heterogeneity analyses don't pertain. Or if this is the motifs summary it may be that there were no motifs found. Try grepping for 'Error' in the files: <clones_file>*.err\n")
         else:
             ## can't use 'run' command since that messes with the webfile
             if not webdir_contains_input_files: system('cp {} {}'.format(file,webdir))

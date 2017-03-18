@@ -1,5 +1,12 @@
 from basic import *
 
+if not isdir('testing/'):
+    mkdir('testing/')
+
+cmd = 'rm testing/* testing/*web/*'
+print cmd
+system(cmd)
+
 for filetag, max_epitopes, max_subjects, max_tcrs_per_subject in \
     [ [ 'test_tiny', 1, 1, 15 ],
       [ 'test_small', 3, 3, 15 ] ]:
@@ -7,6 +14,7 @@ for filetag, max_epitopes, max_subjects, max_tcrs_per_subject in \
     fields = 'id	epitope	subject	a_nucseq	b_nucseq	a_quals	b_quals'.split()
 
     for organism in ['mouse','human']:
+        ## this is the dataset from the paper
         oldfile = './datasets/{}_pairseqs_v1.tsv'.format(organism)
         assert exists( oldfile )
 
@@ -29,7 +37,10 @@ for filetag, max_epitopes, max_subjects, max_tcrs_per_subject in \
                     out.write(make_tsv_line( outl, fields )+'\n' )
         out.close()
 
-        cmd = 'python run_basic_analysis.py --organism {} --pair_seqs_file {} > {}.log 2> {}.err &'\
+
+        ## use intrasubject_nbrdists here because these mini-repertoires may contain only a single subject
+        ## if there's only one subject, then we can't compute a nbrdist if we exclude intra-subject distances
+        cmd = 'python run_basic_analysis.py --intrasubject_nbrdists --organism {} --pair_seqs_file {} > {}.log 2> {}.err &'\
               .format( organism, newfile, newfile, newfile )
         print cmd
         system(cmd)

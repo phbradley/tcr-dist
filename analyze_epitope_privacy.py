@@ -584,7 +584,7 @@ for epitope in epitopes:
                 plt.suptitle( 'mouse tree for {} showing gene composition of mouse repertoires'.format(epitope))
 
             ## now save the figure
-            pngfile = '{}_{}_mouse_tree.png'.format( outfile_prefix, epitope )
+            pngfile = '{}_{}_subject_tree.png'.format( outfile_prefix, epitope )
             print 'making:',pngfile
             plt.savefig( pngfile )
             util.readme( pngfile, """
@@ -602,13 +602,13 @@ if paper_figs: ## just the individual tree images
     exit()
 
 plt.suptitle('mouse trees based on avg TCR-TCR distance between mice',x=0.5,y=1.0)
-pngfile = '{}_mouse_trees.png'.format( outfile_prefix )
+pngfile = '{}_subject_trees.png'.format( outfile_prefix )
 print 'making:',pngfile
 plt.savefig( pngfile )
 util.readme( pngfile, """This figure shows hierachical clustering (average linkage) trees of the different
 mice (subjects), where the distance between two mice is defined as the average distance between TCRs in one
 mouse and TCRs in the other. This could help us to interpret any high repertoire-heterogeneity Z-scores in the
-"_mouse_heterogeneity.png" bar plot earlier on, for example if it turns out that there are distinct sub-clusters of mice
+"_subject_heterogeneity.png" bar plot earlier on, for example if it turns out that there are distinct sub-clusters of mice
 with similar repertoires where the sub-clusters are quite different from one another.
 See the earlier plot's readme for the explanation of how we assign a Z-score
 and P-value to each repertoire reflecting the degree of repertoire heterogeneity across different mice. These
@@ -641,11 +641,11 @@ plt.subplots_adjust(bottom=0.25)
 plt.xticks( [x+0.4 for x in lefts], ['{} P: {:.3f}'.format( x[1], epitope_zps[x[1]][1] ) for x in l], rotation='vertical', fontsize=9 )
 plt.ylabel('Z-score\n(abs. values greater than 2 or 3 start to look significant')
 plt.suptitle('Z-scores for intra- versus inter-mouse distances\nLarger Z means intra-mouse distances are smaller than inter-mouse distances\ni.e. greater heterogeneity across mice')
-pngfile = '{}_mouse_heterogeneity.png'.format( outfile_prefix )
+pngfile = '{}_subject_heterogeneity.png'.format( outfile_prefix )
 print 'making:',pngfile
 plt.savefig( pngfile )
 util.readme( pngfile, """This summary plot is aimed at answering the question: are some mice (or humans) sampling from a different repertoire than others?
-There is a companion plot later on (_mouse_trees.png) which adds a little more detail. The idea behind the analysis is to compute
+There is a companion plot later on (_subject_trees.png) which adds a little more detail. The idea behind the analysis is to compute
 distances between all TCRs in the dataset, and then split those distances into two sets: intra-mouse distances (distances between
 TCRs from the same mouse), and inter-mouse distances (distances between TCRs from different mice). If mice are sampling from different
 repertoires then the intra-mouse distances might be expected to be smaller than the inter-mouse distances. To assess significance of an
