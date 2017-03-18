@@ -38,9 +38,13 @@ try:
 except:
     print """
 =============================================================================
-[ERROR] failed to import the python module sklearn (scikit-learn)
+=============================================================================
+[ERROR]
+[ERROR] Failed to import the python module sklearn (scikit-learn)
 [ERROR] Some analyses (kernelPCA plots, adjusted_mutual_information) will fail
 [ERROR] Take a look at http://scikit-learn.org/stable/install.html
+[ERROR]
+=============================================================================
 =============================================================================
 """
     #exit() ## not exiting since most stuff will probably still work...

@@ -6,10 +6,11 @@ Thanks for your interest in TCRdist! This software is very much a
 work in progress, so we welcome any/all feedback and will work to
 add features and fix bugs as quickly as we can.
 
-If you want to directly add to and modify the repository on github, feel free
-to contact me (Phil); we would welcome the input.
+If you would like to contribute to the project on github, feel free
+to contact us.
 
 Phil Bradley (pbradley@fredhutch.org)
+Jeremy Chase Crawford (Jeremy.Crawford@stjude.org)
 
 See LICENSE.txt for details on the (MIT) license.
 
@@ -18,8 +19,17 @@ See LICENSE.txt for details on the (MIT) license.
 REQUIREMENTS
 ###########################
 
+system:
+				So far we have only tested on LINUX systems. Right now the blast
+				executables used for sequence parsing are probably not going to work
+				on other systems, but we could definitely add logic to autodetect
+				system type and download the appropriate ones. The downstream
+				analysis is pretty much pure python and should work wherever. If you
+				are interested in using the software on Mac, for example, contact
+				us and we can give it a shot.
+
 python:
-				I have tested with 2.7.11
+				We have tested with 2.7.11
 
 ## PYTHON MODULES #########
 
@@ -91,6 +101,9 @@ where <organism> is either mouse or human, and <filename> is the name of a .tsv
 ###########################
 TESTING
 ###########################
+
+[Mar 18, 2017] I am adding the full and testing datasets to the download and setup script.
+Will update this section later today. Thanks for your patience! (Phil)
 
 
 ###########################
