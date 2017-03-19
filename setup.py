@@ -11,7 +11,14 @@
 ##
 from os import popen, system, chdir, mkdir
 from os.path import exists, isdir, isfile
-from sys import stderr,exit
+from sys import stderr,exit,platform
+
+# I don't know how reliable this is:
+mac_osx = ( platform.lower() == "darwin" )
+
+if mac_osx:
+    print 'Detected mac_osx operating system -- if not, hardcode mac_osx=False in setup.py'
+
 
 def download_web_file( address ):
     newfile = address.split('/')[-1]
@@ -86,9 +93,12 @@ chdir( external_dir )
 blastdir = './blast-2.2.16'
 
 if not isdir( blastdir ):
-    address = 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy/2.2.16/blast-2.2.16-x64-linux.tar.gz'
-    tarfile = address.split('/')[-1]
+    if mac_osx:
+        address = 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy/2.2.16/blast-2.2.16-universal-macosx.tar.gz'
+    else:
+        address = 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy/2.2.16/blast-2.2.16-x64-linux.tar.gz'
 
+    tarfile = address.split('/')[-1]
     if not exists( tarfile ):
         print 'Downloading a rather old BLAST tool'
         download_web_file( address )
