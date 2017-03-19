@@ -103,7 +103,7 @@ if not isdir( blastdir ):
 
 
 ## download other db files
-address = 'https://www.dropbox.com/s/yen2puguhtj974g/tcrdist_extras_v1.tgz'
+address = 'https://www.dropbox.com/s/6go61t51vpn2xiu/tcrdist_extras_v1.tgz'
 tarfile = address.split('/')[-1]
 
 if not exists( tarfile ):
