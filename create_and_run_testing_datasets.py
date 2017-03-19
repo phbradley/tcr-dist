@@ -7,9 +7,15 @@ cmd = 'rm testing/* testing/*web/*'
 print cmd
 system(cmd)
 
-for filetag, max_epitopes, max_subjects, max_tcrs_per_subject in \
-    [ [ 'test_tiny', 1, 1, 15 ],
-      [ 'test_small', 3, 3, 15 ] ]:
+
+
+#examples = [ [ 'test_tiny', 1, 1, 15 ],
+#             [ 'test_small', 3, 3, 15 ] ]
+
+examples = [ [ 'test_small', 3, 3, 15 ] ]
+
+
+for filetag, max_epitopes, max_subjects, max_tcrs_per_subject in examples:
 
     fields = 'id	epitope	subject	a_nucseq	b_nucseq	a_quals	b_quals'.split()
 
