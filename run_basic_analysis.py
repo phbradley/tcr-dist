@@ -23,7 +23,7 @@ with Parser(locals()) as p:
     p.str('organism').required()
     p.str('webdir').described_as('Location where the index.html summary output file will be generated. Default is <clones_file>_web/')
     p.str('distance_params')
-    p.int('min_quality_for_singletons').default(20)
+    p.int('min_quality_for_singletons').default(20).described_as('Minimum CDR3 region quality score for singleton clones')
     p.float('seed_threshold_for_motifs')
     p.flag('force')
     p.flag('webstatus')
@@ -78,6 +78,9 @@ NOTES
     consider using the option:
 
        --find_cdr3_motifs_in_parallel
+
+    Also, be aware of the --min_quality_for_singletons flag which can cause some (singleton) TCR clones
+    to be filtered out if they have bad sequence read quality scores. The default is 20.
 
 
 #################

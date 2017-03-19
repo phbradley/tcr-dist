@@ -96,7 +96,16 @@ python run_basic_analysis.py --organism <organism> --pair_seqs_file <filename>
 where <organism> is either mouse or human, and <filename> is the name of a .tsv
 (tab-separated values) file with the following fields:
 
+id	epitope	subject	a_nucseq	b_nucseq	a_quals	b_quals
 
+a_quals and b_quals are '.' separated lists of the quality scores for the
+corresponding nucleotide sequences (a_nucseq and b_nucseq).
+
+Try running
+
+python run_basic_analysis.py -h
+
+for some help text.
 
 ###########################
 TESTING
@@ -146,4 +155,5 @@ The tables in the .html results can be sorted thanks to "tablesorter". See the l
 external/tablesorter/
 
 Sequence parsing relies on the BLAST suite, see info in external/blast-2.2.16/
+
 
