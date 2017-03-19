@@ -136,6 +136,14 @@ results to see if any of the results files are missing from the testing/
 version but present in the testing_ref/ version.
 
 
+You can also re-run the analysis in the original paper by typing:
+
+python rerun_paper_analysis.py
+
+which may take a couple of hours. Add the --from_pair_seqs option to restart
+from nucleotide sequences.
+
+
 ###########################
 CITING
 ###########################

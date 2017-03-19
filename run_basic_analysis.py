@@ -781,16 +781,16 @@ for sufs in pngfile_suffixes:
     files= [ clones_file[:-4] + x for x in sufs.split(',') ]
     out.write('<br><br><h1>{}</h1>\n'.format(sufs))
     for file in files:
+        readme_file = file+'.readme'
+        if exists( readme_file):
+            readme_text = ''.join( open(readme_file,'r').readlines())
+            out.write('{}<br>'.format(readme_text))
         if not exists(file):
             print 'missing:',file
-            out.write("<br><br>The image file is missing. If there is just a single subject, then some of the subject_tree and subject_heterogeneity analyses don't pertain. Or if this is the motifs summary it may be that there were no motifs found. Try grepping for 'Error' in the files: <clones_file>*.err\n")
+            out.write("<br><br><br>The image file is missing. If there is just a single subject, then some of the subject_tree and subject_heterogeneity analyses don't pertain. Or if this is the motifs summary it may be that there were no motifs found. Try grepping for 'Error' in the files: <clones_file>*.err\n")
         else:
             ## can't use 'run' command since that messes with the webfile
             if not webdir_contains_input_files: system('cp {} {}'.format(file,webdir))
-            readme_file = file+'.readme'
-            if exists( readme_file):
-                readme_text = ''.join( open(readme_file,'r').readlines())
-                out.write('{}<br>'.format(readme_text))
             out.write('<img src="{}" />\n'.format( file.split('/')[-1] ) )
     out.write('<br>\n')
 
