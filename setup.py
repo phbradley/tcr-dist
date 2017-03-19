@@ -118,9 +118,9 @@ if not exists( tarfile ):
 lines = popen('md5sum '+tarfile).readlines()
 if lines and len(lines[0].split()) == 2:
     # rhino1 public_release$ md5sum tcrdist_extras_v1.tgz
-    # 3c2625d83fc5667ff9d6d46dad57f2c6  tcrdist_extras_v1.tgz
+    # 3f3d3ad768f1c68b02847696255d89ad  tcrdist_extras_v1.tgz
     checksum = lines[0].split()[0]
-    expected_checksum = '3c2625d83fc5667ff9d6d46dad57f2c6'
+    expected_checksum = '3f3d3ad768f1c68b02847696255d89ad'
     if checksum == expected_checksum:
         print "md5sum checksum for tarfile matches expected..."
     else:
@@ -149,7 +149,11 @@ cmd = 'mv {}/db ../'.format(download_dir)
 print cmd
 system(cmd)
 
+cmd = 'mv {}/datasets ../'.format(download_dir)
+print cmd
+system(cmd)
 
-
-
+cmd = 'mv {}/testing_ref ../'.format(download_dir)
+print cmd
+system(cmd)
 
