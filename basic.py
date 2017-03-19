@@ -66,15 +66,6 @@ def convert_svg_to_png( svgfile, pngfile, verbose=True, allow_missing=False, all
         ## success
         return
 
-    cmd = 'rsvg-convert {} -o {}'.format( svgfile, pngfile )
-    if verbose:
-        print cmd
-    system(cmd)
-
-    if isfile( pngfile ):
-        ## success
-        return
-
     ## cmdline inkscape
     cmd = 'inkscape --export-png {} {}'.format( pngfile, svgfile )
     if verbose:
@@ -100,6 +91,18 @@ def convert_svg_to_png( svgfile, pngfile, verbose=True, allow_missing=False, all
         if isfile( pngfile ):
             ## success
             return
+
+
+    ## another possibility
+    cmd = 'rsvg-convert {} -o {}'.format( svgfile, pngfile )
+    if verbose:
+        print cmd
+    system(cmd)
+
+    if isfile( pngfile ):
+        ## success
+        return
+
 
     ## this might also occur if the svgfile were empty...
     errmsg = 'Error: convert command failed: cmd="{}" -- is the "convert" cmdline tool (Imagemagick) installed?'\
