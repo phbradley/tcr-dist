@@ -786,8 +786,13 @@ for sufs in pngfile_suffixes:
             readme_text = ''.join( open(readme_file,'r').readlines())
             out.write('{}<br>'.format(readme_text))
         if not exists(file):
-            print 'missing:',file
-            out.write("<br><br><br>The image file is missing. If there is just a single subject, then some of the subject_tree and subject_heterogeneity analyses don't pertain. Or if this is the motifs summary it may be that there were no motifs found. Try grepping for 'Error' in the files: <clones_file>*.err\n")
+            svgfile = file[:-4]+'.svg'
+            if exists( svgfile ): ## use svg version instead
+                out.write("<br><br>CONVERSION TO .png FAILED, USING .svg VERSION!!!<br>\n")
+                out.writelines( open( svgfile,'r').readlines())
+            else:
+                print 'missing:',file
+                out.write("<br><br><br>The image file is missing. If there is just a single subject, then some of the subject_tree and subject_heterogeneity analyses don't pertain. Or if this is the motifs summary it may be that there were no motifs found. Try grepping for 'Error' in the files: <clones_file>*.err\n")
         else:
             ## can't use 'run' command since that messes with the webfile
             if not webdir_contains_input_files: system('cp {} {}'.format(file,webdir))
