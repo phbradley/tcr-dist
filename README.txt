@@ -54,12 +54,12 @@ numpy:
 
 ## COMMAND LINE TOOLS #####
 
-convert:
+convert: (or rsvg-convert or inkscape)
 	from Imagemagick is used to convert svg files to png files
 	if you have an alternative you can modify the function
 	"convert_svg_to_png" in basic.py
 
-wget:
+wget: (or curl)
 	for downloading database and other files
 	If you have something else that works similarly on your system,
 	feel free to modify setup.py or contact me to add that as an option.
