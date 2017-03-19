@@ -50,7 +50,7 @@ def Log(s): ## silly legacy helper function
 ##
 def convert_svg_to_png( svgfile, pngfile, verbose=True, allow_missing=False, allow_failure=True ):
     if not isfile(svgfile):
-        errmsg = 'convert_svg_to_png: svgfile does not exist: {}'.format(svgfile)
+        errmsg = 'Error: convert_svg_to_png: svgfile does not exist: {}'.format(svgfile)
         print errmsg
         Log( errmsg )
         if allow_missing:
@@ -61,14 +61,53 @@ def convert_svg_to_png( svgfile, pngfile, verbose=True, allow_missing=False, all
     if verbose:
         print cmd
     system(cmd)
-    if not isfile( pngfile ):
-        ## this might also occur if the svgfile were empty...
-        errmsg = 'convert command failed: cmd="{}" -- is the "convert" cmdline tool (Imagemagick) installed?'\
-                 .format( cmd )
-        print errmsg
-        Log( errmsg )
-        if not allow_failure:
-            exit()
+
+    if isfile( pngfile ):
+        ## success
+        return
+
+    cmd = 'rsvg-convert {} -o {}'.format( svgfile, pngfile )
+    if verbose:
+        print cmd
+    system(cmd)
+
+    if isfile( pngfile ):
+        ## success
+        return
+
+    ## cmdline inkscape
+    cmd = 'inkscape --export-png {} {}'.format( pngfile, svgfile )
+    if verbose:
+        print cmd
+    system(cmd)
+
+    if isfile( pngfile ):
+        ## success
+        return
+
+    ## this is probably a long-shot, but in case inkscape is installed on mac
+    inkscape_exe = '/Applications/Inkscape.app/Contents/Resources/bin/inkscape'
+    if isfile( inkscape_exe ):
+        from os.path import abspath
+        svgfile_full = abspath( svgfile )
+        pngfile_full = abspath( pngfile )
+
+        cmd = '{} --export-png {} {}'.format( inkscape_exe, pngfile_full, svgfile_full )
+        if verbose:
+            print cmd
+        system(cmd)
+
+        if isfile( pngfile ):
+            ## success
+            return
+
+    ## this might also occur if the svgfile were empty...
+    errmsg = 'Error: convert command failed: cmd="{}" -- is the "convert" cmdline tool (Imagemagick) installed?'\
+             .format( cmd )
+    print errmsg
+    Log( errmsg )
+    if not allow_failure:
+        exit()
 
 def get_mean_and_sdev( l ):
     N = len(l)
