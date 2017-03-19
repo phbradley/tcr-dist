@@ -13,6 +13,28 @@ from os import popen, system, chdir, mkdir
 from os.path import exists, isdir, isfile
 from sys import stderr,exit
 
+def download_web_file( address ):
+    newfile = address.split('/')[-1]
+
+    if exists(newfile):
+        print 'download_web_file: {} already exists, delete it to re-download'
+        return
+
+    ## try with wget
+    cmd = 'wget '+address
+    print cmd
+    system(cmd)
+
+    if not exists( newfile ):
+        print 'wget failed, trying curl'
+        cmd = 'curl -L {} -o {}'.format(address,newfile)
+        print cmd
+        system(cmd)
+
+    if not exists( newfile ):
+        print '[ERROR] unable to download (tried wget and curl) the link '+address
+
+
 
 ## check for python modules
 try:
@@ -64,17 +86,15 @@ chdir( external_dir )
 blastdir = './blast-2.2.16'
 
 if not isdir( blastdir ):
-    tarfile = 'blast-2.2.16-x64-linux.tar.gz'
+    address = 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy/2.2.16/blast-2.2.16-x64-linux.tar.gz'
+    tarfile = address.split('/')[-1]
 
     if not exists( tarfile ):
-        cmd = 'wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy/2.2.16/blast-2.2.16-x64-linux.tar.gz'
         print 'Downloading a rather old BLAST tool'
-        print cmd
-        system(cmd)
+        download_web_file( address )
 
         if not exists( tarfile ):
-            print '[ERROR] wget blast dir failed!'
-            print "is the command 'wget' installed?"
+            print '[ERROR] download BLAST failed!'
             exit()
 
     cmd = 'tar -xzf '+tarfile
@@ -83,17 +103,15 @@ if not isdir( blastdir ):
 
 
 ## download other db files
-tarfile = 'tcrdist_extras_v1.tgz'
+address = 'https://www.dropbox.com/s/yen2puguhtj974g/tcrdist_extras_v1.tgz'
+tarfile = address.split('/')[-1]
 
 if not exists( tarfile ):
-    address = 'https://www.dropbox.com/s/yen2puguhtj974g/tcrdist_extras_v1.tgz'
-    cmd = 'wget '+address
     print 'Downloading database files'
-    print cmd
-    system(cmd)
+    download_web_file( address )
 
     if not exists( tarfile ):
-        print '[ERROR] wget db files failed'
+        print '[ERROR] download database files failed'
         exit()
 
 ## md5sum check
