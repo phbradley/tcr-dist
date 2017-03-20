@@ -113,7 +113,7 @@ if not isdir( blastdir ):
 
 
 ## download other db files
-address = 'https://www.dropbox.com/s/6go61t51vpn2xiu/tcrdist_extras_v1.tgz'
+address = 'https://www.dropbox.com/s/hgjg2tzknxv7mm8/tcrdist_extras_v1.tgz'
 tarfile = address.split('/')[-1]
 
 if not exists( tarfile ):
@@ -127,10 +127,10 @@ if not exists( tarfile ):
 ## md5sum check
 lines = popen('md5sum '+tarfile).readlines()
 if lines and len(lines[0].split()) == 2:
-    # rhino1 public_release$ md5sum tcrdist_extras_v1.tgz
-    # 3f3d3ad768f1c68b02847696255d89ad  tcrdist_extras_v1.tgz
+    # rhino1 tcr-dist$ md5sum tcrdist_extras_v1.tgz
+    # a6e0513e86aa077e541df6294e4574ae  tcrdist_extras_v1.tgz
     checksum = lines[0].split()[0]
-    expected_checksum = '3f3d3ad768f1c68b02847696255d89ad'
+    expected_checksum = 'a6e0513e86aa077e541df6294e4574ae'
     if checksum == expected_checksum:
         print "md5sum checksum for tarfile matches expected..."
     else:

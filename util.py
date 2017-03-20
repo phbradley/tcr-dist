@@ -88,8 +88,22 @@ def reps_from_genes( genes, organism, mm1=False, trim_allele=False ):
     return reps
 
 def readme( pngfile, text ):
+    """Generate some readme text associated to an image file, that will be incorporated into the
+    big html results file by run_basic_analysis.py"""
+
     out = open(pngfile+'.readme','w')
-    out.write(text)
+    cmd = ' '.join(argv)
+    out.write("""
+<u>Command</u>:
+{}
+<br><br>
+<u>Filename</u>:
+{}
+<br><br>
+<u>Readme</u>:
+{}
+<br><br>
+""".format(cmd, pngfile, text))
     out.close()
 
 
