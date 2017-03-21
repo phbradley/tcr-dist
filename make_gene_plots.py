@@ -3,10 +3,6 @@ import cdr3s_human
 import html_colors
 import svg_basic
 import util
-
-
-# from amino_acids import amino_acids
-# from tcr_distances_blosum import blosum
 import numpy as np
 
 
@@ -14,7 +10,7 @@ import numpy as np
 with Parser(locals()) as p:
     p.str('clones_file').required()
     p.multiword('epitopes').cast(lambda x:x.split())
-    p.multiword('force_pairing_order').cast(lambda x:x.split())
+    p.multiword('force_pairing_order').cast(lambda x:x.split()).described_as('Left-right order for segments in gene usage diagrams')
     p.str('organism').required()
     p.str('outfile_prefix')
     p.str('countrep_enrichments_file')
@@ -34,6 +30,22 @@ with Parser(locals()) as p:
     p.flag('paper_figs')
     p.flag('paper_supp')
     p.flag('consistentfigcolors')
+    p.set_help_prefix("""
+    This script makes a set of plots that illustrate gene segment usage in the dataset. The default prefix for plot output is the name of the clones file with the .tsv trimmed off.
+
+    Plot descriptions:
+
+    <prefix>_cdr3lens.png: Visualizes the length distribution of the CDR3 segments, colored by gene usage
+
+    <prefix>_gene_segment_pies.png: Shows the gene segment usage for each repertoire as pie plots.
+
+    <prefix>_gene_entropies_and_mi.png: Heat maps of gene usage distribution entropies, differences from background, and mutual information (reflecting covariation between gene usage in different segments)
+
+    <prefix>_vj_pairings.png: 'Chord' style diagrams showing gene usage and covariation in graphical format.
+
+    """)
+
+
 
 #if paper_supp:
 #    paper_figs = True ## NOTE

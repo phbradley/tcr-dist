@@ -103,6 +103,16 @@ python run_basic_analysis.py -h
 
 for some help text.
 
+You can also run individual steps in the analysis from the command line.
+Running a script with the -h option will print a very basic help message
+listing the command line arguments. We are currently working hard to
+flesh out the help messages -- our apologies for the lack of clarity.
+Some scripts depend on the output of previous steps (for example
+compute_distances.py generates distance matrices which are used by downstream
+programs). The source code for run_basic_analysis.py gives an example of
+an appropriate order for calling the scripts.
+
+
 ###########################
 TESTING
 ###########################
