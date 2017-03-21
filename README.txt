@@ -147,7 +147,8 @@ You can also re-run the analysis in the original paper by typing:
 python rerun_paper_analysis.py
 
 which may take a couple of hours. Add the --from_pair_seqs option to restart
-from nucleotide sequences.
+from nucleotide sequences. And/or the --multicore option to let the pipeline
+spawn multiple, independent processes.
 
 
 ###########################
