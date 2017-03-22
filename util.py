@@ -188,7 +188,7 @@ def countreps_from_genes( genes, organism ):
 
 def assign_label_reps_and_colors_based_on_most_common_genes_in_repertoire( tcr_infos, organism ):
     ## assumes that each element of tcr_infos is a dictionary with fields that would have come from parse_tsv_line
-    ## uses the *_countreps info that was filled in by read_pairseqs
+    ## uses the *_countreps info that was filled in by read_pair_seqs.py
     ## the _label_rep* fields get over-written if they were present
     for segtype in segtypes_lowercase:
         countreps_tag = segtype+'_countreps'
