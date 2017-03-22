@@ -1,4 +1,5 @@
 from basic import *
+import time
 
 if not isdir('testing/'):
     mkdir('testing/')
@@ -51,5 +52,6 @@ for filetag, max_epitopes, max_subjects, max_tcrs_per_subject in examples:
               .format( organism, newfile, newfile, newfile )
         print cmd
         system(cmd)
+        time.sleep(1.0) ## short pause
 
 

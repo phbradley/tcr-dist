@@ -1,4 +1,5 @@
 from basic import *
+import time
 
 with Parser(locals()) as p:
     p.flag('from_pair_seqs').described_as('Restart from the nucleotide sequences (default is to start from parsed clones file)')
@@ -20,6 +21,7 @@ for organism in ['mouse','human']:
             .format( extra_args, organism, pair_seqs_file, pair_seqs_file, pair_seqs_file, cmd_suffix )
         print cmd
         system(cmd)
+        time.sleep(1.0) ## short pause
     else:
 
         clones_file = 'datasets/{}_pairseqs_v1_parsed_seqs_probs_mq20_clones.tsv'.format(organism)
@@ -32,4 +34,5 @@ for organism in ['mouse','human']:
             .format( extra_args, organism, clones_file, clones_file, clones_file, cmd_suffix )
         print cmd
         system(cmd)
+        time.sleep(1.0) ## short pause
 

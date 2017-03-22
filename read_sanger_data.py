@@ -143,7 +143,6 @@ def get_all_hits_with_evalues_and_scores( blastfile ):
     return hits
 
 
-## this only checks the positive frame alignments
 ##
 ##    returns genes,evalues,status ## status is a list, may be empty
 ##
@@ -153,7 +152,9 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
                                         return_all_good_hits = False,
                                         max_bit_score_delta_for_good_hits = 50 ):
 
-    blast_tmpfile = 'tmp%f.fa'%(random.random())
+    ## make this a little more unique
+    blast_tmpfile = 'tmp%d%s%s%f%s.fa'%(len(blast_seq),organism,ab,random.random(),blast_seq[:3])
+    #print 'blast_tmpfile:',blast_tmpfile
     #assert not exists(blast_tmpfile)
 
     genes =  ( 'UNK', 'UNK', [100,0], 'UNK', 'UNK', [100,0], '-' )
