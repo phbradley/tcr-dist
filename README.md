@@ -62,7 +62,7 @@ See LICENSE.txt for details on the (MIT) license.
 2. Run the command:
 ```
 python setup.py
-'''
+```
 
 3) Cross your fingers.
 
