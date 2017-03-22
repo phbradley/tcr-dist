@@ -551,13 +551,7 @@ def nucleotide_symbols_match( a_in, b_in ):
 
 
 def reverse_complement( seq ):
-    newseq = ''
-    L = len(seq)
-    for pos in range( L-1, -1, -1 ):
-        newseq += base_partner[ seq[ pos ] ]
-    assert len( newseq ) == L
-    return newseq
-
+    return ''.join([base_partner[b] for b in seq[::-1]])
 # def reverse_complement_pwm( pwm ):
 #     global base_partner
 #     revpwm = {}
