@@ -14,9 +14,9 @@ MAX_MOTIFS_TIME_IN_SECONDS = 24 * 60 * 60 ## a day
 with Parser(locals()) as p:
     p.str('pair_seqs_file').described_as('Name of the pair_seqs file (input option #1)')
     p.str('parsed_seqs_file').described_as('Name of the parsed_seqs file (input option #2)')
+    p.str('clones_file').described_as('Name of the clones file (input option #3)')
     p.flag('only_parsed_seqs')
     p.flag('find_cdr3_motifs_in_parallel').described_as('Will spawn multiple simultaneous CDR3 motif finding jobs')
-    p.str('clones_file').described_as('Name of the clones file (input option #3)')
     p.flag('only_clones')
     p.str('extra_make_really_tall_trees_args').shorthand('mrtt_args')
     p.str('extra_find_clones_args').shorthand('fc_args')
@@ -25,6 +25,8 @@ with Parser(locals()) as p:
     p.str('distance_params')
     p.int('min_quality_for_singletons').default(20).described_as('Minimum CDR3 region quality score for singleton clones')
     p.float('seed_threshold_for_motifs')
+    p.flag('make_fake_quals').described_as("(for --pair_seqs_file I/O, arg is passed to read_pair_seqs.py) Create a fictitious quality string for each nucleotide sequence")
+    p.flag('make_fake_ids').described_as("(for --pair_seqs_file I/O, arg passed to read_pair_seqs.py) Create an id for each line based on index in the pair_seqs file")
     p.flag('force')
     p.flag('webstatus')
     p.flag('dry_run')
@@ -42,6 +44,13 @@ This script will run a pipeline of analysis tools starting from three possible i
     pair_seqs_file: A .tsv (tab-separated values) file with info on alpha and beta chain
        sequences and quality scores, epitope, subject, and id.
        Required fields: id epitope subject a_nucseq b_nucseq a_quals b_quals
+       For further details, run "python read_pair_seqs.py -h"
+       In particular,
+          * if you don't have quality score info you can add --make_fake_quals and fictitious
+            quality scores will be created.
+          * if you don't have ids, you can add --make_fake_ids and default ids will be created based
+            on position in the file.
+
 
     parsed_seqs_file: A processed sequence file with V and J genes assigned, CDR3s parsed, etc. Will be produced
        as an intermediate when you start from a pair_seqs_file and could be then reused to re-run downstream
@@ -218,8 +227,11 @@ def run(cmd):
 
 
 if pair_seqs_file and ( force or not exists( parsed_seqs_file ) ):
-    cmd = 'python {}/read_pairseqs.py --organism {} --infile {} --outfile {} -c > {}.log 2> {}.err'\
-          .format( path_to_scripts, organism, pair_seqs_file, parsed_seqs_file, parsed_seqs_file, parsed_seqs_file )
+    cmd = 'python {}/read_pair_seqs.py {} {} --organism {} --infile {} --outfile {} -c > {}.log 2> {}.err'\
+          .format( path_to_scripts,
+                   ' --make_fake_ids ' if make_fake_ids else '',
+                   ' --make_fake_quals ' if make_fake_quals else '',
+                   organism, pair_seqs_file, parsed_seqs_file, parsed_seqs_file, parsed_seqs_file )
     run( cmd )
 
 if only_parsed_seqs:

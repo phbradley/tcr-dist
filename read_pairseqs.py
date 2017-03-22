@@ -12,6 +12,36 @@ with Parser(locals()) as p:
     p.flag('clobber').shorthand('c')       # --flag_arg  (no argument passed)
     p.flag('dry_run')       # --flag_arg  (no argument passed)
     p.flag('save_results')       # --flag_arg  (no argument passed)
+    p.flag('make_fake_quals').described_as("Create a fictitious quality string for each nucleotide sequence")
+    p.flag('make_fake_ids').described_as("Create an id for each line based on index in the file")
+    p.set_help_prefix("""
+    This script reads a paired sequence file and tries to assign V/J genes and parse the CDR3 amino acid
+    sequences of the TCRs in the file.
+
+    The required fields in the input .tsv (tab-separated values) file are
+
+    id -- a unique identifier for each line
+    epitope -- the epitope for which the tcr is specific
+    subject -- an identifier for the subject from whom the tcr was sampled
+    a_nucseq -- the alpha chain sequence read
+    b_nucseq -- the beta chain sequence read
+    a_quals -- a '.'-separated list of the quality scores for a_nucseq; e.g. 19.25.36.40.38.20 (etc)
+    b_quals -- like a_quals but for the b_nucseq sequence read
+
+    If you don't have read quality info or it's a nuisance to add it to the file, you can use the option
+
+        --make_fake_quals
+
+    which will assign fictitious (high) quality scores to each read. Note that this will prevent any
+    filtering of TCRs with low-quality CDR3 regions, which would ordinarily happen in find_clones.py
+
+    If you don't have ids, you can use the option
+
+        --make_fake_ids
+
+    which will assign an id of the form tcr<N> to each tcr based on index in the file.
+
+    """)
 
 default_outfields = ['id','epitope','subject',
                      'va_gene','va_rep','va_mismatches','va_alignlen','va_evalue','va_bitscore_gap',
@@ -76,6 +106,7 @@ infields = []
 
 saved_results = {}
 
+
 for line in open( infile,'r'):
     if line[0] == '#' or not infields:
         assert not infields
@@ -105,13 +136,23 @@ for line in open( infile,'r'):
     #l = line[:-1].split('\t')
     #assert len(l) == len(infields)
 
-    id = l[ 'id' ]
+    if make_fake_ids:
+        id = 'tcr{:d}'.format(num_lines)
+    else:
+        id = l[ 'id' ]
     epitope = l[ 'epitope' ]
     mouse = l[ 'subject' ]
     aseq = l[ 'a_nucseq' ]
     bseq = l[ 'b_nucseq' ]
-    aquals = map( int, l[ 'a_quals' ].split('.') )
-    bquals = map( int, l[ 'b_quals' ].split('.') )
+    if make_fake_quals:
+        aquals = [60]*len(aseq)
+        bquals = [60]*len(bseq)
+    else:
+        aquals = map( int, l[ 'a_quals' ].split('.') )
+        bquals = map( int, l[ 'b_quals' ].split('.') )
+
+    assert len(aseq) == len(aquals)
+    assert len(bseq) == len(bquals)
 
     if dry_run: continue
 
@@ -181,7 +222,6 @@ for line in open( infile,'r'):
         ja_countrepstring = '-'
 
     if bhits and len(bhits)==2 and bhits[0] and bhits[1]:
-        print id, bhits
         vb_blast_hits = ';'.join( '{}:{}'.format(x[0],x[1]) for x in bhits[0] )
         jb_blast_hits = ';'.join( '{}:{}'.format(x[0],x[1]) for x in bhits[1] )
         vb_genes = util.get_top_genes( vb_blast_hits ) ## a set
