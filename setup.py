@@ -3,7 +3,7 @@
 ##
 ## python setup.py
 ##
-## To clean up and start again, just remove the db/ and external/ directories and re-run.
+## To clean up and start again, just remove the db/ external/ datasets/ and testing_ref/ directories and re-run.
 ##
 ## If you are getting errors, clean up as described above and re-run, saving the stdout and stderr in logfiles
 ## and contact pbradley@fredhutch.org for help trouble-shooting.
@@ -113,7 +113,8 @@ if not isdir( blastdir ):
 
 
 ## download other db files
-address = 'https://www.dropbox.com/s/hgjg2tzknxv7mm8/tcrdist_extras_v1.tgz'
+#https://www.dropbox.com/s/ex3vm75hypnvrer/tcrdist_extras_v1.tgz?dl=0
+address = 'https://www.dropbox.com/s/ex3vm75hypnvrer/tcrdist_extras_v1.tgz'
 tarfile = address.split('/')[-1]
 
 if not exists( tarfile ):
@@ -128,9 +129,9 @@ if not exists( tarfile ):
 lines = popen('md5sum '+tarfile).readlines()
 if lines and len(lines[0].split()) == 2:
     # rhino1 tcr-dist$ md5sum tcrdist_extras_v1.tgz
-    # a6e0513e86aa077e541df6294e4574ae  tcrdist_extras_v1.tgz
+    # 4aadc2e956cd61acb1d20a638fb2c32f  tcrdist_extras_v1.tgz
     checksum = lines[0].split()[0]
-    expected_checksum = 'a6e0513e86aa077e541df6294e4574ae'
+    expected_checksum = '4aadc2e956cd61acb1d20a638fb2c32f'
     if checksum == expected_checksum:
         print "md5sum checksum for tarfile matches expected..."
     else:

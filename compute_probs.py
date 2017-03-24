@@ -55,8 +55,11 @@ infields = []
 outfields = []
 
 for line in open(infile,'r'):
-    if line[0] == '#':
-        infields = line[1:-1].split('\t')
+    if not infields:
+        if line[0] == '#':
+            infields = line[1:-1].split('\t')
+        else:
+            infields = line[:-1].split('\t')
 
         outfields = infields[:]
         outfields.extend( ['a_protseq_prob','cdr3a_protseq_prob','va_rep_prob','ja_rep_prob','a_nucseq_prob',
