@@ -5,13 +5,31 @@
 ##
 ## To clean up and start again, just remove the db/ external/ datasets/ and testing_ref/ directories and re-run.
 ##
-## If you are getting errors, clean up as described above and re-run, saving the stdout and stderr in logfiles
+## If you are getting errors, clean up as described above and re-run, saving the output,
 ## and contact pbradley@fredhutch.org for help trouble-shooting.
 ##
 ##
 from os import popen, system, chdir, mkdir
 from os.path import exists, isdir, isfile
 from sys import stderr,exit,platform
+
+msg = """
+This script will download a set of compatible BLAST executables, parameter and
+database files used by the tcr-dist pipeline, and some TCR datasets for
+testing and analysis. It should be run in the main tcr-dist/ directory.
+
+Altogether, it will end up taking about 500 Megabytes of space.
+
+(To reduce this a bit you can delete the .tgz files in external/ after
+it completes successfully.)
+
+Do you want to proceed? [Y/n] """
+
+ans = raw_input(msg)
+
+if ans and ans not in 'Yy':
+    print 'Setup aborted.'
+    exit()
 
 # I don't know how reliable this is:
 mac_osx = ( platform.lower() == "darwin" )
