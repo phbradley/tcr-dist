@@ -3,9 +3,7 @@
 ##
 ## python setup.py
 ##
-## To clean up and start again, just remove the db/ external/ datasets/ and testing_ref/ directories and re-run.
-##
-## If you are getting errors, clean up as described above and re-run, saving the output,
+## If you are getting errors, re-run the script saving the output
 ## and contact pbradley@fredhutch.org for help trouble-shooting.
 ##
 ##
@@ -30,6 +28,31 @@ ans = raw_input(msg)
 if ans and ans not in 'Yy':
     print 'Setup aborted.'
     exit()
+
+
+old_directories = ['db','external','datasets','testing_ref']
+found_old_directory = False
+for d in old_directories:
+    if exists(d):
+        found_old_directory = True
+
+if found_old_directory:
+    msg = """
+It looks like you have some old directories from a previous setup.
+
+I need to remove db/ external/ datasets/ and testing_ref/
+
+Is that OK? [Y/n] """
+    ans = raw_input(msg)
+
+    if ans and ans not in 'Yy':
+        print 'Setup aborted.'
+        exit()
+    for d in old_directories:
+        if exists(d):
+            cmd = 'rm -rf '+d
+            print cmd
+            system(cmd)
 
 # I don't know how reliable this is:
 mac_osx = ( platform.lower() == "darwin" )
@@ -132,16 +155,23 @@ if not isdir( blastdir ):
 
 ## download other db files
 #https://www.dropbox.com/s/ex3vm75hypnvrer/tcrdist_extras_v1.tgz?dl=0
-address = 'https://www.dropbox.com/s/ex3vm75hypnvrer/tcrdist_extras_v1.tgz'
+address = 'http://xfiles.fhcrc.org:7007/bradley_p/pub/tcrdist_extras_v1.tgz'
+backup_address = 'https://www.dropbox.com/s/ex3vm75hypnvrer/tcrdist_extras_v1.tgz'
+
 tarfile = address.split('/')[-1]
+assert tarfile == backup_address.split('/')[-1]
 
 if not exists( tarfile ):
     print 'Downloading database files'
     download_web_file( address )
 
     if not exists( tarfile ):
-        print '[ERROR] download database files failed'
-        exit()
+        print '[ERROR] download database files failed, trying a backup location'
+        download_web_file( backup_address )
+
+        if not exists( tarfile ):
+            print '[ERROR] download database files failed'
+            exit()
 
 ## md5sum check
 lines = popen('md5sum '+tarfile).readlines()
@@ -151,7 +181,7 @@ if lines and len(lines[0].split()) == 2:
     checksum = lines[0].split()[0]
     expected_checksum = '4aadc2e956cd61acb1d20a638fb2c32f'
     if checksum == expected_checksum:
-        print "md5sum checksum for tarfile matches expected..."
+        print "\n[SUCCESS] md5sum checksum for tarfile matches expected, phew!\n"
     else:
         print "[ERROR] OH NO! md5sum checksum for tarfile does not match: actual={} expected={}"\
             .format( checksum, expected_checksum )
