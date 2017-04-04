@@ -811,7 +811,7 @@ if len(epitopes)>1:
     y = distance.squareform( epitope_divergences, checks=True )
 
     assert len(y) == ( len(epitopes)*(len(epitopes)-1) )/2
-    Z = hierarchy.average( epitope_divergences )
+    Z = hierarchy.average( y )
     c,coph_dists = hierarchy.cophenet(Z,y)
 
     leaves = hierarchy.leaves_list( Z )

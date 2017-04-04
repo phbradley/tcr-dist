@@ -328,7 +328,8 @@ for epitope in epitopes:
                 y = distance.squareform( mouse_D, checks=True )
                 assert len(y) == ( num_mice*(num_mice-1) )/2
 
-                Z = hierarchy.average( mouse_D )
+                Z = hierarchy.average( y )
+                #Z = hierarchy.average( mouse_D )
                 c,coph_dists = hierarchy.cophenet(Z,y)
 
                 # leaves = hierarchy.leaves_list( Z )
@@ -359,7 +360,7 @@ for epitope in epitopes:
                     save_labels = labels
                 else:
                     labels = None
-                hierarchy.dendrogram( Z, ax=ax, orientation='left',labels = labels, leaf_font_size=leaf_font_size )
+                hierarchy.dendrogram( Z, ax=ax, orientation='right',labels = labels, leaf_font_size=leaf_font_size )
 
                 #if ii==0:
                 #    plt.ylabel(epitope)
@@ -517,7 +518,7 @@ for epitope in epitopes:
             else:
                 ax = plt.subplot( 132 ) ## middle plot, will have the dendrogram
 
-            hierarchy.dendrogram( Z, ax=ax, orientation='left',labels = ['']*len(mice), link_color_func = None )
+            hierarchy.dendrogram( Z, ax=ax, orientation='right',labels = ['']*len(mice), link_color_func = None )
             plt.axis('off')
 
             if not paper_figs:

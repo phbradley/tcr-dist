@@ -1300,9 +1300,10 @@ for ( epitope, chain, num_motifs_ec ) in tree_infos:
                 assert -1e-3 <= D[i,j] <= 1.001
 
     if num_motifs_ec>1:
-        Z = hierarchy.average( D )
+        Z = hierarchy.average( distance.squareform(D,force='tovector') )
 
-        hierarchy.dendrogram( Z, ax=ax, orientation='left',labels = [x[0] for x in infos], leaf_font_size=label_font_size )
+        hierarchy.dendrogram( Z, ax=ax, orientation='right',labels = [x[0] for x in infos],
+                              leaf_font_size=label_font_size )
 
     inches_from_top += tree_height_inches + tree_vspacer_inches
     plt.title('{} {} {}'.format(epitope,chain,num_motifs_ec))

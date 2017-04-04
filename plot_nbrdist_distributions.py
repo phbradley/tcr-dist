@@ -2,8 +2,6 @@ from basic import *
 import html_colors
 import tcr_distances
 import util
-from scipy.cluster import hierarchy
-from scipy.spatial import distance
 
 with Parser(locals()) as p:
     #p.str('args').unspecified_default().multiple().required()
