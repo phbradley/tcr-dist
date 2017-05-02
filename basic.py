@@ -51,7 +51,7 @@ def Log(s): ## silly legacy helper function
 def convert_svg_to_png( svgfile, pngfile, verbose=True, allow_missing=False, allow_failure=True ):
     if not isfile(svgfile):
         errmsg = 'Error: convert_svg_to_png: svgfile does not exist: {}'.format(svgfile)
-        print errmsg
+        print(errmsg)
         Log( errmsg )
         if allow_missing:
             return
@@ -59,7 +59,7 @@ def convert_svg_to_png( svgfile, pngfile, verbose=True, allow_missing=False, all
             exit()
     cmd = 'convert {} {}'.format( svgfile, pngfile )
     if verbose:
-        print cmd
+        print(cmd)
     system(cmd)
 
     if isfile( pngfile ):
@@ -69,7 +69,7 @@ def convert_svg_to_png( svgfile, pngfile, verbose=True, allow_missing=False, all
     ## cmdline inkscape
     cmd = 'inkscape --export-png {} {}'.format( pngfile, svgfile )
     if verbose:
-        print cmd
+        print(cmd)
     system(cmd)
 
     if isfile( pngfile ):
@@ -85,7 +85,7 @@ def convert_svg_to_png( svgfile, pngfile, verbose=True, allow_missing=False, all
 
         cmd = '{} --export-png {} {}'.format( inkscape_exe, pngfile_full, svgfile_full )
         if verbose:
-            print cmd
+            print(cmd)
         system(cmd)
 
         if isfile( pngfile ):
@@ -96,7 +96,7 @@ def convert_svg_to_png( svgfile, pngfile, verbose=True, allow_missing=False, all
     ## another possibility
     cmd = 'rsvg-convert {} -o {}'.format( svgfile, pngfile )
     if verbose:
-        print cmd
+        print(cmd)
     system(cmd)
 
     if isfile( pngfile ):
@@ -107,7 +107,7 @@ def convert_svg_to_png( svgfile, pngfile, verbose=True, allow_missing=False, all
     ## this might also occur if the svgfile were empty...
     errmsg = 'Error: convert command failed: cmd="{}" -- is the "convert" cmdline tool (Imagemagick) installed?'\
              .format( cmd )
-    print errmsg
+    print(errmsg)
     Log( errmsg )
     if not allow_failure:
         exit()

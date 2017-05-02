@@ -41,9 +41,9 @@ if not epitope_prefixes:
 
 assert len(epitope_prefixes) == len(clones_files)
 
-print 'precomputing v-region distances'
+print('precomputing v-region distances')
 rep_dists = tcr_distances.compute_all_v_region_distances( organism, distance_params )
-print 'done precomputing v-region distances'
+print('done precomputing v-region distances')
 
 if not distfile_prefix:
     assert len(clones_files) == 1
@@ -170,7 +170,7 @@ for chains in ['A','B','AB']:
         e_out[e1].write(' '.join( [clone_id1]+[ '{:.3f}'.format(x) for x in my_epitope_dists] )+'\n' )
 
         ## get an nbrdist
-        for e,edists in epitope_distances.iteritems():
+        for e,edists in epitope_distances.items():
             edists.sort()
             for nbrdist_percentile in nbrdist_percentiles:
                 if edists:
@@ -197,7 +197,7 @@ for chains in ['A','B','AB']:
             #         epitope_self_densities[e][distance_sdev].append( density )
 
     out.close()
-    for o in e_out.values(): o.close()
+    for o in list(e_out.values()): o.close()
 
 
     ## record new fields in outfields

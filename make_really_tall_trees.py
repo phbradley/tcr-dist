@@ -8,6 +8,7 @@ import html_colors
 import scipy.stats
 import copy
 from operator import add
+from functools import reduce
 #from mannwhitneyu import mannwhitneyu as mannwhitneyu_exact #too slow
 
 
@@ -119,10 +120,10 @@ def tree_splits_ttest( edge_pvals, tree, other_leaves, leaf_scores, leaf_names, 
                     #     print 'calc exact:',len(a_scores),len(b_scores)
                     #     u2, u_pvalue_exact = mannwhitneyu_exact( a_scores, b_scores )
                     #     print 'exact MWU:',u,u2,u_pvalue, u_pvalue_exact
-                    print 'pvalue: {:.3e} {:.3e} {:.3e} {:.3e} {} a: {} {} {:.2f} b: {} {} {:.2f}'\
+                    print('pvalue: {:.3e} {:.3e} {:.3e} {:.3e} {} a: {} {} {:.2f} b: {} {} {:.2f}'\
                         .format( maxp, t_pvalue1, t_pvalue2, u_pvalue, info,
                                  len(a_leaves), leaf_names[a_leaves[0]], amean,
-                                 len(b_leaves), leaf_names[b_leaves[0]], bmean )
+                                 len(b_leaves), leaf_names[b_leaves[0]], bmean ))
                     k = tuple( sorted( a_leaves ) )
                     assert k not in edge_pvals
                     symbol = '-' if amean < bmean else '+'
@@ -145,7 +146,7 @@ def label_pval_edges( cmds, edge_pvals, subtree, plotting_info ):
             #assert little_rmsd<=big_rmsd
             assert little_rmsd <= big_rmsd+1e-3
             if little_rmsd > big_rmsd:
-                print 'WHOAH:',little_rmsd,big_rmsd
+                print('WHOAH:',little_rmsd,big_rmsd)
             leaves = tuple( sorted( score_trees_devel.Node_members(iitree) ) )
             if leaves in edge_pvals:
                 pvals = edge_pvals[leaves]
@@ -233,7 +234,7 @@ for line in open( clones_file_with_nbrdists,'r'):
     tcr.color_scores[ min_other_nbrdist_cs ] = {}
     for ab in ['A','B','AB']:
         other_ranks = []
-        for tag,val in l.iteritems():
+        for tag,val in l.items():
             suf = '_{}{}'.format(ab,suffix)
             if tag.endswith(suf):
                 ep = tag[:-1*len(suf)]
@@ -259,7 +260,7 @@ for line in open( clones_file_with_nbrdists,'r'):
 
 
 
-epitopes = sorted( all_tcrs.keys()[:] )
+epitopes = sorted( list(all_tcrs.keys())[:] )
 
 
 # color_score_range = {'A':None, 'B':None, 'AB':None }
@@ -323,7 +324,7 @@ for epitope in epitopes:
                         mice[ epitope == ep2 ].append( tcr2.subject )
 
             if counts_xr:
-                other_epitopes = counts_xr.keys()[:]
+                other_epitopes = list(counts_xr.keys())[:]
                 other_epitopes.sort()
             else:
                 other_epitopes = []
@@ -484,7 +485,7 @@ for epitope in epitopes:
                                           for x in my_color_scores ]
 
             if my_color_scores_floats.count(None) == len(my_color_scores_floats):
-                print 'skipping empty color scheme:',color_scheme,epitope
+                print('skipping empty color scheme:',color_scheme,epitope)
                 continue ## no scores for this guy
 
 
@@ -677,7 +678,7 @@ for epitope in epitopes:
 
             ## now we make an svg file
             prefix = '{}_tree_{}_{}_{}'.format(clones_file[:-4],ab,epitope,color_scheme)
-            print 'create: {}.png'.format(prefix)
+            print('create: {}.png'.format(prefix))
 
             svg_basic.create_file( cmds, total_svg_width, total_svg_height, prefix+'.svg', create_png=True)
 

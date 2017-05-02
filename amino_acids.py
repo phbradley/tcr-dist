@@ -12,7 +12,7 @@ longer_names={'ALA': 'A', 'ARG': 'R', 'ASN': 'N', 'ASP': 'D',
               'THR': 'T', 'TRP': 'W', 'TYR': 'Y', 'VAL': 'V'}
 
 short_to_long = {}
-for rsd in longer_names.keys():short_to_long[longer_names[rsd]] = rsd
+for rsd in list(longer_names.keys()):short_to_long[longer_names[rsd]] = rsd
 
 
 HP = {'I': 0.73, 'F': 0.61, 'V': 0.54, 'L': 0.53, 'W': 0.37,
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     slope, intercept, r_ges_hp, p_value, std_err = stats.linregress(ges,hp)
     slope, intercept, r_kd_hp, p_value, std_err = stats.linregress(kd,hp)
 
-    print 'r_ges_kd:',r_ges_kd
-    print 'r_ges_hp:',r_ges_hp
-    print 'r_kd_hp:',r_kd_hp
+    print('r_ges_kd:',r_ges_kd)
+    print('r_ges_hp:',r_ges_hp)
+    print('r_kd_hp:',r_kd_hp)
 

@@ -10,7 +10,7 @@ from paths import path_to_db, path_to_blast_executables
 
 AB = 'AB'
 
-bases_plus = logo_tools.nucleotide_classes_lower_case.keys()
+bases_plus = list(logo_tools.nucleotide_classes_lower_case.keys())
 
 for a in bases_plus:
     for b in bases_plus:
@@ -108,7 +108,7 @@ for organism in ['mouse','human']:
 def reverse_q2hmap( qseq, hseq, hit ):
     assert hit.h_strand == -1
     q2hmap = {}
-    for qpos,(hpos,na) in hit.q2hmap.iteritems():
+    for qpos,(hpos,na) in hit.q2hmap.items():
         if hpos>=0:
             new_qpos = len(qseq)-qpos-1
             new_na = logo_tools.base_partner[ na ]
@@ -166,7 +166,7 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
     all_good_hits_with_scores = [[],[]]
 
     if verbose:
-        print 'blast_seq:',info,ab,blast_seq
+        print('blast_seq:',info,ab,blast_seq)
 
     if len(blast_seq) <= 20:
         status.append('short_{}_blast_seq_{}'.format(ab,len(blast_seq)))
@@ -191,18 +191,18 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
             system(cmd)
 
             if verbose:
-                print 'blast:',info,ab,vj, '='*50
-                print ''.join( open(blast_tmpfile+'.blast','r').readlines())
-                print '='*80
+                print('blast:',info,ab,vj, '='*50)
+                print(''.join( open(blast_tmpfile+'.blast','r').readlines()))
+                print('='*80)
 
             ## try parsing the results
             evalue_threshold = 1e-1
             identity_threshold = 20
             hits = blast.parse_blast_alignments( blast_tmpfile+'.blast', evalue_threshold, identity_threshold )
             hits_scores = get_all_hits_with_evalues_and_scores( blast_tmpfile+'.blast' ) ## id,bitscore,evalue
-            if hits and hits[ hits.keys()[0]]:
+            if hits and hits[ list(hits.keys())[0]]:
 
-                top_hit = hits[ hits.keys()[0] ][0]
+                top_hit = hits[ list(hits.keys())[0] ][0]
                 top_id, top_bit_score, top_evalue = hits_scores[0]
 
                 all_good_hits_with_scores[ivj] \
@@ -252,7 +252,7 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
 
 
             if v_hit.h_strand != j_hit.h_strand:
-                Log(`( 'ERR V/J strand mismatch:',v_hit.h_strand, v_hit.evalue, j_hit.h_strand, j_hit.evalue)`)
+                Log(repr(( 'ERR V/J strand mismatch:',v_hit.h_strand, v_hit.evalue, j_hit.h_strand, j_hit.evalue)))
                 genes = ( v_gene.replace('TRAV','TRaV' ).replace('TRBV','TRbV'),
                           v_rep .replace('TRAV','TRaV' ).replace('TRBV','TRbV'), [100,0],
                           j_gene.replace('TRAJ','TRaJ' ).replace('TRBJ','TRbJ'),
@@ -271,23 +271,23 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
 
                     blast_seq = logo_tools.reverse_complement( blast_seq )
                     if verbose:
-                        print 'reverse-comp blast_seq:',ab
+                        print('reverse-comp blast_seq:',ab)
 
 
                 q_vframes = {}
-                for qpos,(vpos,vna) in v_q2hmap.iteritems():
+                for qpos,(vpos,vna) in v_q2hmap.items():
                     if vpos>=0:
                         f = ( qpos - vpos + v_hitseq_frame )%3
                         q_vframes[f] = q_vframes.get(f,0)+1
-                q_vframe = max( [(count,x) for x,count in q_vframes.iteritems() ] )[1]
+                q_vframe = max( [(count,x) for x,count in q_vframes.items() ] )[1]
 
                 q_jframes = {}
-                for qpos,(jpos,jna) in j_q2hmap.iteritems():
+                for qpos,(jpos,jna) in j_q2hmap.items():
                     if jpos>=0:
                         f = ( qpos - jpos + j_hitseq_frame )%3
                         q_jframes[f] = q_jframes.get(f,0)+1
 
-                q_jframe = max( [(count,x) for x,count in q_jframes.iteritems() ] )[1]
+                q_jframe = max( [(count,x) for x,count in q_jframes.items() ] )[1]
 
 
 
@@ -296,7 +296,7 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
 
                 ## construct a protein sequence alignment between translation of blast_seq and
                 q2v_align = {}
-                for qpos,(vpos,vna) in sorted( v_q2hmap.iteritems() ):
+                for qpos,(vpos,vna) in sorted( v_q2hmap.items() ):
                     if vpos>=0:
                         f = ( qpos - vpos + v_hitseq_frame )%3
                         if f != q_vframe: continue
@@ -313,9 +313,9 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
 
 
                 if q_vframe != q_jframe: ## out of frame
-                    Log(`( 'ERR frame mismatch:',q_vframe, v_hit.evalue, q_jframe, j_hit.evalue)`)
+                    Log(repr(( 'ERR frame mismatch:',q_vframe, v_hit.evalue, q_jframe, j_hit.evalue)))
                     if verbose:
-                        print 'frame mismatch',q_vframe,q_jframe
+                        print('frame mismatch',q_vframe,q_jframe)
                     # genes = ( v_gene.replace('TRAV','TRaV' ).replace('TRBV','TRbV'),
                     #           v_rep .replace('TRAV','TRaV' ).replace('TRBV','TRbV'), [100,0],
                     #           j_gene.replace('TRAJ','TRaJ' ).replace('TRBJ','TRbJ'),
@@ -348,7 +348,7 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
                                                                 q2v_align, extended_cdr3 = extended_cdr3 )
 
                 if verbose:
-                    print 'cdr3:',ab,cdr3,cdr3 in qseq,'q_vframe:',q_vframe
+                    print('cdr3:',ab,cdr3,cdr3 in qseq,'q_vframe:',q_vframe)
 
                 status.extend(errors)
 
@@ -363,8 +363,8 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
                             alt_nucseq = blast_seq[ nucseq_startpos:nucseq_startpos+len(cdr3_nucseq) ]
                             rc1 = logo_tools.reverse_complement(cdr3_nucseq)
                             rc2 = logo_tools.reverse_complement(blast_seq)
-                            print 'cdr3_nucseq',ab,offset,cdr3_nucseq,cdr3_nucseq in blast_seq,\
-                                blast_seq.index(cdr3_nucseq),alt_nucseq,rc1 in rc2
+                            print('cdr3_nucseq',ab,offset,cdr3_nucseq,cdr3_nucseq in blast_seq,\
+                                blast_seq.index(cdr3_nucseq),alt_nucseq,rc1 in rc2)
                 else:
                     assert cdr3 == '-'
                 if '#' in blast_seq: ## sign of out-of-frame
@@ -406,7 +406,7 @@ def parse_unpaired_dna_sequence_blastx( organism, ab, blast_seq, info,
     evalues = {'V'+ab:(1,0),'J'+ab:(1,0)}
 
     if verbose:
-        print 'blast_seq:',info,ab,blast_seq
+        print('blast_seq:',info,ab,blast_seq)
 
     if len(blast_seq) <= 20:
         status.append('short_{}_blast_seq_{}'.format(ab,len(blast_seq)))
@@ -431,17 +431,17 @@ def parse_unpaired_dna_sequence_blastx( organism, ab, blast_seq, info,
             system(cmd)
 
             if verbose:
-                print 'blast:',info,ab,vj, '='*50
-                print ''.join( open(blast_tmpfile+'.blast','r').readlines())
-                print '='*80
+                print('blast:',info,ab,vj, '='*50)
+                print(''.join( open(blast_tmpfile+'.blast','r').readlines()))
+                print('='*80)
 
             ## try parsing the results
             evalue_threshold = 1e-1
             identity_threshold = 20
             hits = blast.parse_blast_alignments( blast_tmpfile+'.blast', evalue_threshold, identity_threshold )
             hits_scores = get_all_hits_with_evalues_and_scores( blast_tmpfile+'.blast' )
-            if hits and hits[ hits.keys()[0]]:
-                top_hit = hits[ hits.keys()[0] ][0]
+            if hits and hits[ list(hits.keys())[0]]:
+                top_hit = hits[ list(hits.keys())[0] ][0]
                 top_id, top_bit_score, top_evalue = hits_scores[0]
                 assert top_hit.hit_id == top_id
                 ## figure out the score gap to the next non-equivalen
@@ -478,7 +478,7 @@ def parse_unpaired_dna_sequence_blastx( organism, ab, blast_seq, info,
 
 
             if v_hit.frame != j_hit.frame: ## out of frame
-                Log(`('ERR frame mismatch:',v_hit.frame, v_hit.evalue, j_hit.frame, j_hit.evalue)`)
+                Log(repr(('ERR frame mismatch:',v_hit.frame, v_hit.evalue, j_hit.frame, j_hit.evalue)))
                 genes = ( v_gene.replace('TRAV','TRaV' ).replace('TRBV','TRbV'),
                           v_rep .replace('TRAV','TRaV' ).replace('TRBV','TRbV'), [100,0],
                           j_gene.replace('TRAJ','TRaJ' ).replace('TRBJ','TRbJ'),
@@ -566,9 +566,9 @@ def parse_paired_dna_sequences( program, organism, aseq, bseq, info = '',
 
     ab_genes = {'A': a_genes, 'B': b_genes }
     evalues = {}
-    for tag,evalue in a_evalues.iteritems():
+    for tag,evalue in a_evalues.items():
         evalues[tag] = evalue
-    for tag,evalue in b_evalues.iteritems():
+    for tag,evalue in b_evalues.items():
         evalues[tag] = evalue
 
     return ab_genes, evalues, a_status+b_status, [a_hits,b_hits]

@@ -174,7 +174,7 @@ def color_stack( upper_left, lower_right, letters, colors, values ):
     height_sum = 0.
     lines = []
 
-    for (letter,(color,value)) in zip( letters, zip( colors, values ) ):
+    for (letter,(color,value)) in zip( letters, list(zip( colors, values )) ):
         my_height = height * float(value)/total
         height_sum += my_height
         my_x = upper_left[0]
@@ -236,14 +236,14 @@ def protein_logo( upper_left, lower_right, pwm, scale={} ):## scale[pos] should 
     width  = lower_right[0] - upper_left[0]
     height = lower_right[1] - upper_left[1]
 
-    N = len(pwm.keys())
+    N = len(list(pwm.keys()))
 
     letter_width = float(width) / N
 
     cmds = []
 
     for pos in range(N):
-        l = [(y,x) for x,y in pwm[pos].iteritems() ]
+        l = [(y,x) for x,y in pwm[pos].items() ]
         l.sort()
         l.reverse()
         ## start from the top
@@ -273,14 +273,14 @@ def generic_logo( upper_left, lower_right, pwm ):
     width  = lower_right[0] - upper_left[0]
     height = lower_right[1] - upper_left[1]
 
-    N = len(pwm.keys())
+    N = len(list(pwm.keys()))
 
     column_width = float(width) / N
 
     cmds = []
 
     for pos in range(N):
-        l = [(y,x) for x,y in pwm[pos].iteritems() ]
+        l = [(y,x) for x,y in pwm[pos].items() ]
         l.sort()
         l.reverse()
         ## start from the top

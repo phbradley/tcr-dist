@@ -20,13 +20,13 @@ auc_logfile= clones_file[:-4]+'_random_aucs.log'
 
 
 if not exists( logfile ):
-    print 'Sorry, you need to run analyze_overlap_compute_simpsons.py before this script'
-    print 'If successful, it will generate',logfile
+    print('Sorry, you need to run analyze_overlap_compute_simpsons.py before this script')
+    print('If successful, it will generate',logfile)
     exit()
 
 if not exists( auc_logfile ):
-    print 'Sorry, you need to run random_tcr_distances.py and read_random_tcr_distances.py before this script'
-    print 'If successful, they will generate',auc_logfile
+    print('Sorry, you need to run random_tcr_distances.py and read_random_tcr_distances.py before this script')
+    print('If successful, they will generate',auc_logfile)
     exit()
 
 cmdline_epitopes = epitopes
@@ -104,7 +104,7 @@ if True:
         yvals = []
         locs_labels = []
 
-        epitopes = all_dats.keys()
+        epitopes = list(all_dats.keys())
 
         l = [ ( all_dats[x][0],x ) for x in epitopes ]
         l.sort()
@@ -237,7 +237,7 @@ if True:
     for chains in ['A','B','AB']:
         counter += 1
         if chains not in all_dats: continue
-        epitopes = all_dats[chains].keys()
+        epitopes = list(all_dats[chains].keys())
 
         comparison_mode_for_sorting = 1 ## identity based on gene segments
         comparison_mode_for_sorting = 2 ## based on small distances
@@ -248,7 +248,7 @@ if True:
             if comparison_mode_for_sorting in all_dats[chains][epitope]:
                 sortval = all_dats[chains][epitope][comparison_mode_for_sorting][0]
             else:
-                sortval = min( ( dats[0] for dats in all_dats[chains][epitope].values() ) )
+                sortval = min( ( dats[0] for dats in list(all_dats[chains][epitope].values()) ) )
             l.append( ( sortval, epitope ) )
 
         #l = [ ( all_dats[chains][x][comparison_mode_for_sorting][0],x ) for x in epitopes ]
@@ -261,7 +261,7 @@ if True:
             counter += 1
 
             for comparison_mode in [0,2,1]:
-                if comparison_mode not in all_dats[chains][epitope].keys(): continue
+                if comparison_mode not in list(all_dats[chains][epitope].keys()): continue
 
                 div,divlo,divhi,top3 = all_dats[chains][epitope][comparison_mode]
 
@@ -369,7 +369,7 @@ if True: #######################################################################
         for chains in ['A','B','AB']:
             counter += 1
             if chains not in all_dats: continue
-            epitopes = [ x for x,y in all_dats[chains].iteritems() if y.keys() != [1] ]
+            epitopes = [ x for x,y in all_dats[chains].items() if list(y.keys()) != [1] ]
 
             #comparison_mode_for_sorting = 1 ## identity based on gene segments
             comparison_mode_for_sorting = 2 ## based on small distances
@@ -379,7 +379,7 @@ if True: #######################################################################
                 if comparison_mode_for_sorting in all_dats[chains][epitope]:
                     sortval = all_dats[chains][epitope][comparison_mode_for_sorting][0]
                 else:
-                    sortval = min( ( dats[0] for dats in all_dats[chains][epitope].values() ) )
+                    sortval = min( ( dats[0] for dats in list(all_dats[chains][epitope].values()) ) )
                 l.append( ( sortval, epitope ) )
             l.sort()
             l.reverse()
@@ -391,7 +391,7 @@ if True: #######################################################################
                 counter += 1
 
                 for comparison_mode in [0,2,1]:
-                    if comparison_mode not in all_dats[chains][epitope].keys(): continue
+                    if comparison_mode not in list(all_dats[chains][epitope].keys()): continue
 
                     div,divlo,divhi,top3 = all_dats[chains][epitope][comparison_mode]
 
@@ -417,7 +417,7 @@ if True: #######################################################################
 plt.subplots_adjust(bottom=0.1,top=0.97,left=0.05,right=0.97,hspace=0.3)
 
 pngfile = '{}.png'.format(outfile_prefix)
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig(pngfile)
 util.readme(pngfile,"""These next five plots reflect different notions of sharing or repetition in the repertoire (ie, seeing "the same" TCR more than once).
 The top two plots corresponds to repetition within a single mouse (ie, clonality), and give two representations of Simpson's measure: 1-Simpson's in the top
@@ -500,7 +500,7 @@ nrows = 3 ## A,B,AB
 #ncols = 3
 ncols = 3
 
-epitopes = epitope_diversity['A'].keys()
+epitopes = list(epitope_diversity['A'].keys())
 #epitopes.sort()
 
 plotno=0
@@ -516,7 +516,7 @@ for chains in ['A','B','AB']:
 
         if paper_figs:
             for div,epitope in l:
-                print 'epitope_diversity:',chains,epitope,'_'.join(divtype.split()),div
+                print('epitope_diversity:',chains,epitope,'_'.join(divtype.split()),div)
 
         plotno+=1
         ax = plt.subplot(nrows,ncols,plotno )
@@ -528,10 +528,10 @@ for chains in ['A','B','AB']:
             aucs = [-100*x[0] for x in l] ## now go from 0 to 100
             heights = [x-100 for x in aucs]
             bottoms = [100]*len(l)
-            lefts = range(len(l))
+            lefts = list(range(len(l)))
             plt.bar( lefts, heights, bottom=bottoms )
         else:
-            plt.bar( range(len(l)), [x[0] for x in l ] )
+            plt.bar( list(range(len(l))), [x[0] for x in l ] )
         plt.xticks( [x+0.4 for x in range(len(l))], [x[1] for x in l ], rotation='vertical', fontsize=10 )
         plt.title('{} {}'.format(chains, divtype))
 
@@ -565,7 +565,7 @@ plt.suptitle( 'repertoire diversity summary' )
 plt.subplots_adjust(bottom=0.1,top=0.93,left=0.05,right=0.97,hspace=0.35)
 
 pngfile = '{}_diversity.png'.format(outfile_prefix)
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig(pngfile)
 util.readme(pngfile,"""These bar plots represent three ways of looking at the total diversity of an epitope-specific
 repertoire, measured over single-chains (top two rows) and full receptors (bottom row). The left column shows the TCRdiv

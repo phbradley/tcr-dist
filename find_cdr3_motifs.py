@@ -40,7 +40,7 @@ unmask = True
 use_groups = True
 
 
-groups = dict( zip( amino_acids, amino_acids ) )
+groups = dict( list(zip( amino_acids, amino_acids )) )
 
 groups['k'] = '[KR]'
 groups['d'] = '[DE]'
@@ -51,7 +51,7 @@ groups['a'] = '[AGSP]'
 groups['v'] = '[VILM]'
 
 if not use_groups:
-    groups = dict( zip( amino_acids, amino_acids ) )
+    groups = dict( list(zip( amino_acids, amino_acids )) )
 
 
 begin = '^'
@@ -141,7 +141,7 @@ def extend_motif( oldmotif, oldshowmotif, old_chi_squared, seqs, seq_indices, ra
 
                 if motif_len in all_seen and ''.join(showmotif) in all_seen[motif_len]:
                     if very_verbose:
-                        print 'repeat',motif_len,''.join(showmotif)
+                        print('repeat',motif_len,''.join(showmotif))
                     continue
 
                 if motif_len not in all_seen: all_seen[motif_len] = set()
@@ -171,17 +171,17 @@ def extend_motif( oldmotif, oldshowmotif, old_chi_squared, seqs, seq_indices, ra
 
         if chi_squared<best_chi_squared:
             if very_verbose:
-                print 'worse motif:',chi_squared,best_chi_squared,''.join(showmotif)
+                print('worse motif:',chi_squared,best_chi_squared,''.join(showmotif))
             continue
 
         best_motifs[count][new_seq_indices] = chi_squared
 
 
         if very_verbose:
-            print 'NEW {:3d} {:5.2f} {:5.2f} {:8.1f} {:15s} {:6d} {:4s} {}'\
+            print('NEW {:3d} {:5.2f} {:5.2f} {:8.1f} {:15s} {:6d} {:4s} {}'\
                 .format( count, -1*negexpected, -1*neg_ng_expected,
                          chi_squared, ''.join(showmotif), len(all_seen[motif_len]),
-                         epitope, ab )
+                         epitope, ab ))
             sys.stdout.flush()
 
 
@@ -222,7 +222,7 @@ for ab in 'AB':
         if counter==1:
             assert l==['v_reps','j_reps','cdr3','cdr3_nucseq']
             continue
-        if not counter%1000000:Log(`counter`+' '+`num_chains`+' '+ng_logfile)
+        if not counter%1000000:Log(repr(counter)+' '+repr(num_chains)+' '+ng_logfile)
         if max_ng_lines and counter>max_ng_lines:break
         v_reps = set( ( util.get_mm1_rep(x,organism) for x in l[0].split(',') ) )
         j_reps = l[1].split(',')
@@ -336,7 +336,7 @@ for epitope in all_tcrs:
 
         #print ('\n'+ab+'seq: ').join(seqs)
         if very_verbose:
-            print 'numseqs:',len(seqs),'numrandseqs:',len(random_seqs)
+            print('numseqs:',len(seqs),'numrandseqs:',len(random_seqs))
 
         for a in groups:
             if a== end: continue
@@ -375,7 +375,7 @@ for epitope in all_tcrs:
 
                         if chi_squared > chi_squared_threshold_for_seeds:
                             if very_verbose:
-                                print 'newseed:',''.join(showmotif),chi_squared,expected,ng_expected
+                                print('newseed:',''.join(showmotif),chi_squared,expected,ng_expected)
                                 sys.stdout.flush()
                             motif_len = 2
                             info_tuple = ( chi_squared, motif_len, count, -1*expected, -1*ng_expected, motif, showmotif )
@@ -472,18 +472,18 @@ for epitope in all_tcrs:
                 v_rep,j_rep = seqinfos[i]
                 v_counts[v_rep] = v_counts.get(v_rep,0)+1
                 j_counts[j_rep] = j_counts.get(j_rep,0)+1
-            vl = [(y,x) for x,y in v_counts.iteritems()]
-            jl = [(y,x) for x,y in j_counts.iteritems()]
+            vl = [(y,x) for x,y in v_counts.items()]
+            jl = [(y,x) for x,y in j_counts.items()]
             vl.sort() ; vl.reverse()
             jl.sort() ; jl.reverse()
             vtags = ','.join( ['{}:{}'.format(y,x) for x,y in vl ][:3] )
             jtags = ','.join( ['{}:{}'.format(y,x) for x,y in jl ][:3] )
 
 
-            print 'MOTIF {:4d} {:9.4f} {:9.4f} {:8.1f} {:2d} {:15s} {:4d} {:4d} {:3d} {:4s} {} {} {} {}'\
+            print('MOTIF {:4d} {:9.4f} {:9.4f} {:8.1f} {:2d} {:15s} {:4d} {:4d} {:3d} {:4s} {} {} {} {}'\
                 .format( count, expected, ng_expected, chi_squared, nfixed, ''.join(showmotif), len(seen),
                          max_cover+1, int(100*max_coverage),
-                         epitope, ab, len(seqs), vtags, jtags )
+                         epitope, ab, len(seqs), vtags, jtags ))
 
             sys.stdout.flush()
         #exit()

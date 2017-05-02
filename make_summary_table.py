@@ -5,6 +5,7 @@ from amino_acids import HP, GES, KD, aa_charge, amino_acids
 from operator import add
 import html_colors
 import matplotlib
+from functools import reduce
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
@@ -85,7 +86,7 @@ def add_dat( epitope, tag, val ):
 
 ## parse the clones file
 all_tcrs = parse_tsv.parse_tsv_file( clones_file, ['epitope','subject'], ['cdr3a','cdr3b','clone_size'] )
-epitopes = all_tcrs.keys()[:]
+epitopes = list(all_tcrs.keys())[:]
 epitopes.sort()
 
 def get_charge( cdr3 ):
@@ -104,9 +105,9 @@ for epitope in epitopes:
     all_dats[epitope] = {}
     all_scores[epitope] = {}
     add_dat(epitope, 'epitope', epitope )
-    mice = all_tcrs[epitope].keys()
+    mice = list(all_tcrs[epitope].keys())
     add_dat(epitope, 'num_individuals', len(mice) )
-    tcrs = reduce( add, all_tcrs[epitope].values() )
+    tcrs = reduce( add, list(all_tcrs[epitope].values()) )
     tcrs = [ [x[0], x[1], x[0]+x[1], int(x[2]) ] for x in tcrs ]
     add_dat(epitope, 'num_clones', len(tcrs) )
     add_dat(epitope, 'N', len(tcrs) )
@@ -181,7 +182,7 @@ for epitope in all_dats:
     for chains in ['a','b','ab']:
         tag= 'Pshare-'+chains
         if tag not in all_dats[epitope]:
-            print 'missing:',epitope,tag
+            print('missing:',epitope,tag)
             add_dat( epitope, tag, 0.0 )
 
 
@@ -308,7 +309,7 @@ for ab in ['a','b','ab']:
                     count[val] = count.get( val,0)+1
                 imn = int(floor(mn+0.5))
                 imx = int(floor(mx+0.5))
-                xs = range(imn,imx+1)
+                xs = list(range(imn,imx+1))
                 ys = [ float(count.get(x,0))/len(vals) for x in xs]
 
             plt.plot( xs, ys, c=color,label=epitope)
@@ -317,7 +318,7 @@ for ab in ['a','b','ab']:
         plt.legend(fontsize=6,frameon=False,loc='best')
         plt.title(scoretag)
 
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig(pngfile)
 
 

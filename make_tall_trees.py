@@ -41,7 +41,7 @@ if outfile_prefix is None:
     outfile_prefix = clones_file[:-4]
 
 if constant_seed != None:
-    print 'constant_seed:',constant_seed
+    print('constant_seed:',constant_seed)
     random.seed(constant_seed)
 
 if paper_figs and ABs == None:
@@ -151,7 +151,7 @@ log10_of_zero = -100
 all_tcr_infos = parse_tsv_file( clones_file, ['epitope'], [], True )
 
 if not epitopes:
-    epitopes = all_tcr_infos.keys()
+    epitopes = list(all_tcr_infos.keys())
     epitopes.sort()
 
 all_tcrs = {}
@@ -275,7 +275,7 @@ for epitope in epitopes:
             for color_scores in all_color_scores[epitope]:
                 if color_scores[ab] != log10_of_zero:
                     min_good_score = min( min_good_score, color_scores[ab] )
-            print 'min_good_score:',epitope,ab,min_good_score
+            print('min_good_score:',epitope,ab,min_good_score)
             for color_scores in all_color_scores[epitope]:
                 if color_scores[ab] == log10_of_zero:
                     color_scores[ab] = min_good_score
@@ -345,7 +345,7 @@ for epitope in epitopes:
         ab_all_members[ab] = all_members
 
         ## possibly subsample
-        tree_indices = range(len(tcrs))
+        tree_indices = list(range(len(tcrs)))
         if len(tree_indices) > max_tcrs_for_trees:
             tree_indices = random.sample( tree_indices, max_tcrs_for_trees )
 
@@ -392,8 +392,8 @@ for epitope in epitopes:
 
 
 
-        print 'num_tcrs:',len(tcrs),'num_clusters:',len(centers),'fake_num_tcrs',sum(sizes),\
-            'fake_num_clusters:',len(sizes)
+        print('num_tcrs:',len(tcrs),'num_clusters:',len(centers),'fake_num_tcrs',sum(sizes),\
+            'fake_num_clusters:',len(sizes))
 
         percentile = -1
 
@@ -523,7 +523,7 @@ for epitope in epitopes:
 
 
         while True: ## keep looping until we are bump-free
-            l = [(y,x) for x,y in glyph_location.iteritems() ]
+            l = [(y,x) for x,y in glyph_location.items() ]
 
             l.sort()
             bump = False
@@ -647,22 +647,22 @@ for epitope in epitopes:
 
                 center_cdr3 = tcrs[center][ cdr3_index ][3:-2]
                 if verbose:
-                    print 'center_cdr3: {} {} {} {:15s} {:15s} {:9.3f} {:2d} {}'\
+                    print('center_cdr3: {} {} {} {:15s} {:15s} {:9.3f} {:2d} {}'\
                         .format( epitope,ab,ab2,
                                  tcrs[center][v_index],tcrs[center][j_index],
                                  distl_dict[center],
-                                 len(center_cdr3), center_cdr3 )
+                                 len(center_cdr3), center_cdr3 ))
                 L = len(center_cdr3)
 
                 pwm = {}
                 junction_pwm = {}
                 gap_count = {}
                 for i in range(L):
-                    pwm[i] = dict(zip(amino_acids+[gap_character],[0]*21))
+                    pwm[i] = dict(list(zip(amino_acids+[gap_character],[0]*21)))
                     gap_count[i]=0
                 for i in range(3*L):
-                    junction_pwm[i] = dict( zip( junction_bars_order+[gap_character],
-                                                 [0.]*(1+len(junction_bars_order))))
+                    junction_pwm[i] = dict( list(zip( junction_bars_order+[gap_character],
+                                                 [0.]*(1+len(junction_bars_order)))))
 
                 for member in members:
                     member_cdr3 = tcrs[member][cdr3_index][3:-2]
@@ -670,11 +670,11 @@ for epitope in epitopes:
                     assert len(member_junction) == 3*len(member_cdr3)
                     a,b = align_cdr3s( center_cdr3, member_cdr3, gap_character )
                     if verbose:
-                        print 'member_cdr3: {} {} {} {:15s} {:15s} {:9.3f} {:2d} {} {} {}'\
+                        print('member_cdr3: {} {} {} {:15s} {:15s} {:9.3f} {:2d} {} {} {}'\
                             .format( epitope,ab,ab2,
                                      tcrs[member][v_index],tcrs[member][j_index],
                                      distl_dict[member],
-                                     len( member_cdr3 ), member_cdr3, a, b )
+                                     len( member_cdr3 ), member_cdr3, a, b ))
 
 
                     for i in range(len(a)):
@@ -716,8 +716,8 @@ for epitope in epitopes:
                 # y1 = node_position[fake_ic] + pwm_height/2.
 
                 ## make a v-gene logo
-                vl = [(y,x[4:],rep_colors[x]) for x,y in v_count.iteritems()]
-                jl = [(y,x[4:],rep_colors[x]) for x,y in j_count.iteritems()]
+                vl = [(y,x[4:],rep_colors[x]) for x,y in v_count.items()]
+                jl = [(y,x[4:],rep_colors[x]) for x,y in j_count.items()]
                 #vl = [(y,x[4:x.index('*')]) for x,y in v_count.iteritems()]
                 #jl = [(y,x[4:x.index('*')]) for x,y in j_count.iteritems()]
 
@@ -755,7 +755,7 @@ for epitope in epitopes:
                     colpwm={}
                     colpwm[0] = pwm[pos]
                     if verbose:
-                        print 'colpwm:',pos,pwm[pos]
+                        print('colpwm:',pos,pwm[pos])
                     cmds.append( svg_basic.protein_logo( (x0,y0), (x0+column_width,y1), colpwm ) )
 
                     save_x0 = x0 ## for junction_bars
@@ -775,9 +775,9 @@ for epitope in epitopes:
                     if junction_bars:
                         junction_bar_width = ( column_width + gap_column_width/2. + prev_gap_column_width/2. )/3.
                         junction_bar_x0 = save_x0 - prev_gap_column_width/2.
-                        print 'left:',junction_bar_x0,'right:',junction_bar_x0 + 3.*junction_bar_width,\
+                        print('left:',junction_bar_x0,'right:',junction_bar_x0 + 3.*junction_bar_width,\
                             'prev_gap_column_width:',prev_gap_column_width,'gap_column_width:',gap_column_width,\
-                            'save_x0:',save_x0,'column_width:',column_width,'junction_bar_width:',junction_bar_width
+                            'save_x0:',save_x0,'column_width:',column_width,'junction_bar_width:',junction_bar_width)
                         if jb_rights:
                             assert abs( junction_bar_x0 - jb_rights[-1] )<1e-3
                         jb_rights.append( junction_bar_x0 + 3.*junction_bar_width )

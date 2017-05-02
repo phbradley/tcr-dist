@@ -41,7 +41,7 @@ random_nbrdists_file = '{}_random_nbrdists{}.tsv'.format( clones_file[:-4],file_
 assert exists(random_nbrdists_file)
 
 outlogfile = '{}_random_aucs.log'.format( clones_file[:-4] )
-print 'making:',outlogfile
+print('making:',outlogfile)
 outlog =open( outlogfile,'w')
 
 
@@ -94,7 +94,7 @@ def same_tcr( a, b ):
              (not a[vb_genes_index].isdisjoint( b[vb_genes_index]) ) )
 
 if exclude_xr:
-    print 'finding X-reactive'
+    print('finding X-reactive')
 
     for e1 in all_tcrs:
         for e2 in all_tcrs:
@@ -102,13 +102,13 @@ if exclude_xr:
             for a in all_tcrs[e1]:
                 for b in all_tcrs[e2]:
                     if same_tcr(a,b):
-                        print 'X-react:',e1,a[cdr3a_index],a[cdr3b_index],e2,b[cdr3a_index],b[cdr3b_index]
+                        print('X-react:',e1,a[cdr3a_index],a[cdr3b_index],e2,b[cdr3a_index],b[cdr3b_index])
                         a[-1] = True
                         b[-1] = True
 
 
 
-epitopes = all_tcrs.keys()
+epitopes = list(all_tcrs.keys())
 epitopes.sort()
 
 all_aucs_random = {}
@@ -295,7 +295,7 @@ for ii_epitope, epitope in enumerate(epitopes):
                 plt.yticks([],[])
                 if paper_supp:
                     locs,labels = plt.xticks()
-                    print 'locs,labels:',locs,labels
+                    print('locs,labels:',locs,labels)
                     newlocs,newlabels = [],[]
                     for loc in locs:
                         if abs(loc/100.0 - int(loc/100.0))<1e-3:
@@ -347,7 +347,7 @@ for ii_roc in range(2):
         figno = 2*ii_chains + ii_roc + 1
         figtype = 'roc' if ii_roc else 'nbrdists'
         pngfile = '{}_{}_{}.png'.format(outfile_prefix, figtype, chains )
-        print 'making:',pngfile
+        print('making:',pngfile)
         plt.figure(figno)
         plt.savefig(pngfile)
         if ii_roc==0:
@@ -363,7 +363,7 @@ for ii_roc in range(2):
 figno = 7
 pngfile = '{}_summary.png'.format(outfile_prefix)
 plt.figure(figno)
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig(pngfile)
 util.readme( pngfile, """KDE-smoothed nbrdist10P histograms for alpha (col 1), beta (col 2), and alpha-beta (col 3). ROC curves for
 the same in columns 4-6.<br><br>""")
@@ -375,7 +375,7 @@ plt.figure(figno,figsize=(12,8))
 
 plt.subplot(121) ## the nbrdist distributions
 mn = 0
-mx = max( ( max(x) for x in save_epitope_nbrdists.values() ) )
+mx = max( ( max(x) for x in list(save_epitope_nbrdists.values()) ) )
 
 
 for epitope,color in zip( epitopes, html_colors.get_rank_colors_no_lights(len(epitopes))):
@@ -401,7 +401,7 @@ plt.ylim((0,1.0))
 plt.legend(fontsize=9,frameon=False,loc='best')
 
 pngfile = '{}_nbrdist_roc_superpositions.png'.format(outfile_prefix)
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig(pngfile)
 util.readme( pngfile, """
 Superimposed KDE-smoothed NNdistance ({}) distributions (left) and ROC curves (right) for all epitopes (paired-chain analyses).<br><br>

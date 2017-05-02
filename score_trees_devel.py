@@ -150,7 +150,7 @@ def Show_tree(tree,names):
 
 def Show_small(tree):
     if IsALeaf(tree):
-        return `tree[0]`
+        return repr(tree[0])
     else:
         return '('+Show_small(tree[0])+','+Show_small(tree[1])+')'
 
@@ -191,7 +191,7 @@ def Update_distance_matrix_AL(new_node,old_nodes,distances): ## average linkage
     return
 
 def Update_distance_matrix_AL_GEOM(new_node,old_nodes,distances):
-    dl = distances.values()
+    dl = list(distances.values())
     dl.sort()
     for i in dl:
         if i!=0:
@@ -311,7 +311,7 @@ def Node_labels(tree,sizes,node_position,use_sizes_as_weights=False):
         size = 0
         for leaf in Node_members(tree):
             size = size+sizes[leaf]
-        return [ [ `size`, pos] ] + \
+        return [ [ repr(size), pos] ] + \
                Node_labels(tree[0],sizes,node_position,use_sizes_as_weights) + \
                Node_labels(tree[1],sizes,node_position,use_sizes_as_weights)
 
@@ -355,8 +355,8 @@ def Canvas_tree(tree, names, sizes, upper_left, lower_right, branch_width_fracti
     remainder = plot_height - total
     cluster_width = float(remainder)/len(names) ## padding alotted to each cluster
 
-    print 'branch_width_pixels: {:.2f} plot_height: {:.2f} cluster_padding: {:.3f} w_factor: {:.3f} num_clusters: {} total_members: {}'\
-        .format( branch_width_pixels,plot_height,cluster_width,w_factor,len(sizes),sum(sizes))
+    print('branch_width_pixels: {:.2f} plot_height: {:.2f} cluster_padding: {:.3f} w_factor: {:.3f} num_clusters: {} total_members: {}'\
+        .format( branch_width_pixels,plot_height,cluster_width,w_factor,len(sizes),sum(sizes)))
 
     ## position nodes vertically on tree
     nodes = Node_members(tree)
@@ -395,7 +395,7 @@ def Canvas_tree(tree, names, sizes, upper_left, lower_right, branch_width_fracti
 
     min_score = min(scores)
     max_score = max(scores)
-    print 'min_score:',min_score,'max_score:',max_score,score_range_for_coloring
+    print('min_score:',min_score,'max_score:',max_score,score_range_for_coloring)
     if max_score == min_score:
         max_score = max_score + 1
     if score_range_for_coloring:

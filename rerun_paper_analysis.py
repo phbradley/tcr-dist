@@ -19,7 +19,7 @@ for organism in ['mouse','human']:
 
         cmd = 'nice python run_basic_analysis.py {} --organism {} --pair_seqs_file {} > {}.log 2> {}.err {}'\
             .format( extra_args, organism, pair_seqs_file, pair_seqs_file, pair_seqs_file, cmd_suffix )
-        print cmd
+        print(cmd)
         system(cmd)
         time.sleep(1.0) ## short pause
     else:
@@ -32,7 +32,7 @@ for organism in ['mouse','human']:
 
         cmd = 'nice python run_basic_analysis.py {} --organism {} --clones_file {} > {}.log 2> {}.err {}'\
             .format( extra_args, organism, clones_file, clones_file, clones_file, cmd_suffix )
-        print cmd
+        print(cmd)
         system(cmd)
         time.sleep(1.0) ## short pause
 

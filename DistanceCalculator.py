@@ -62,5 +62,4 @@ TRBV7-8*01 CASSSSGGMNIQYF""".split('\n')
             if j<=i:continue
             dist = calculator.distance( t1, t2, chains = 'B' )
             if dist<100:
-                print t1.vb_reps, t1.cdr3b, t2.vb_reps, t2.cdr3b, dist
-
+                print((t1.vb_reps, t1.cdr3b, t2.vb_reps, t2.cdr3b, dist))

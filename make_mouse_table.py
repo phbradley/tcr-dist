@@ -1,6 +1,7 @@
 from basic import *
 import html_colors
 import util
+from functools import reduce
 
 with Parser(locals()) as p:
 #    p.str('args').unspecified_default().multiple().required()
@@ -50,10 +51,10 @@ import matplotlib.pyplot as plt
 
 
 all_tcrs = parse_tsv_file( clones_file, ['subject','epitope'], ['clone_size'], False )
-all_epitopes = list( reduce( set.union, ( set( x.keys() ) for x in all_tcrs.values() ) ) )
+all_epitopes = list( reduce( set.union, ( set( x.keys() ) for x in list(all_tcrs.values()) ) ) )
 all_epitopes.sort()
 
-all_mice= all_tcrs.keys()[:]
+all_mice= list(all_tcrs.keys())[:]
 all_mice.sort()
 
 counts = {}
@@ -130,7 +131,7 @@ left_margin   = float( left_margin_inches ) / fig_width
 right_margin  = float( left_margin_inches + plot_width ) / fig_width
 
 
-print 'fig_width: {:.1f} fig_height: {:.1f}'.format(fig_width,fig_height)
+print('fig_width: {:.1f} fig_height: {:.1f}'.format(fig_width,fig_height))
 
 fig = plt.figure(1,figsize=(fig_width,fig_height))
 
@@ -179,13 +180,13 @@ for mouse in all_mice:
             thresh = 0.3*w.r
             ha = 'left'   if x>thresh else ( 'center' if x>-thresh else 'right' )
             va = 'bottom' if y>thresh else ( 'center' if y>-thresh else 'top' )
-            plt.text(x,y,`topsize`,fontdict={'fontsize':fontsize_small},color='r',
+            plt.text(x,y,repr(topsize),fontdict={'fontsize':fontsize_small},color='r',
                      horizontalalignment=ha,verticalalignment=va)
 
 
         ## show the total number of reads
         radius = wedges[0].r
-        plt.text(0,-1.1*radius,`total_size`,fontdict={'fontsize':fontsize_medium},
+        plt.text(0,-1.1*radius,repr(total_size),fontdict={'fontsize':fontsize_medium},
                  horizontalalignment='center',verticalalignment='top' )
 
         #t = plt.title(`sum(clone_sizes)`,fontdict={'fontsize':8})
@@ -253,7 +254,7 @@ for ii,epitope in enumerate( all_epitopes ):
 
 
 pngfile = outfile_prefix+'_subject_table.png'
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig(pngfile)
 
 util.readme(pngfile,"""This subject-table plot shows all the successfully parsed, paired reads, split by mouse/subject (the rows)

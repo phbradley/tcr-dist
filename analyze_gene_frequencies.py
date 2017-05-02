@@ -34,9 +34,9 @@ def get_freq_from_tuple_counts_and_bias( counts, bias ):
             reps.add(rep)
     nreps = len(reps)
 
-    single_counts = dict( zip(reps, [0.]*nreps ) )
+    single_counts = dict( list(zip(reps, [0.]*nreps )) )
 
-    for t,count in counts.iteritems():
+    for t,count in counts.items():
         tfreqs = [ bias.get(x,0.) for x in t ]
         tfreqs_total = sum(tfreqs)
         if tfreqs_total==0:
@@ -59,14 +59,14 @@ def get_baseline_tuple_count_frequencies( counts ):
             reps.add(rep)
     nreps = len(reps)
 
-    bias = dict( zip( reps, [1.0/nreps]*nreps ) )
+    bias = dict( list(zip( reps, [1.0/nreps]*nreps )) )
 
     return get_freq_from_tuple_counts_and_bias( counts, bias )
 
 
 def js_divergence( P, Q ):
     total=0.
-    for rep in frozenset( P.keys() + Q.keys() ):
+    for rep in frozenset( list(P.keys()) + list(Q.keys()) ):
         p = P.get(rep,0.0)
         q = Q.get(rep,0.0)
         m = 0.5*(p+q)
@@ -77,7 +77,7 @@ def js_divergence( P, Q ):
 
 def shannon_entropy( P ):
     total=0.
-    for rep,p in P.iteritems():
+    for rep,p in P.items():
         if p:
             total -= p * math.log( p, 2.0 )
     return total
@@ -139,15 +139,15 @@ all_tcrs = parse_tsv_file( clones_file, ['epitope'], [], True )
 
 
 
-print 'making:',summary_tsvfile
+print('making:',summary_tsvfile)
 out_summary = open( summary_tsvfile, 'w')
 out_summary.write( '\t'.join( summary_fields )+'\n' )
 
-print 'making:',probs_tsvfile
+print('making:',probs_tsvfile)
 out_probs = open( probs_tsvfile, 'w')
 out_probs.write( '\t'.join( probs_fields )+'\n' )
 
-for epitope,tcrs in all_tcrs.iteritems():
+for epitope,tcrs in all_tcrs.items():
     ## this collapses the ambiguity of segment assignment by going with the most popular one in the repertoire
     ## only doing this here for completeness in the tsv output
     ## not used for JS-DIV calculation
@@ -219,11 +219,11 @@ for epitope,tcrs in all_tcrs.iteritems():
         ## let's look at enrichments of the genes
         bg_freq, tcr_freq = best_bg_freq, best_tcr_freq
 
-        l = [ (y,x) for x,y in tcr_freq.iteritems() ]
+        l = [ (y,x) for x,y in tcr_freq.items() ]
         l.sort()
         l.reverse()
 
-        countreps = sorted( ( x for x in all_countrep_pseudoprobs[organism].keys() if x[3]+x[2] == segtype ) )
+        countreps = sorted( ( x for x in list(all_countrep_pseudoprobs[organism].keys()) if x[3]+x[2] == segtype ) )
 
         num_tcrs = len(tcrs)
 

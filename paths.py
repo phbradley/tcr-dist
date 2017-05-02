@@ -28,5 +28,5 @@ sys.path.append(path_to_blargs)
 
 if __name__ == '__main__':
     for p in sys.path:
-        print 'sys.path:',p
+        print('sys.path:',p)
 

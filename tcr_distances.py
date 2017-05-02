@@ -33,9 +33,9 @@ class DistanceParams:
                     assert val in ['True','False']
                     self.trim_cdr3s = ( val == 'True' )
                 else:
-                    print 'unrecognized tag:',tag
+                    print('unrecognized tag:',tag)
                     assert False
-            print 'config_string: {} self: {}'.format( config_string, self )
+            print('config_string: {} self: {}'.format( config_string, self ))
 
     def __str__(self):
         return 'DistanceParams: gap_penalty_v_region= {} gap_penalty_cdr3_region= {} weight_v_region= {} weight_cdr3_region= {} align_cdr3s= {} trim_cdr3s= {}'\
@@ -187,7 +187,7 @@ def weighted_cdr3_distance( seq1, seq2, params ):
 def compute_all_v_region_distances( organism, params ):
     rep_dists = {}
     repseqs = []
-    for rep,seqs in cdr3s_human.all_merged_loopseqs[organism].iteritems():
+    for rep,seqs in cdr3s_human.all_merged_loopseqs[organism].items():
         repseqs.append( ( rep,seqs) )
         rep_dists[rep] = {}
 

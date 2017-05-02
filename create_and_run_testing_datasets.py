@@ -5,7 +5,7 @@ if not isdir('testing/'):
     mkdir('testing/')
 
 cmd = 'rm testing/* testing/*web/*'
-print cmd
+print(cmd)
 system(cmd)
 
 
@@ -31,7 +31,7 @@ for filetag, max_epitopes, max_subjects, max_tcrs_per_subject in examples:
         epitopes = sorted( all_tcrs.keys() )[:max_epitopes]
         newfile = './testing/{}_{}_pairseqs_v1.tsv'.format(filetag, organism)
 
-        print 'making',newfile
+        print('making',newfile)
 
         out = open(newfile,'w')
         out.write( '\t'.join( fields )+'\n' )
@@ -50,7 +50,7 @@ for filetag, max_epitopes, max_subjects, max_tcrs_per_subject in examples:
         ## if there's only one subject, then we can't compute a nbrdist if we exclude intra-subject distances
         cmd = 'python run_basic_analysis.py --intrasubject_nbrdists --organism {} --pair_seqs_file {} > {}.log 2> {}.err &'\
               .format( organism, newfile, newfile, newfile )
-        print cmd
+        print(cmd)
         system(cmd)
         time.sleep(1.0) ## short pause
 

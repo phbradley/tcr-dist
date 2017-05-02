@@ -6,6 +6,7 @@ import html_colors
 import parse_tsv
 import util
 from operator import add
+from functools import reduce
 
 with Parser(locals()) as p:
     p.str('organism').required()
@@ -48,7 +49,7 @@ if showmotifs:
                                                 'cluster_number', 'is_cluster_center','cluster_consensus' ] )
 
 if epitopes is None:
-    epitopes = all_tcrs.keys()[:]
+    epitopes = list(all_tcrs.keys())[:]
     epitopes.sort()
 
 ## first load all the distance matrices so we can use a consistent Dmax scaling (make landscapes comparable)
@@ -73,14 +74,14 @@ for epitope in epitopes:
         all_dists.append( dists )
 
     D = np.matrix(all_dists)
-    print epitope, D.shape, 'D.max()=',D.max()
+    print(epitope, D.shape, 'D.max()=',D.max())
     all_Ds.append( D )
 
 max_Dmax = max( ( D.max() for D in all_Ds ) )
 all_Dmax = [ D.max() for D in all_Ds ]
 med_Dmax = get_median( all_Dmax )
 
-print 'max_Dmax:',max_Dmax,'med_Dmax:',med_Dmax,'cmdline_Dmax:',Dmax
+print('max_Dmax:',max_Dmax,'med_Dmax:',med_Dmax,'cmdline_Dmax:',Dmax)
 
 if Dmax is None:
     Dmax = med_Dmax ## Note: using median value of D.max()
@@ -90,7 +91,7 @@ all_xys = []
 for epitope,D in zip(epitopes,all_Ds):
     old_Dmax = D.max()
     D = np.minimum( D, np.full( D.shape, Dmax ) )
-    print 'true_Dmax:',old_Dmax,'using_Dmax:',Dmax,epitope
+    print('true_Dmax:',old_Dmax,'using_Dmax:',Dmax,epitope)
 
     pca = KernelPCA(kernel='precomputed')
     gram = 1 - ( D / Dmax )
@@ -108,11 +109,11 @@ all_vals = reduce( add, [list(xy[:,0]) for xy in all_xys ] ) + \
 if minval is None:
     minval, maxval = min(all_vals), max(all_vals)
 else:
-    print 'minval {} maxval {}'.format(min(all_vals),max(all_vals))
+    print('minval {} maxval {}'.format(min(all_vals),max(all_vals)))
     assert minval <= min(all_vals)
     assert maxval >= max(all_vals)
 
-print 'minval {} maxval {}'.format(minval,maxval)
+print('minval {} maxval {}'.format(minval,maxval))
 
 
 span = maxval-minval
@@ -264,7 +265,7 @@ for ii_epitope, epitope in enumerate( epitopes ):
             tcr_reps.append( rep )
             tcr_colors.append( color )
             rep_colors[rep] = color
-        repl = [ (y,x) for x,y in repcounts.iteritems()]
+        repl = [ (y,x) for x,y in repcounts.items()]
         repl.sort()
         repl.reverse()
 
@@ -346,16 +347,16 @@ for ii_epitope, epitope in enumerate( epitopes ):
 
 
             #print motif_cluster_centers
-            assert max( motif_cluster_centers.keys() ) == len(motif_cluster_centers.keys())-1 ## 0-indexed cluster #s
+            assert max( motif_cluster_centers.keys() ) == len(list(motif_cluster_centers.keys()))-1 ## 0-indexed cluster #s
 
             l_clusters = [ ( max( ( motifid2info[m]['chi_squared'] for m in members ) ), cnum )
-                  for cnum,members in motif_cluster_members.iteritems() ]
+                  for cnum,members in motif_cluster_members.items() ]
             l_clusters.sort()
             l_clusters.reverse() ## decreasing order of top chi_squared for each cluster
             #print l_clusters
 
-            motif_cluster_colors = dict( zip( [ x[1] for x in l_clusters ],
-                                              html_colors.get_rank_colors_no_lights( len(motif_cluster_centers) ) ) )
+            motif_cluster_colors = dict( list(zip( [ x[1] for x in l_clusters ],
+                                              html_colors.get_rank_colors_no_lights( len(motif_cluster_centers) ) )) )
 
             plotno = ii_epitope*ncols + 4 + jj_motifchain + 1
             assert not vertical
@@ -427,8 +428,8 @@ for ii_epitope, epitope in enumerate( epitopes ):
                              s=10, c=color, edgecolors='none' )
 
 
-            print '{} {} matched: {} {:.6f}'.format(epitope,motifchain,len(all_matched_ids),
-                                                    float(len(all_matched_ids))/num_tcrs)
+            print('{} {} matched: {} {:.6f}'.format(epitope,motifchain,len(all_matched_ids),
+                                                    float(len(all_matched_ids))/num_tcrs))
             plt.xticks(ticks,[])
             plt.yticks(ticks,[])
 
@@ -463,7 +464,7 @@ for ii_epitope, epitope in enumerate( epitopes ):
                 tcr_reps.append( rep )
                 tcr_colors.append( color )
                 rep_colors[rep] = color
-            repl = [ (y,x) for x,y in repcounts.iteritems()]
+            repl = [ (y,x) for x,y in repcounts.items()]
             repl.sort()
             repl.reverse()
 
@@ -512,7 +513,7 @@ for ii_epitope, epitope in enumerate( epitopes ):
         plt.subplots_adjust( hspace=(3*sep)/height, wspace=sep/width, left=margin/width, right=(width-margin)/width,
                              bottom=margin/height, top=(height-margin)/height )
         pngfile = '{}_{}_kpca.png'.format(pngfile_prefix,epitope)
-        print 'making:',pngfile
+        print('making:',pngfile)
         plt.savefig(pngfile,dpi=paper_figs_dpi)
         # ## make a special secret figure just for this epitope
         # margin=0.1
@@ -581,7 +582,7 @@ plt.subplots_adjust( hspace=hspace, wspace = wspace, left=left_margin, right = r
     #plt.suptitle('epitope={}   2D kernal-PCA projection'.format(epitope),size='large')
 
 pngfile = pngfile_prefix + '_kpca.png'
-print 'making',pngfile
+print('making',pngfile)
 plt.savefig(pngfile,dpi=paper_figs_dpi)
 
 util.readme( pngfile, """

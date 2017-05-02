@@ -119,8 +119,8 @@ for codon in gencode:
     reverse_genetic_code[aa].append( lowcodon )
 
 if __name__ == "__main__":
-    print 'hi'
+    print('hi')
     for c in code:
         d = c.upper()
         if standard[d] != code[c] or gencode[d] != code[c]:
-            print code[c], standard.get(c.upper(),'?'), gencode.get(c.upper(),'?')
+            print(code[c], standard.get(c.upper(),'?'), gencode.get(c.upper(),'?'))

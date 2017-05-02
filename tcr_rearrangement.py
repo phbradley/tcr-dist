@@ -121,8 +121,8 @@ for organism in ['mouse','human']:
         if not l:continue
         assert l[0].startswith('PROB_A')
         tag = l[0][5:]
-        vals = map(float,l[1:])
-        trim_probs[tag] = dict( zip( range(len(vals)), vals ) )
+        vals = list(map(float,l[1:]))
+        trim_probs[tag] = dict( list(zip( list(range(len(vals))), vals )) )
 
 
     for line in beta_trim_prob_lines[organism].split('\n'):
@@ -144,7 +144,7 @@ for organism in ['mouse','human']:
 
 
     ## fake probability for total trimming of the D gene
-    for did,nucseq in all_trbd_nucseq[organism].iteritems():
+    for did,nucseq in all_trbd_nucseq[organism].items():
         trimtag = 'B_D{}_d01_trim'.format(did)
         prob_trim_all_but_1 = 0.0
         for d0_trim in range(len(nucseq)):
@@ -179,7 +179,7 @@ for organism in ['mouse','human']:
         #tag2 = 'B_D2_{}'.format(tag)
         avgtag = 'B_{}'.format(tag)
         trim_probs[avgtag] = {}
-        for k in trim_probs[tags[0]].keys():
+        for k in list(trim_probs[tags[0]].keys()):
             trim_probs[avgtag][k] = sum( trim_probs[x].get(k,0) for x in tags ) / float(len(tags))
         #print organism,avgtag,trim_probs[avgtag]
 
@@ -217,10 +217,10 @@ for organism in ['mouse','human']:
             for rep in probs:
                 rep_probs[rep] = avg_probs[rep] / total
                 if __name__ == '__main__' and len(sys.argv) == 1:
-                    print 'rep_probs: %12.6f %s %s'%(100.0*rep_probs[rep],organism,rep)
+                    print('rep_probs: %12.6f %s %s'%(100.0*rep_probs[rep],organism,rep))
 
     ## normalize trim_probs
-    for tag,probs in trim_probs.iteritems():
+    for tag,probs in trim_probs.items():
         if type(probs) == type({}):
             total = sum( probs.values())
             assert abs(1.0-total)<1e-2

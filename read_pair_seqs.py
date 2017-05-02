@@ -91,7 +91,7 @@ def get_qualstring( cdr3seqtag, nucseq_in, quals_in ):
             pos = nucseq.find( cdr3nucseq, offset )
             min_qual = min( quals[pos:pos+len(cdr3nucseq)] )
             if verbose:
-                print 'multiple matches:',pos,min_qual,max_min_qual
+                print('multiple matches:',pos,min_qual,max_min_qual)
             if min_qual>max_min_qual:
                 max_min_qual = min_qual
                 bestpos = pos
@@ -127,7 +127,7 @@ for line in open( infile,'r'):
     assert infields
 
     if num_lines and num_lines%100==0:
-        print 'num_lines: {} successes: {}'.format(num_lines,successes)
+        print('num_lines: {} successes: {}'.format(num_lines,successes))
         sys.stdout.flush()
 
     num_lines += 1
@@ -148,8 +148,8 @@ for line in open( infile,'r'):
         aquals = [60]*len(aseq)
         bquals = [60]*len(bseq)
     else:
-        aquals = map( int, l[ 'a_quals' ].split('.') )
-        bquals = map( int, l[ 'b_quals' ].split('.') )
+        aquals = list(map( int, l[ 'a_quals' ].split('.') ))
+        bquals = list(map( int, l[ 'b_quals' ].split('.') ))
 
     assert len(aseq) == len(aquals)
     assert len(bseq) == len(bquals)
@@ -196,7 +196,7 @@ for line in open( infile,'r'):
             r = cdr3b_nucseq.upper()
             s1 = bseq.upper()
             s2 = logo_tools.reverse_complement( s1 )
-            print 'cdr3b_nucseq in b_nucseq:',r in s1, r in s2
+            print('cdr3b_nucseq in b_nucseq:',r in s1, r in s2)
         cdr3b_quals = get_qualstring( cdr3b_plus, bseq, bquals )
 
     ## the problem is that blast may return multiple hits with equal bitscore, so store also the full list of top hits
@@ -283,4 +283,4 @@ for line in open( infile,'r'):
     #        afile, bfile )
 out.close()
 
-print 'num_lines: {} successes: {}'.format(num_lines,successes)
+print('num_lines: {} successes: {}'.format(num_lines,successes))

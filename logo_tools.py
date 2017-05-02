@@ -2,7 +2,7 @@ import amino_acids
 import sys
 
 def get_alphabet( pwm ):
-    alphabet = pwm[0].keys()[:]
+    alphabet = list(pwm[0].keys())[:]
     alphabet.sort()
     return alphabet
 
@@ -10,7 +10,7 @@ def check_pwm( pwm, tol= 0.001 ):
     L = len(pwm)
     alphabet = get_alphabet( pwm )
     for pos in range(L):
-        for aa,val in pwm[pos].iteritems(): assert val > -1e-6
+        for aa,val in pwm[pos].items(): assert val > -1e-6
         total = sum( ( pwm[pos][aa] for aa in alphabet ) )
         assert abs( total - 1.0 ) - tol
 
@@ -26,7 +26,7 @@ def create_pwm_from_sequences( seqs, alphabet, pseudocounts=0.0 ):
     L = len( seqs[0] )
 
     for pos in range(L):
-        pwm[ pos ] = dict( zip( alphabet, [pseudocounts]*len(alphabet) ) )
+        pwm[ pos ] = dict( list(zip( alphabet, [pseudocounts]*len(alphabet) )) )
 
     for s in seqs:
         assert len(s) == L

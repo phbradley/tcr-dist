@@ -225,7 +225,7 @@ if COLOR_BREWER:
     other_colors = [ x for x in html_colors_no_whites if all_rgb[x] not in starter_colors_rgbs and sum(all_rgb[x]) >= min_rgb_sum ]
     other_colors_no_lights = [ x for x in html_colors_no_lights if all_rgb[x] not in starter_colors_rgbs and sum(all_rgb[x]) >= min_rgb_sum ]
 
-    print 'min_rgb_sum:',min_rgb_sum,'other_colors:',len(other_colors),'other_colors_no_lights:',len(other_colors_no_lights)
+    print('min_rgb_sum:',min_rgb_sum,'other_colors:',len(other_colors),'other_colors_no_lights:',len(other_colors_no_lights))
 
 else:
     starter_colors = ['red',
@@ -274,10 +274,10 @@ def get_rank_colors_no_lights( num ):
 if __name__=='__main__':
     colors = get_rank_colors(20)
     for i,col in enumerate(colors):
-        print i,col,sum(all_rgb[col])
+        print(i,col,sum(all_rgb[col]))
 
     colors = get_rank_colors_no_lights(20)
     for i,col in enumerate(colors):
-        print i,col,sum(all_rgb[col])
+        print(i,col,sum(all_rgb[col]))
 
 

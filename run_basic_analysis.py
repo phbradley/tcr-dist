@@ -109,31 +109,31 @@ SUPPORT/FEEDBACK
 try:
     import numpy
 except:
-    print '[ERROR] Failed to import the python module scipy-- is it installed? I really need it.'
+    print('[ERROR] Failed to import the python module scipy-- is it installed? I really need it.')
     exit()
 
 try:
     import scipy
 except:
-    print '[ERROR] Failed to import the python module scipy-- is it installed? I really need it.'
+    print('[ERROR] Failed to import the python module scipy-- is it installed? I really need it.')
     exit()
 
 try:
     import matplotlib
 except:
-    print '[ERROR] Failed to import the python module matplotlib-- is it installed? I really need it.'
+    print('[ERROR] Failed to import the python module matplotlib-- is it installed? I really need it.')
     exit()
 
 try:
     import sklearn
 except:
-    print """
+    print("""
 =============================================================================
 [ERROR] failed to import the python module sklearn (scikit-learn)
 [ERROR] Some analyses (kernelPCA plots, adjusted_mutual_information) will fail
 [ERROR] Take a look at http://scikit-learn.org/stable/install.html
 =============================================================================
-"""
+""")
 
 import time
 import os
@@ -145,7 +145,7 @@ from paths import path_to_scripts, path_to_tablesorter_files
 if pair_seqs_file:
     assert not parsed_seqs_file
     if not os.path.isfile(pair_seqs_file):
-        print "Error: file " + pair_seqs_file + " does not exist."
+        print("Error: file " + pair_seqs_file + " does not exist.")
         sys.exit()
     else:
         #checkinput(pair_seqs_file)
@@ -156,7 +156,7 @@ if parsed_seqs_file:
     assert not clones_file
     if not pair_seqs_file:
         if not os.path.isfile(parsed_seqs_file):
-            print "Error: file " + parsed_seqs_file + " does not exist."
+            print("Error: file " + parsed_seqs_file + " does not exist.")
             sys.exit()
         #else:
             #checkinput(parsed_seqs_file)
@@ -187,7 +187,7 @@ if not only_parsed_seqs and not only_clones:
 webfile = '{}/index.html'.format(webdir)
 
 if not ( only_clones or only_parsed_seqs ):
-    print '\nWill generate summary output file: {}\n'.format(webfile)
+    print('\nWill generate summary output file: {}\n'.format(webfile))
 
 webdir_contains_input_files = ( os.path.dirname(os.path.normpath(os.path.realpath( webfile ))) ==
                                 os.path.dirname(os.path.normpath(os.path.realpath( clones_file ))) )
@@ -205,7 +205,7 @@ all_errfiles = []
 
 def run(cmd):
     if not dry_run:
-        print cmd
+        print(cmd)
         if webstatus: ## we want a continuously updating index.html file
             outwebstatus = open(webfile,'a')
             outwebstatus.write('<h2>Running:</h2>\n{}<br><br>\n'.format(cmd))
@@ -259,7 +259,7 @@ if only_clones:
 
 all_clones = parse_tsv_file( clones_file, ['epitope','subject'], ['cdr3a'], False )
 
-epitopes = all_clones.keys()[:]
+epitopes = list(all_clones.keys())[:]
 epitopes.sort()
 
 
@@ -355,7 +355,7 @@ if 1: #force or not motifs_files:
 
         if exists( outfile ) and not force: continue ############### NOTE NOTE NOTE
 
-        num_clones = sum( ( len(all_clones[ep][x]) for x in all_clones[ep].keys() ) )
+        num_clones = sum( ( len(all_clones[ep][x]) for x in list(all_clones[ep].keys()) ) )
         if seed_threshold_for_motifs:
             my_seed_threshold_for_motifs = seed_threshold_for_motifs
         elif num_clones<200:
@@ -368,7 +368,7 @@ if 1: #force or not motifs_files:
 
         min_count = min( max_min_count, max( min_min_count, num_clones/10 ) )
 
-        print 'num_clones:',ep,num_clones,'my_seed_threshold_for_motifs:',my_seed_threshold_for_motifs,'min_count:',min_count
+        print('num_clones:',ep,num_clones,'my_seed_threshold_for_motifs:',my_seed_threshold_for_motifs,'min_count:',min_count)
 
 
         extra_args = ' --chi_squared_threshold_for_seeds {} '.format( my_seed_threshold_for_motifs ) \
@@ -382,7 +382,7 @@ if 1: #force or not motifs_files:
                      outfile, errfile )
 
         if find_cdr3_motifs_in_parallel:
-            print 'SPAWN: cmd'
+            print('SPAWN: cmd')
             proc = subprocess.Popen( cmd, shell=True )
             all_procs[ep] = proc
         else:
@@ -394,18 +394,18 @@ if 1: #force or not motifs_files:
             time.sleep(sleepseconds)
             total_time += sleepseconds
             all_done = True
-            for ep,proc in all_procs.iteritems():
+            for ep,proc in all_procs.items():
                 retval = proc.poll()
-                print total_time, ep, retval
+                print(total_time, ep, retval)
                 if retval==None: all_done = False
 
             if all_done: break
 
-        for ep,proc in all_procs.iteritems():
+        for ep,proc in all_procs.items():
             retval = proc.poll()
             if retval==None:
                 ## didn't finish!!!
-                print 'ACK motif finding didnt finish!!!',ep
+                print('ACK motif finding didnt finish!!!',ep)
                 proc.kill()
 
 
@@ -450,8 +450,8 @@ for epitope in epitopes:
     ## actually lets glob by epitope... easier for epitopes w underscores...
     for file in tree_files:
         suffix = file[ len(clones_file)-4:-4] ## also trim .png
-        print 'tree_file:',file
-        print 'suffix:',suffix
+        print('tree_file:',file)
+        print('suffix:',suffix)
         assert suffix.startswith('_tree_')
         suffix = suffix[6:]
         ab = suffix.split('_')[0]
@@ -803,7 +803,7 @@ for sufs in pngfile_suffixes:
                 out.write("<br><br>CONVERSION TO .png FAILED, USING .svg VERSION!!!<br>\n")
                 out.writelines( open( svgfile,'r').readlines())
             else:
-                print 'missing:',file
+                print('missing:',file)
                 out.write("<br><br><br>The image file {} is missing. If there is just a single subject, then some of the subject_tree and subject_heterogeneity analyses don't pertain. Or if this is the motifs summary it may be that there were no motifs found. Try grepping for 'Error' in the files: <clones_file>*.err\n".format(file))
         else:
             ## can't use 'run' command since that messes with the webfile

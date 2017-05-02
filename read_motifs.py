@@ -101,7 +101,7 @@ num_nextgen_samples = 100
 num_nextgen_samples = 25
 
 ### this is stolen from cdr3_motifs.faster.nextgen.py
-groups = dict( zip( amino_acids, amino_acids ) )
+groups = dict( list(zip( amino_acids, amino_acids )) )
 
 groups['k'] = '[KR]'
 groups['d'] = '[DE]'
@@ -121,7 +121,7 @@ groups[end  ] = end
 groups[dot] = X
 
 def get_amino_acid_consensus_character( counts ):
-    topcount,topaa = max( ( (y,x) for x,y in counts.iteritems() ) )
+    topcount,topaa = max( ( (y,x) for x,y in counts.items() ) )
     frac = float( topcount)/ sum(counts.values())
     if frac >= 0.75:
         return topaa
@@ -159,7 +159,7 @@ def get_amino_acid_consensus( seqs ):
 all_tcr_infos = parse_tsv.parse_tsv_file( clones_file, ['epitope'], [], True )
 
 if epitopes is None:
-    epitopes = all_tcr_infos.keys()[:]
+    epitopes = list(all_tcr_infos.keys())[:]
     epitopes.sort()
 
 
@@ -253,7 +253,7 @@ for ab in 'AB':
         if counter==1:
             assert l==['v_reps','j_reps','cdr3','cdr3_nucseq']
             continue
-        if not counter%500000:Log(`counter`+' '+`num_chains`+' '+ng_logfile)
+        if not counter%500000:Log(repr(counter)+' '+repr(num_chains)+' '+ng_logfile)
         v_reps = set( ( util.get_mm1_rep( x, organism ) for x in l[0].split(',') ) ) ## mm1 reps
         j_reps = l[1].split(',')
         cdr3,cdr3_nucseq = l[2:4]
@@ -392,7 +392,7 @@ for epitope in epitopes:
                     for rp in reps:
                         counts[rp[ii]] = counts.get(rp[ii],0) + reppair_wts[rp]
 
-                    for rep,count in counts.iteritems():
+                    for rep,count in counts.items():
                         desired_count = scale_factor * ii_target_reps.count(rep)
                         dev += abs( desired_count - count )
                         fac = float(desired_count)/count
@@ -409,7 +409,7 @@ for epitope in epitopes:
                     break
                 prev_dev = dev
 
-            print 'final_dev:',bigrepeat,dev
+            print('final_dev:',bigrepeat,dev)
             if dev<1e-1:
                 break
 
@@ -417,7 +417,7 @@ for epitope in epitopes:
         L = len(seqs[0])
         pwm = {}
         for i in range(L):
-            pwm[i] = dict(zip(alphabet,[0.0]*len(alphabet)))
+            pwm[i] = dict(list(zip(alphabet,[0.0]*len(alphabet))))
 
         for seq,rp in zip( seqs, reps ):
             assert len(seq) == L
@@ -459,7 +459,7 @@ for epitope in epitopes:
             if vrep in ng_tcrs[ab] and jrep in ng_tcrs[ab][vrep]:
                 ngl = [ x for x in ng_tcrs[ab][vrep][jrep] if x not in seen ]
                 if not ngl:
-                    print 'empty ngl!'
+                    print('empty ngl!')
 
                 for ngseq in random.sample( ngl, min(num_nextgen_samples,len(ngl)) ):
                     seen.add(ngseq)
@@ -484,7 +484,7 @@ for epitope in epitopes:
                 ## cdr3s with the same length
                 ngl_samelen = [ x for x in ng_tcrs[ab][vrep][jrep] if len(x[0]) == mylen and x not in seen_samelen ]
                 if not ngl_samelen:
-                    print 'empty ngl_samelen!'
+                    print('empty ngl_samelen!')
                 for ngseq in random.sample( ngl_samelen, min(num_nextgen_samples,len(ngl_samelen))):
                     seen_samelen.add( ngseq )
                     cdr3 = ngseq[0]
@@ -512,9 +512,9 @@ for epitope in epitopes:
             revpwm[i] = {}
             incrememnt = 1.0/len(matches)
             for pos in [x[2][i] for x in matches]:
-                fwdpwm[i][`pos`] = fwdpwm[i].get(`pos`,0)+incrememnt
+                fwdpwm[i][repr(pos)] = fwdpwm[i].get(repr(pos),0)+incrememnt
             for pos in [x[3][i] for x in matches]:
-                revpwm[i][`pos`] = revpwm[i].get(`pos`,0)+incrememnt
+                revpwm[i][repr(pos)] = revpwm[i].get(repr(pos),0)+incrememnt
 
         ## look at relative entropies between nbrpwm and the fwd and rev pwms
         ## not nbr anymore since this is a subroutine
@@ -524,13 +524,13 @@ for epitope in epitopes:
             relents=[]
             for control_pwm in [ ng_fwdpwm[i], ng_revpwm[i] ]:
                 relent = 0.0
-                for a,pa in pwm[i].iteritems():
+                for a,pa in pwm[i].items():
                     if pa>= min_prob_for_relent_for_scaling:
                         qa = max(min_prob_for_relent_for_scaling, control_pwm.get(a,min_prob_for_relent_for_scaling))
                         relent += pa * math.log(pa/qa, 2.0 )
                 relents.append( relent )
             scale_by_relent[i] = max(0.,min(1., min(relents)/max_column_relent_for_scaling) )
-            print 'RE {:2d} {:5.2f} {:5.2f} {:5.2f} {} {} {}'.format( i, min(relents), relents[0], relents[1], ab, epitope, ''.join(showmotif) )
+            print('RE {:2d} {:5.2f} {:5.2f} {:5.2f} {} {} {}'.format( i, min(relents), relents[0], relents[1], ab, epitope, ''.join(showmotif) ))
 
         return pwm, npwm, ng_lenpwm, ng_fwdpwm, ng_revpwm, fwdpwm, revpwm, scale_by_relent, \
             ng_fwdseq_reps, ng_lenseq_reps, len( ng_lenseqs ), len( ng_fwdseqs )
@@ -542,8 +542,8 @@ for epitope in epitopes:
         if l[0] != 'MOTIF': continue
 
         count, expect_random, expect_nextgen, chi_squared, nfixed, showmotif, num, othernum, overlap, ep, ab, nseqs, v_rep_counts, j_rep_counts = l[1:]
-        count,nfixed,num,othernum,overlap,nseqs = map(int,[count,nfixed,num,othernum,overlap,nseqs] )
-        expect_random, expect_nextgen, chi_squared = map(float, [ expect_random, expect_nextgen, chi_squared ] )
+        count,nfixed,num,othernum,overlap,nseqs = list(map(int,[count,nfixed,num,othernum,overlap,nseqs] ))
+        expect_random, expect_nextgen, chi_squared = list(map(float, [ expect_random, expect_nextgen, chi_squared ] ))
         showmotif = list(showmotif)
         assert ep==epitope
 
@@ -557,7 +557,7 @@ for epitope in epitopes:
         # if num==1 and chi_squared<min_top_chi_squared: continue
         # if overlap>max_overlap: continue
 
-        print line[:-1]
+        print(line[:-1])
 
         motif = [groups[x] for x in showmotif]
 
@@ -583,7 +583,7 @@ for epitope in epitopes:
             if m:
                 mseq = cdr3[ m.start():m.end() ]
                 nseq = cdr3_nucseq_src[ 3*m.start():3*m.end() ]
-                positions = range(m.start(),m.end())
+                positions = list(range(m.start(),m.end()))
                 rpositions = [len(cdr3)-1-x for x in positions]
                 matches.append( (mseq,nseq,positions,rpositions) )
                 matched_tcrs.append( ii )
@@ -649,7 +649,7 @@ for epitope in epitopes:
             dist = 1.0 - float(intersection)/max( len(prev_matches), num_matched_tcrs_plus_nbrs )
             dists.append( dist )
             if dist<1e-3:
-                print 'zero-dist:',epitope,ab,ii,len(motif_matches[ab]),dist, my_tree_label, motif_infos[ab][ii][0]
+                print('zero-dist:',epitope,ab,ii,len(motif_matches[ab]),dist, my_tree_label, motif_infos[ab][ii][0])
 
 
 
@@ -692,7 +692,7 @@ for epitope in epitopes:
             for tag,count in [x.split(':') for x in counts_string.split(',') ]:
                 rc = ( rep2label_rep[ tag ][4:], rep2label_rep_color[ tag ] )
                 counts[rc] = counts.get(rc,0)+float(count)
-            return [ (y,x[0],x[1]) for x,y in counts.iteritems() ]
+            return [ (y,x[0],x[1]) for x,y in counts.items() ]
 
         def get_counts_lists_from_tcr_indices( indices ):
             vcounts = {}
@@ -705,8 +705,8 @@ for epitope in epitopes:
                     vrep,jrep = tcr[8:10]
                 vcounts[vrep] = vcounts.get(vrep,0)+1
                 jcounts[jrep] = jcounts.get(jrep,0)+1
-            vstring = ','.join( ['{}:{}'.format(x,y) for x,y in vcounts.iteritems()] )
-            jstring = ','.join( ['{}:{}'.format(x,y) for x,y in jcounts.iteritems()] )
+            vstring = ','.join( ['{}:{}'.format(x,y) for x,y in vcounts.items()] )
+            jstring = ','.join( ['{}:{}'.format(x,y) for x,y in jcounts.items()] )
             return get_counts_list_condensing_alleles(vstring), get_counts_list_condensing_alleles(jstring)
 
         def get_counts_lists_from_rep_lists( reps ):
@@ -715,8 +715,8 @@ for epitope in epitopes:
             for vrep,jrep in reps:
                 vcounts[vrep] = vcounts.get(vrep,0)+1
                 jcounts[jrep] = jcounts.get(jrep,0)+1
-            vstring = ','.join( ['{}:{}'.format(x,y) for x,y in vcounts.iteritems()] )
-            jstring = ','.join( ['{}:{}'.format(x,y) for x,y in jcounts.iteritems()] )
+            vstring = ','.join( ['{}:{}'.format(x,y) for x,y in vcounts.items()] )
+            jstring = ','.join( ['{}:{}'.format(x,y) for x,y in jcounts.items()] )
             return get_counts_list_condensing_alleles(vstring), get_counts_list_condensing_alleles(jstring)
 
 
@@ -916,7 +916,7 @@ for epitope in epitopes:
             if junction_bars:
                 junction_pwm = nbr_npwm
                 junction_bars_height = y4-y3 - 2*junction_bars_ypad
-                ncols = len( nbr_npwm.keys() )
+                ncols = len( list(nbr_npwm.keys()) )
                 junction_bar_width = ( x1-x0 )/float(ncols)
                 for j in range(ncols):
                     lcol = [ ( junction_pwm[j][x],x) for x in junction_bars_order[ab] ]
@@ -1135,7 +1135,7 @@ for epitope in epitopes:
         ## create our own little svg file with this guy
         for ab in 'AB':
             if not ab_cmds[ab]:
-                print 'no {} motifs for {}'.format(ab,epitope)
+                print('no {} motifs for {}'.format(ab,epitope))
                 continue
             svgfile = '{}_{}_{}.svg'.format( outfile_prefix, epitope, ab )
             svg_basic.create_file( ab_cmds[ab], x1, ab_total_y[ab], svgfile, create_png=True )
@@ -1251,7 +1251,7 @@ single_motif_height_inches = label_font_size / 72.0 ## 72 points per inch, rough
 fig_height = top_margin_inches + bottom_margin_inches + (num_trees-1)*tree_vspacer_inches + num_motifs*single_motif_height_inches
 fig_width = 8.0
 
-print 'fig_height=',fig_height,'fig_width=',fig_width
+print('fig_height=',fig_height,'fig_width=',fig_width)
 
 
 left_margin_inches = 2.5
@@ -1348,7 +1348,7 @@ for ( epitope, chain, num_motifs_ec ) in tree_infos:
         centers.append( center )
         members = [center]
 
-        print 'new-cluster:',epitope, chain, threshold, len(centers), best_nbr_count, infos[center][0]
+        print('new-cluster:',epitope, chain, threshold, len(centers), best_nbr_count, infos[center][0])
 
         deleted[center] = True
         for nbr in all_nbrs[center]:
@@ -1384,7 +1384,7 @@ for ( epitope, chain, num_motifs_ec ) in tree_infos:
             expected = infos[m][1]['expected_fraction'] * num_tcrs
             my_weight = 1.0 if expected < 1 else 1.0/expected
             offsets = []
-            for (ind,(mseq,posl)) in m_positions.iteritems():
+            for (ind,(mseq,posl)) in m_positions.items():
                 if ind in center_matches:
                     center_posl = center_positions[ind][1]
                     offsets.append( center_posl[0] - posl[0] ) ## add this to posl[0] to get center_posl[0]
@@ -1394,7 +1394,7 @@ for ( epitope, chain, num_motifs_ec ) in tree_infos:
             offsets.sort()
             ## OK, now we have a consensus offset
             offset = int(get_median( offsets ))
-            for ind,(mseq,posl) in m_positions.iteritems():
+            for ind,(mseq,posl) in m_positions.items():
                 tcr = tcrs[ind]
                 cdr3 = ( tcr[4] if chain == 'A' else tcr[5] )
                 assert mseq == cdr3[min(posl):max(posl)+1]
@@ -1411,9 +1411,9 @@ for ( epitope, chain, num_motifs_ec ) in tree_infos:
         l = [ (sum( all_aa_counts[x].values() ), x ) for x in all_aa_counts ]
         l.sort()
         l.reverse()
-        print 'all_aa_counts by position:',l
+        print('all_aa_counts by position:',l)
         max_total = l[0][0]
-        posl = all_aa_counts.keys()[:]
+        posl = list(all_aa_counts.keys())[:]
         posl.sort()
         consensus = ''
         started = False
@@ -1437,7 +1437,7 @@ for ( epitope, chain, num_motifs_ec ) in tree_infos:
 
 pngfile = '{}_motif_trees.png'.format(outfile_prefix)
 
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig(pngfile)
 
 

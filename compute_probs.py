@@ -14,10 +14,10 @@ from amino_acids import amino_acids
 new_probs = pipeline_params['new_probs']
 
 if new_probs:
-    print 'compute_probs: new_probs'
+    print('compute_probs: new_probs')
     import tcr_rearrangement_new as tcr_rearrangement ## all_rep_probs
 else:
-    print 'compute_probs: old_probs'
+    print('compute_probs: old_probs')
     import tcr_rearrangement
 
 
@@ -123,8 +123,8 @@ for line in open(infile,'r'):
                                                                                 return_final_cdr3_nucseq=True )
 
     if new_cdr3a_nucseq != cdr3a_nucseq: ## note note note
-        print 'new_cdr3a_nucseq:',len(new_cdr3a_nucseq),new_cdr3a_nucseq
-        print 'old_cdr3a_nucseq:',len(cdr3a_nucseq),cdr3a_nucseq
+        print('new_cdr3a_nucseq:',len(new_cdr3a_nucseq),new_cdr3a_nucseq)
+        print('old_cdr3a_nucseq:',len(cdr3a_nucseq),cdr3a_nucseq)
         new_cdr3a_protseq = read_sanger_data.get_translation( new_cdr3a_nucseq, '+1' )[0]
     else:
         new_cdr3a_protseq = cdr3a_protseq[:]
@@ -212,7 +212,7 @@ for line in open(infile,'r'):
     vals['jb_rep_prob'       ] = jb_rep_prob
     vals['b_nucseq_prob'     ] = bprob_nucseq * vb_rep_prob * jb_rep_prob
 
-    assert len(vals.keys()) == len(outfields)
+    assert len(list(vals.keys())) == len(outfields)
 
     out.write( make_tsv_line( vals, outfields, '-' )+'\n' )
     out.flush()

@@ -216,12 +216,12 @@ for em in all_tcrs:
 
             if samelen and mismatches<3 and clones_have_common_genes:
                 if verbose:
-                    print 'close by1: {:2d} {:2d} {} {} {:2d} {} {} {} {}'\
+                    print('close by1: {:2d} {:2d} {} {} {:2d} {} {} {} {}'\
                         .format( qa1, qb1, mismatches, new_mismatches, len(all_tcrs[em][t1]),
-                                 cdr3_nucseq_prob1, cdr3_protseq_prob1, s1, ' '.join(t1[:4]) )
-                    print 'close by2: {:2d} {:2d} {} {} {:2d} {} {} {} {}'\
+                                 cdr3_nucseq_prob1, cdr3_protseq_prob1, s1, ' '.join(t1[:4]) ))
+                    print('close by2: {:2d} {:2d} {} {} {:2d} {} {} {} {}'\
                         .format( qa2, qb2, mismatches, new_mismatches, len(all_tcrs[em][t2]),
-                                 cdr3_nucseq_prob2, cdr3_protseq_prob2, s2, ' '.join(t2[:4]) )
+                                 cdr3_nucseq_prob2, cdr3_protseq_prob2, s2, ' '.join(t2[:4]) ))
 
                 ## plan: only merge if one gene is perfect
                 if t1[4] == t2[4] or t1[5] == t2[5]:
@@ -235,12 +235,12 @@ for em in all_tcrs:
                     min_size = min( len(all_tcrs[em][t1]), len(all_tcrs[em][t2]) )
 
                     if verbose:
-                        print 'merge1: {:2d} {} {} {:2d} {} {} {}'\
+                        print('merge1: {:2d} {} {} {:2d} {} {} {}'\
                             .format( q1, mismatches, new_mismatches, len(all_tcrs[em][t1]),
-                                     cdr3_nucseq_prob1, new_nucseq1, ' '.join(t1[:4]) )
-                        print 'merge2: {:2d} {} {} {:2d} {} {} {}'\
+                                     cdr3_nucseq_prob1, new_nucseq1, ' '.join(t1[:4]) ))
+                        print('merge2: {:2d} {} {} {:2d} {} {} {}'\
                             .format( q2, mismatches, new_mismatches, len(all_tcrs[em][t2]),
-                                     cdr3_nucseq_prob2, new_nucseq2, ' '.join(t2[:4]) )
+                                     cdr3_nucseq_prob2, new_nucseq2, ' '.join(t2[:4]) ))
 
 
                     do_merge = ( mismatches==0 or
@@ -248,12 +248,12 @@ for em in all_tcrs:
                                    ( new_mismatches<=1 or min(cdr3_nucseq_prob1,cdr3_nucseq_prob2)<-15 ) ) )
 
                     if do_merge:
-                        print 'domerge1: {:2d} {} {} {:2d} {} {} {} {} {}'\
+                        print('domerge1: {:2d} {} {} {:2d} {} {} {} {} {}'\
                             .format( q1, mismatches, new_mismatches, len(all_tcrs[em][t1]),
-                                     cdr3_nucseq_prob1, new_nucseq1, em[0], em[1], ' '.join(t1[:4]) )
-                        print 'domerge2: {:2d} {} {} {:2d} {} {} {} {} {}'\
+                                     cdr3_nucseq_prob1, new_nucseq1, em[0], em[1], ' '.join(t1[:4]) ))
+                        print('domerge2: {:2d} {} {} {:2d} {} {} {} {} {}'\
                             .format( q2, mismatches, new_mismatches, len(all_tcrs[em][t2]),
-                                     cdr3_nucseq_prob2, new_nucseq2, em[0], em[1], ' '.join(t2[:4]) )
+                                     cdr3_nucseq_prob2, new_nucseq2, em[0], em[1], ' '.join(t2[:4]) ))
 
                         ## which should we take
                         nbrs[ t1 ].append( t2 )
@@ -298,18 +298,18 @@ for em in all_tcrs:
 
 
         if len(sizel)>1:
-            print 'sizel:',[(x[0],x[1]) for x in sizel]
+            print('sizel:',[(x[0],x[1]) for x in sizel])
 
         aq,bq = quals[t1]
 
         if clone_size==1 and ( aq < min_quality_for_singletons or bq<min_quality_for_singletons ):
-            if verbose: print 'skipping:',aq,bq,t1[:4]
+            if verbose: print('skipping:',aq,bq,t1[:4])
             skipcount+=1
             continue
 
         trep = sizel[0][-1]
         if t1 != trep:
-            if verbose: print 'nonrep:',aq,bq,t1[:4],'rep:',trep[:4]
+            if verbose: print('nonrep:',aq,bq,t1[:4],'rep:',trep[:4])
             continue
 
         ## ok, we are taking this guy as the rep, so mark all members as seen
@@ -357,8 +357,8 @@ for em in all_tcrs:
                     for g in gsets[ii]:
                         counts[g] = counts.get(g,0)+1
                 mx = max(counts.values())
-                genesets[ii] = set( [ x for x,y in counts.iteritems() if y==mx ] )
-                print 'empty common genes:',ii,'clone_size:',clone_size,'mx-genecount',mx,'newgeneset:',genesets[ii],em
+                genesets[ii] = set( [ x for x,y in counts.items() if y==mx ] )
+                print('empty common genes:',ii,'clone_size:',clone_size,'mx-genecount',mx,'newgeneset:',genesets[ii],em)
 
         for genes,segtype in zip( genesets, segtypes_lowercase ):
             assert genes
@@ -392,4 +392,4 @@ for em in all_tcrs:
         out.flush()
 
 out.close()
-print 'skipcount:',skipcount,'total_lines:',total_lines,'total_clones:',total_clones
+print('skipcount:',skipcount,'total_lines:',total_lines,'total_clones:',total_clones)

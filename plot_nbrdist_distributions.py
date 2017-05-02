@@ -56,7 +56,7 @@ ncols = 3
 if skip_controls:
     epitopes = [ x for x in all_tcrs if 'NEG_CNTRL' not in x and '_DP' not in x and 'EMPTY' not in x and 'NA_' not in x]
 else:
-    epitopes = all_tcrs.keys()[:]
+    epitopes = list(all_tcrs.keys())[:]
 
 epitopes.sort()
 max_epitope_len = max( ( len(x) for x in epitopes ) )
@@ -108,7 +108,7 @@ for suffix in suffixes_corr:
                 D[i_ep1][i_ep2] = 1.0-r
                 D[i_ep2][i_ep1] = 1.0-r
                 if simple_correlations:
-                    print 'RANK_CORR {:7.3f} {} {} {}'.format( r, chains, ep1, ep2 )
+                    print('RANK_CORR {:7.3f} {} {} {}'.format( r, chains, ep1, ep2 ))
 
         epitopes, leaves = util.tree_sort( epitopes, D )
 
@@ -125,12 +125,12 @@ for suffix in suffixes_corr:
             A_AB = A2
 
         if suffix==suffixes_corr[-1]:
-            plt.xticks( range(len(epitopes)), epitopes, rotation='vertical' )
+            plt.xticks( list(range(len(epitopes))), epitopes, rotation='vertical' )
         else:
             plt.xticks( [], [] )
 
         if False and chains==all_chains_corr[0]: ## no yticks since the order is changing
-            plt.yticks( range(len(epitopes)), epitopes )
+            plt.yticks( list(range(len(epitopes))), epitopes )
         else:
             plt.yticks( [],[] )
 
@@ -144,7 +144,7 @@ for suffix in suffixes_corr:
 plt.suptitle('epitope-epitope nbrdist-score correlations (colorscale=0.4 to 1.0)')
 plt.subplots_adjust( left=0.15, bottom=0.15, top=0.925, right = 0.925, hspace=0.02, wspace=0.02 )
 pngfile = '{}_epitope_correlations_{}.png'.format(clones_file[:-4],nbrdist_percentile )
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig(pngfile)
 util.readme(pngfile,"""These heat maps show correlations between nbrdist scores for different repertoire datasets.
 The idea is that, given one reference epitope-specific repertoire, we can assign a number to any TCR in any of the
@@ -187,13 +187,13 @@ for i_ep1,ep1 in enumerate(epitopes):
                 sumval = sum( vals )/float(len(vals))
                 dists.append( sumval )
                 ns.append( len(vals) )
-                print 'ORDERED {:7.1f} {:3d} {:{}s} {:{}s} {} {}'\
+                print('ORDERED {:7.1f} {:3d} {:{}s} {:{}s} {} {}'\
                     .format( dists[-1], ns[-1], e1, max_epitope_len, e2, max_epitope_len,
-                             chains, suffix )
+                             chains, suffix ))
             avgval = sum(dists)/2
-            print 'AVG {:7.1f} {:3d} {:{}s} {:{}s} {} {}'\
+            print('AVG {:7.1f} {:3d} {:{}s} {:{}s} {} {}'\
                 .format( avgval, min(ns), ep1, max_epitope_len, ep2, max_epitope_len,
-                         chains, suffix )
+                         chains, suffix ))
             A[i_ep1][i_ep2] = 100 - avgval ## so red is small dists
             A[i_ep2][i_ep1] = 100 - avgval ## avgval will be mostly in range of 50 (same rep) to 100 (very different)
 
@@ -214,14 +214,14 @@ plt.figure(5,figsize=(10,10))
 
 plt.imshow( A2, interpolation='nearest', vmin=0, vmax=50 ) ## since we took 100-val
 
-plt.xticks( range(len(epitopes)), epitopes, rotation='vertical' )
-plt.yticks( range(len(epitopes)), epitopes )
+plt.xticks( list(range(len(epitopes))), epitopes, rotation='vertical' )
+plt.yticks( list(range(len(epitopes))), epitopes )
 
 plt.title('epitope-epitope average mutual NNdist rank scores (50=red, 100=blue)')
 plt.subplots_adjust( left=0.2, bottom=0.2, top=0.95, right = 0.95 )
 
 pngfile = '{}_epitope_epitope_avg_nbrdist_rank_scores.png'.format(clones_file[:-4] )
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig(pngfile)
 util.readme(pngfile,"""This heat map shows a distance measure between repertoires based on the NNdistance rank score: for any pair of repertoires, we can compute
 the NNdistance rank scores of the TCRs in the first repertoire with respect to the second as a reference, and also the NNdistance rank scores of the TCRs in the second repertoire
@@ -322,8 +322,8 @@ plt.figure(2,figsize=(10,10))
 plt.imshow( A, interpolation='nearest', #aspect = aspect,
             vmin=-250, vmax=0 )
 
-plt.xticks( range(len(epitopes)), epitopes, rotation='vertical' )
-plt.yticks( range(len(epitopes)), epitopes )
+plt.xticks( list(range(len(epitopes))), epitopes, rotation='vertical' )
+plt.yticks( list(range(len(epitopes))), epitopes )
 #plt.yticks( range(len(entropy_keys_single)), entropy_keys_single )
 
 #plt.title('gene entropies (colorscale: {:.1f}-{:.1f})'\
@@ -333,7 +333,7 @@ plt.title('epitope-epitope repertoire distance distribution summary statistic (r
 plt.subplots_adjust( left=0.2, bottom=0.2, top=0.95, right = 0.95 )
 
 pngfile = '{}_epitope_distances.png'.format(clones_file[:-4] )
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig(pngfile)
 util.readme(pngfile,"""Another way of comparing two repertoires/datasets is just to look at all the distances between a TCR in
 one repertoire and a TCR in another, If they are similar repertoires, these numbers will be smaller than if the
@@ -351,8 +351,8 @@ plt.figure(3,figsize=(10,10))
 plt.imshow( B, interpolation='nearest' ), #aspect = aspect,
 #vmin=0, vmax=0 )
 
-plt.xticks( range(len(epitopes)), epitopes, rotation='vertical' )
-plt.yticks( range(len(epitopes)), epitopes )
+plt.xticks( list(range(len(epitopes))), epitopes, rotation='vertical' )
+plt.yticks( list(range(len(epitopes))), epitopes )
 #plt.yticks( range(len(entropy_keys_single)), entropy_keys_single )
 
 #plt.title('gene entropies (colorscale: {:.1f}-{:.1f})'\
@@ -362,7 +362,7 @@ plt.title('epitope-epitope repertoire distance fraction below threshold')
 plt.subplots_adjust( left=0.2, bottom=0.2, top=0.95, right = 0.95 )
 
 pngfile = '{}_epitope_small_distances_fraction.png'.format(clones_file[:-4] )
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig(pngfile)
 # not being used right now
 #util.readme(pngfile,"""
@@ -374,7 +374,7 @@ plt.figure(1,figsize=(12,8))
 ncols = 3
 nrows = len(suffixes)
 
-epitope_colors = dict( zip( epitopes, html_colors.get_rank_colors_no_lights( len(epitopes)) ) )
+epitope_colors = dict( list(zip( epitopes, html_colors.get_rank_colors_no_lights( len(epitopes)) )) )
 
 from scipy.stats import gaussian_kde
 
@@ -424,7 +424,7 @@ plt.subplots_adjust(left=0.06,right=0.97,bottom=0.08,top=0.95)
 plt.suptitle('nbr-distance distributions, lower is more clustered; legend shows average values')
 
 pngfile = '{}_nbrdist_distributions.png'.format( clones_file[:-4] )
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig(pngfile)
 # not being used right now
 #util.readme(pngfile,"""
@@ -442,7 +442,7 @@ for nbrdist_perc in nbrdist_percentiles:
     suffix = '_wtd_nbrdist'+str(nbrdist_perc)
 
 
-    epitope_colors = dict( zip( epitopes, html_colors.get_rank_colors_no_lights( len(epitopes)) ) )
+    epitope_colors = dict( list(zip( epitopes, html_colors.get_rank_colors_no_lights( len(epitopes)) )) )
 
     from scipy.stats import gaussian_kde
 
@@ -520,7 +520,7 @@ for nbrdist_perc in nbrdist_percentiles:
     plt.suptitle('nbr-distance distributions, lower is more clustered; legend shows average values')
 
     pngfile = '{}_nbrdist{}_distributions_w_cdf.png'.format( clones_file[:-4], nbrdist_perc )
-    print 'making:',pngfile
+    print('making:',pngfile)
     plt.savefig(pngfile)
     util.readme(pngfile,"""These plots show distributions of the nbr-distance (aka NNdistance) score for the different
 epitopes in the dataset. The score assigned to a given TCR is just the weighted average of the distance

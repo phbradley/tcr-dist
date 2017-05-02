@@ -25,7 +25,7 @@ if outfile_prefix is None:
     outfile_prefix = clones_file[:-4]
 
 outlogfile = '{}_sharing.log'.format( clones_file[:-4] )
-print 'making:',outlogfile
+print('making:',outlogfile)
 outlog =open( outlogfile,'w')
 
 import matplotlib
@@ -193,7 +193,7 @@ for ab in all_nucprobs:
 
 ## update the protprobs
 for epitope in all_tcrs:
-    for mouse,tcrs in all_tcrs[epitope].iteritems():
+    for mouse,tcrs in all_tcrs[epitope].items():
         for ptcr,ntcr in tcrs:
             for chains in ['A','B','AB']:
                 if ptcr[-1][chains]==0: ptcr[-1][chains] = smallest_nonzero_protprob[chains]
@@ -245,7 +245,7 @@ if True:
 
         #print epitope, type(epitope_protprobs[0]), epitope_protprobs[:3]
 
-        for mouse,tcrs in all_tcrs[epitope].iteritems():
+        for mouse,tcrs in all_tcrs[epitope].items():
             max_clone_size = max( ( int( all_info[x[0][6]]['clone_size'] ) for x in tcrs ) )
             for ptcr,ntcr in tcrs:
                 ## is this clone shared across other mice?
@@ -256,7 +256,7 @@ if True:
                 #is_clonal = 2 if ( clone_size==1 and clone_size==max_clone_size) else 1 if (clone_size>1 ) else 0
                 is_clonal = 1 if (clone_size>1 ) else 0
                 is_shared = 0
-                for other_mouse, other_tcrs in all_tcrs[epitope].iteritems():
+                for other_mouse, other_tcrs in all_tcrs[epitope].items():
                     if other_mouse==mouse: continue
                     for ptcr2,ntcr2 in other_tcrs:
                         if same_tcr( ptcr, ptcr2, 'AB', comparison_mode=0 ):
@@ -312,11 +312,11 @@ if True:
             slope, intercept, r_value, p_value, std_err = stats.linregress(xvals,yvals)
             rho, p_value2 = stats.spearmanr( xvals,yvals)
             tau, p_value3 = stats.kendalltau( xvals,yvals)
-            print 'overall_correlations: R: {:.4f} {:3g} rho: {:.4f} {:.3g} tau: {:.4f} {:.3g} {} {}'\
+            print('overall_correlations: R: {:.4f} {:3g} rho: {:.4f} {:.3g} tau: {:.4f} {:.3g} {} {}'\
                 .format( r_value, p_value,
                          rho, p_value2,
                          tau, p_value3,
-                         xtag, ytag )
+                         xtag, ytag ))
 
 
 
@@ -350,8 +350,8 @@ if True:
         plt.title('P-value\n{:.3g}'.format( p ) )
         mn0 = sum(dats[0])/len(dats[0]) if dats[0] else 0.0
         mn1 = sum(dats[1])/len(dats[1]) if dats[1] else 0.0
-        print 'overall_P {:9.3g} mn0 {:7.3f} mn1 {:7.3f} {} vs {}'\
-            .format( p, mn0, mn1, '_'.join( xlabel.split()), '_'.join( ylabel.split()) )
+        print('overall_P {:9.3g} mn0 {:7.3f} mn1 {:7.3f} {} vs {}'\
+            .format( p, mn0, mn1, '_'.join( xlabel.split()), '_'.join( ylabel.split()) ))
 
         plt.xticks( [1,2], ['no\n({})'.format(len(dats[0])),'yes\n({})'.format(len(dats[1]))], fontsize=8 )
         plt.xlabel(xlabel)
@@ -378,14 +378,14 @@ if True:
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.title('P-value\n{:.3g}'.format(p_table))
-        print 'overall_P {:.3g} {} vs {}'.format( p_table, '_'.join( xlabel.split()), '_'.join( ylabel.split()) )
+        print('overall_P {:.3g} {} vs {}'.format( p_table, '_'.join( xlabel.split()), '_'.join( ylabel.split()) ))
 
 
     plt.subplots_adjust(bottom = 0.1, top=0.9, right=0.98, left=0.07, wspace=0.65 )
 
     filetag = '{}_nbrdist{}'.format( '_wtd' if wtd_nbrdist else '', str(nbrdist_percentile) )
     pngfile = '{}_sharing_and_clonality{}.png'.format(outfile_prefix,filetag)
-    print 'making',pngfile
+    print('making',pngfile)
     plt.savefig(pngfile)
     util.readme(pngfile,"""These plots explore the relationship between clonality and sharing of TCRs across mice for the same epitope. For the purpose of
     this analysis a TCR is "clonal" if it has a clone_size of at least 2 and is "shared" if it is seen in more than one mouse (ie subject). protprob and nucprob are the
@@ -395,7 +395,7 @@ if True:
     """.format(rank_suffix))
 
     if epitopes is None:
-        epitopes = all_tcrs.keys()[:]
+        epitopes = list(all_tcrs.keys())[:]
         epitopes.sort()
 
     plt.figure(2,figsize=(14,4*len(epitopes)))
@@ -434,7 +434,7 @@ if True:
         for epitope in all_tcrs:
             if epitope!=desired_epitope: continue
             #
-            for mouse,tcrs in all_tcrs[epitope].iteritems():
+            for mouse,tcrs in all_tcrs[epitope].items():
                 for ptcr,ntcr in tcrs:
                     ## is this clone shared across other mice?
                     info = all_info[ ptcr[6] ]
@@ -443,7 +443,7 @@ if True:
                     ## define is_clonal and is_shared
                     is_clonal = 1 if ( clone_size>1 ) else 0
                     is_shared = 0
-                    for other_mouse, other_tcrs in all_tcrs[epitope].iteritems():
+                    for other_mouse, other_tcrs in all_tcrs[epitope].items():
                         if other_mouse==mouse: continue
                         for ptcr2,ntcr2 in other_tcrs:
                             if same_tcr( ptcr, ptcr2, 'AB', comparison_mode=0 ):
@@ -485,11 +485,11 @@ if True:
                 slope, intercept, r_value, p_value, std_err = stats.linregress(xvals,yvals)
                 rho, p_value2 = stats.spearmanr( xvals,yvals)
                 tau, p_value3 = stats.kendalltau( xvals,yvals)
-                print 'epitope_correlations: R: {:.4f} {:3g} rho: {:.4f} {:.3g} tau: {:.4f} {:.3g} {} {} {}'\
+                print('epitope_correlations: R: {:.4f} {:3g} rho: {:.4f} {:.3g} tau: {:.4f} {:.3g} {} {} {}'\
                     .format( r_value, p_value,
                              rho, p_value2,
                              tau, p_value3,
-                             xtag, ytag, desired_epitope )
+                             xtag, ytag, desired_epitope ))
 
 
 
@@ -512,8 +512,8 @@ if True:
             plt.xlabel(xlabel)
             plt.ylabel(ylabel)
             plt.title('{} P-value\n{:.3g}'.format( desired_epitope, p ) )
-            print 'epitope_P {:.3g} {} vs {} {}'.format( p, '_'.join( xlabel.split()), '_'.join( ylabel.split()),
-                                                         desired_epitope )
+            print('epitope_P {:.3g} {} vs {} {}'.format( p, '_'.join( xlabel.split()), '_'.join( ylabel.split()),
+                                                         desired_epitope ))
 
         ## now show sharing, clonal frequencies
         for xlabel,ylabel,table in [ [ 'is shared','P( is clonal )',table_s ],
@@ -535,15 +535,15 @@ if True:
             plt.xlabel(xlabel)
             plt.ylabel(ylabel)
             plt.title('{} P-value\n{:.3g}'.format(desired_epitope,p_table))
-            print 'epitope_P {:.3g} {} vs {} {}'.format( p_table, '_'.join( xlabel.split()), '_'.join( ylabel.split()),
-                                                         desired_epitope )
+            print('epitope_P {:.3g} {} vs {} {}'.format( p_table, '_'.join( xlabel.split()), '_'.join( ylabel.split()),
+                                                         desired_epitope ))
 
 
     plt.subplots_adjust(bottom = 0.1, top=0.9, right=0.98, left=0.07, wspace=0.65, hspace=0.4)
 
     filetag = '{}_nbrdist{}'.format( '_wtd' if wtd_nbrdist else '', str(nbrdist_percentile) )
     pngfile = '{}_sharing_and_clonality_by_epitope{}.png'.format(outfile_prefix,filetag)
-    print 'making',pngfile
+    print('making',pngfile)
     plt.savefig(pngfile)
     util.readme(pngfile,"""Same plots as above, but now broken down by epitope.
     """)
@@ -559,17 +559,17 @@ if True:
 
 
 ## analyze clonality
-print "Mouse\tEpitope\tTotal_tcrs_this_mouse\tSame_pairs_this_mouse\tTotal_pairs_this_mouse\tp_this_mouse\tClone_sizes"
-print "total_tcrs_this_mouse = sum(clone_sizes) and clone_sizes = [ int(all_info[x[0][6]] ['clone_size']) for x in tcrs ]"
-print "same_pairs_this_mouse = sum( ( x*(x-1) for x in clone_sizes ) )"
-print "total_pairs_this_mouse = total_tcrs_this_mouse * (total_tcrs_this_mouse-1)"
-print "p_this_mouse = float( same_pairs_this_mouse )/total_pairs_this_mouse"
+print("Mouse\tEpitope\tTotal_tcrs_this_mouse\tSame_pairs_this_mouse\tTotal_pairs_this_mouse\tp_this_mouse\tClone_sizes")
+print("total_tcrs_this_mouse = sum(clone_sizes) and clone_sizes = [ int(all_info[x[0][6]] ['clone_size']) for x in tcrs ]")
+print("same_pairs_this_mouse = sum( ( x*(x-1) for x in clone_sizes ) )")
+print("total_pairs_this_mouse = total_tcrs_this_mouse * (total_tcrs_this_mouse-1)")
+print("p_this_mouse = float( same_pairs_this_mouse )/total_pairs_this_mouse")
 
 for epitope in all_tcrs:
     total_pairs = 0
     same_pairs = 0
     mice_infostrings = []
-    for mouse,tcrs in all_tcrs[epitope].iteritems():
+    for mouse,tcrs in all_tcrs[epitope].items():
         clone_sizes = [ int(all_info[x[0][6]] ['clone_size']) for x in tcrs ]
         total_tcrs_this_mouse = sum(clone_sizes)
         same_pairs_this_mouse = sum( ( x*(x-1) for x in clone_sizes ) )
@@ -581,7 +581,7 @@ for epitope in all_tcrs:
             mice_infostrings.append( '{:.6f},{}'.format(p_this_mouse,total_tcrs_this_mouse))
         else:
             p_this_mouse = 0
-        print mouse, epitope, total_tcrs_this_mouse, same_pairs_this_mouse, total_pairs_this_mouse, p_this_mouse, clone_sizes
+        print(mouse, epitope, total_tcrs_this_mouse, same_pairs_this_mouse, total_pairs_this_mouse, p_this_mouse, clone_sizes)
     p = float( same_pairs )/total_pairs
 
     #inv_p = 1.0/p if p!=0 else 1000.0
@@ -631,8 +631,8 @@ for epitope1 in all_tcrs:
                 overlap_sum = 0.0
                 total_sum = 0.0
 
-                for m1,tcrs1 in all_tcrs[epitope1].iteritems():
-                    for m2,tcrs2 in all_tcrs[epitope2].iteritems():
+                for m1,tcrs1 in all_tcrs[epitope1].items():
+                    for m2,tcrs2 in all_tcrs[epitope2].items():
                         if epitope1==epitope2:
                             if m2<m1:continue # dont count pairs twice
                             if (not same_mouse) and m1==m2: continue
@@ -654,8 +654,8 @@ for epitope1 in all_tcrs:
                     p0 = 0.0
                     diversity = 0.0
 
-                N1 = sum( ( len(x) for x in all_tcrs[epitope1].values() ) )
-                N2 = sum( ( len(x) for x in all_tcrs[epitope2].values() ) )
+                N1 = sum( ( len(x) for x in list(all_tcrs[epitope1].values()) ) )
+                N2 = sum( ( len(x) for x in list(all_tcrs[epitope2].values()) ) )
 
                 outlog.write( 'GAUSSDIV SM{:d} SE{:d} {:{}s} {:{}s} {:2s} div: {:9.1f} overlap: {:.3f} total: {:.1f} N1: {} N2: {}\n'\
                               .format( same_mouse, epitope1 == epitope2,
@@ -672,12 +672,12 @@ for epitope in all_tcrs:
 
         entropy = 0.0
         count = 0
-        for m1,tcrs1 in all_tcrs[epitope].iteritems():
+        for m1,tcrs1 in all_tcrs[epitope].items():
             for it1,t1 in enumerate(tcrs1):
                 my_pval_sum = 0.0
                 my_pval_norm = 0.0
 
-                for m2,tcrs2 in all_tcrs[epitope].iteritems():
+                for m2,tcrs2 in all_tcrs[epitope].items():
                     for it2,t2 in enumerate(tcrs2):
                         if m1==m2 and it1==it2: continue ## no self-distance
                         dist = all_chain_dists[ chains ][ t1[0][6] ][ t2[0][6] ]
@@ -700,7 +700,7 @@ for epitope in all_tcrs:
     for ab in ['A','B','AB']:
         avg_nbrdist = 0.0
         total = 0
-        for mouse,tcrs in all_tcrs[epitope].iteritems():
+        for mouse,tcrs in all_tcrs[epitope].items():
             for ptcr,ntcr in tcrs:
                 ## is this clone shared across other mice?
                 info = all_info[ ptcr[6] ]
@@ -729,8 +729,8 @@ for comparison_mode in range(3): ## normal, genes only, distance-based
 
                         overlaps = []
 
-                        for m1,tcrs1 in all_tcrs[epitope1].iteritems():
-                            for m2,tcrs2 in all_tcrs[epitope2].iteritems():
+                        for m1,tcrs1 in all_tcrs[epitope1].items():
+                            for m2,tcrs2 in all_tcrs[epitope2].items():
                                 if epitope1==epitope2 and m2<=m1:continue
                                 if same_mouse != ( m1==m2 ): continue
 

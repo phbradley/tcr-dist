@@ -59,9 +59,9 @@ else:
         random_info.append( { 'va_reps': l[0], 'vb_reps': l[1], 'cdr3a': l[2], 'cdr3b': l[3] } )
 
 
-print 'precomputing v-region distances'
+print('precomputing v-region distances')
 rep_dists = tcr_distances.compute_all_v_region_distances( organism, distance_params )
-print 'done precomputing v-region distances'
+print('done precomputing v-region distances')
 
 
 for epitope in all_tcrs:
@@ -72,7 +72,7 @@ for epitope in all_tcrs:
                        frozenset( [cdr3s_human.all_loopseq_representative[ organism ][x] for x in l[1].split(';') ] ),
                        l[2], l[3] ) )
 
-    print 'num_tcrs:',epitope,len(tcrs)
+    print('num_tcrs:',epitope,len(tcrs))
 
     for chains in ['A','B','AB']:
         for ii, rtcr in enumerate( random_tcrs ):

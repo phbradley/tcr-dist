@@ -55,18 +55,18 @@ def tree_sort( old_l, distances, return_leaves=True ): ## average linkage
 def get_top_genes( blast_hits_string ):
     hits = dict( [ ( x.split(':')[0], int( x.split(':')[1] ) ) for x in blast_hits_string.split(';') ] )
     top_score = max( hits.values() )
-    return set( [ x for x,y in hits.iteritems() if y >= top_score ] )
+    return set( [ x for x,y in hits.items() if y >= top_score ] )
 
 def get_top_reps( blast_hits_string, organism ):
     hits = dict( [ ( x.split(':')[0], int( x.split(':')[1] ) ) for x in blast_hits_string.split(';') ] )
     top_score = max( hits.values() )
-    vj = hits.keys()[0][3]
+    vj = list(hits.keys())[0][3]
     if vj == 'V':
         rep_map = cdr3s_human.all_loopseq_representative[ organism ]
     else:
         assert vj == 'J'
         rep_map = cdr3s_human.all_jseq_representative[ organism ]
-    return set( [ rep_map[x] for x,y in hits.iteritems() if y >= top_score ] )
+    return set( [ rep_map[x] for x,y in hits.items() if y >= top_score ] )
 
 
 def reps_from_genes( genes, organism, mm1=False, trim_allele=False ):
@@ -122,10 +122,10 @@ for organism in ['human','mouse']:
 
         ## look at gene/allele maps
         ## V
-        vj_alleles = { 'V': [ x for x in cdr3s_human.all_loopseq_representative[ organism ].keys() if x[2] == chain ],
-                       'J': [ x for x in cdr3s_human.all_jseq_representative[ organism ].keys() if x[2] == chain ] }
+        vj_alleles = { 'V': [ x for x in list(cdr3s_human.all_loopseq_representative[ organism ].keys()) if x[2] == chain ],
+                       'J': [ x for x in list(cdr3s_human.all_jseq_representative[ organism ].keys()) if x[2] == chain ] }
 
-        for vj, alleles in vj_alleles.iteritems():
+        for vj, alleles in vj_alleles.items():
             gene2rep = {}
             gene2alleles = {}
             rep_gene2alleles = {}
@@ -145,14 +145,14 @@ for organism in ['human','mouse']:
                 gene2alleles[gene].append( allele )
 
             merge_rep_genes = {}
-            for gene,reps in gene2rep.iteritems():
+            for gene,reps in gene2rep.items():
                 if len(reps)>1:
                     assert vj=='V'
                     if verbose:
-                        print 'multireps:',organism, gene, reps
+                        print('multireps:',organism, gene, reps)
                         for allele in gene2alleles[gene]:
-                            print cdr3s_human.all_merged_loopseqs[organism][allele], allele, \
-                                get_rep(allele,organism), get_mm1_rep(allele,organism)
+                            print(cdr3s_human.all_merged_loopseqs[organism][allele], allele, \
+                                get_rep(allele,organism), get_mm1_rep(allele,organism))
 
                     ## we are going to merge these reps
                     ## which one should we choose?
@@ -173,7 +173,7 @@ for organism in ['human','mouse']:
                     count_rep = merge_rep_genes[ count_rep ]
                 allele2mm1_rep_gene_for_counting[ organism ][ allele] = count_rep
                 if verbose:
-                    print 'allele2mm1_rep_gene_for_counting:',organism, allele, count_rep
+                    print('allele2mm1_rep_gene_for_counting:',organism, allele, count_rep)
 
 def get_mm1_rep_gene_for_counting( allele, organism ):
     global allele2mm1_rep_gene_for_counting
@@ -208,10 +208,10 @@ def assign_label_reps_and_colors_based_on_most_common_genes_in_repertoire( tcr_i
             tcr_info[rep_tag] = toprep ## doesnt have allele info anymore
             newcounts[toprep] = newcounts.get(toprep,0)+1
 
-        l = [(y,x) for x,y in newcounts.iteritems()]
+        l = [(y,x) for x,y in newcounts.items()]
         l.sort()
         l.reverse()
-        rep_colors = dict( zip( [x[1] for x in l], html_colors.get_rank_colors_no_lights(len(l)) ) )
+        rep_colors = dict( list(zip( [x[1] for x in l], html_colors.get_rank_colors_no_lights(len(l)) )) )
         for tcr_info in tcr_infos:
             tcr_info[ color_tag ] = rep_colors[ tcr_info[ rep_tag ] ]
 

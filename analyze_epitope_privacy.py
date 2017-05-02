@@ -50,7 +50,7 @@ all_tcrs = parse_tsv.parse_tsv_file( clones_file, ['epitope','subject'], ['va_ge
                                      save_l = True ) ## last element will be the full parse_tsv_line dictionary
 
 if not epitopes:
-    epitopes = all_tcrs.keys()[:]
+    epitopes = list(all_tcrs.keys())[:]
     epitopes.sort()
 
 
@@ -133,7 +133,7 @@ for epitope in epitopes:
     mouse_indices = {}
     num_mouse_tcrs = {}
 
-    mice = all_tcrs[epitope].keys()[:]
+    mice = list(all_tcrs[epitope].keys())[:]
     mice.sort()
 
     for mouse in mice:
@@ -159,7 +159,7 @@ for epitope in epitopes:
     num_mice = len( mice )
 
     if num_mice<=1:
-        Log( `( 'only one mouse?',epitope,mouse_indices.keys() )` )
+        Log( repr(( 'only one mouse?',epitope,list(mouse_indices.keys()) )) )
         continue
 
     for chains in all_chains:
@@ -181,7 +181,7 @@ for epitope in epitopes:
                 D[i2,i1]= dist
         Log('DONE filling distance matrix {} {}'.format(epitope,chains))
 
-        reorder = range(len(tcrs))
+        reorder = list(range(len(tcrs)))
 
         intras,inters,real_intra_avs,real_inter_avs = compute_mouse_distances_fast( reorder, mice, mouse_indices, D )
 
@@ -228,10 +228,10 @@ for epitope in epitopes:
         assert abs( z_intra + z_inter )<1e-3
 
         p_intra = (1.0*nlower1)/nrepeat
-        print 'rep   Z: {:9.3f} P: {:9.6f} intra {:9.3f} inter {:9.3f} ntcrs: {:3d} nmice: {:3d} {} {}'\
+        print('rep   Z: {:9.3f} P: {:9.6f} intra {:9.3f} inter {:9.3f} ntcrs: {:3d} nmice: {:3d} {} {}'\
             .format( z_intra, p_intra, avg_intra, avg_inter,
                      num_tcrs, num_mice,
-                     chains, epitope )
+                     chains, epitope ))
 
         if chains == 'AB':
             epitope_zps[epitope] = ( z_intra, p_intra )
@@ -245,9 +245,9 @@ for epitope in epitopes:
             Z = get_Z( real_av, mean, sdev )
             p = ( 1.0 * nlower ) / nrepeat if sdev else .5
             mouse_zp[ mice[ii] ] = (Z,p)
-            print 'mouse Z: {:9.3f} P: {:9.6f} {:2d} {} {} {}'\
+            print('mouse Z: {:9.3f} P: {:9.6f} {:2d} {} {} {}'\
                 .format( Z, p,
-                         len(mouse_indices[mice[ii]]), mice[ii] , chains, epitope )
+                         len(mouse_indices[mice[ii]]), mice[ii] , chains, epitope ))
 
         ## look at mouse nbrdists
         rand_Zsums = [0.0]*nrepeat
@@ -263,9 +263,9 @@ for epitope in epitopes:
             plower = ( 1.0 * nlower ) / nrepeat if sdev else .5
             phigher = ( 1.0 * nhigher ) / nrepeat if sdev else .5
             mouse_zp2[ mouse ] = (Z,min(plower,phigher))
-            print 'mouse-nbrdist Z: {:9.3f} P: {:9.6f} {:2d} {} {} {}'\
+            print('mouse-nbrdist Z: {:9.3f} P: {:9.6f} {:2d} {} {} {}'\
                 .format( Z, min( plower, phigher ),
-                         len(mouse_indices[mice[ii]]), mice[ii] , chains, epitope )
+                         len(mouse_indices[mice[ii]]), mice[ii] , chains, epitope ))
             Zsum += abs(Z)
 
             for jj,rand_av in enumerate( rand_avs ):
@@ -281,8 +281,8 @@ for epitope in epitopes:
             epitope_zp2s[epitope] = ( ZZ, Zp )
 
 
-        print 'rep-nbrdist   Z: {:9.3f} P: {:9.6f} ntcrs: {:3d} nmice: {:3d} {} {}'\
-            .format( ZZ, Zp, num_tcrs, num_mice, chains, epitope )
+        print('rep-nbrdist   Z: {:9.3f} P: {:9.6f} ntcrs: {:3d} nmice: {:3d} {} {}'\
+            .format( ZZ, Zp, num_tcrs, num_mice, chains, epitope ))
 
 
         mouse_pairs = []
@@ -297,10 +297,10 @@ for epitope in epitopes:
             mean,sdev = get_mean_and_sdev( rand_avs )
             nlower = len( [ x for x in rand_avs if x < real_av ] )
             mouse1,mouse2 = mouse_pairs[ii]
-            print 'mice  Z: {:9.3f} P: {:9.6f} {:2d} {:2d} {} {} {} {}'\
+            print('mice  Z: {:9.3f} P: {:9.6f} {:2d} {:2d} {} {} {} {}'\
                 .format( get_Z( real_av, mean, sdev ), ( 1.0 * nlower ) / nrepeat if sdev else .5,
                          len(mouse_indices[mouse1]), len(mouse_indices[mouse2]),
-                         mouse1, mouse2, chains, epitope )
+                         mouse1, mouse2, chains, epitope ))
 
 
         if chains == 'AB': ## make some plots
@@ -335,7 +335,7 @@ for epitope in epitopes:
                 # leaves = hierarchy.leaves_list( Z )
                 # tree_ordered_mice = [ mice[x] for x in leaves ]
                 # #print 'leaves:',leaves
-                print 'coph:',epitope,ii,c
+                print('coph:',epitope,ii,c)
                 #print Z[:3]
 
                 plotno += 1
@@ -472,10 +472,10 @@ for epitope in epitopes:
                 plt.axis('off')
             else:
                 plt.yticks( ylocs, ylabels )
-                plt.xticks( range(4), reptypes )
+                plt.xticks( list(range(4)), reptypes )
 
 
-            print 'bars xlim:',plt.xlim()
+            print('bars xlim:',plt.xlim())
 
             ## now add the full-repertoire bars at the top if paper_figs
             if paper_figs:
@@ -535,7 +535,7 @@ for epitope in epitopes:
                     numreps = min( max_reps_to_show, len( ordered_reps_list[ reptype ] ) )
                     inches_per_rep = plot_height / ( 4.0 * numreps )
                     rep_font_size = min( 10.0, max( 6.0, int( floor( 0.5+ inches_per_rep * 72.0 * 0.85 ) ) ) )
-                    print 'rep_font_size:',reptype,rep_font_size
+                    print('rep_font_size:',reptype,rep_font_size)
                     topcount = ordered_reps_list[ reptype ][0][0]
                     pad = 0.05
                     reptype_bottom = 3-ii + pad
@@ -586,7 +586,7 @@ for epitope in epitopes:
 
             ## now save the figure
             pngfile = '{}_{}_subject_tree.png'.format( outfile_prefix, epitope )
-            print 'making:',pngfile
+            print('making:',pngfile)
             plt.savefig( pngfile )
             util.readme( pngfile, """
 This is a hierarchical clustering dendrogram of the subjects for the {} repertoire. The distance between a pair of subjects is defined to be the average distance between receptors in one subject and receptors in the other. The gene frequency composition of each subject is shown in the four stacks of colored bars in the middle (to the left of the tree, which is drawn with thin blue lines). To the right of the tree is a key for the gene segment coloring schemes which also shows the frequencies of each gene in the combined repertoire.
@@ -604,7 +604,7 @@ if paper_figs: ## just the individual tree images
 
 plt.suptitle('mouse trees based on avg TCR-TCR distance between mice',x=0.5,y=1.0)
 pngfile = '{}_subject_trees.png'.format( outfile_prefix )
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig( pngfile )
 util.readme( pngfile, """This figure shows hierachical clustering (average linkage) trees of the different
 mice (subjects), where the distance between two mice is defined as the average distance between TCRs in one
@@ -634,7 +634,7 @@ plt.figure(2,figsize=(14,8))
 l = [ ( -1*epitope_zps[x][0], x ) for x in sorted( epitope_zps.keys()) ]
 l.sort()
 
-lefts = range( len(l) )
+lefts = list(range( len(l)))
 heights = [x[0] for x in l ]
 
 plt.bar( lefts, heights, width=0.8 )
@@ -643,7 +643,7 @@ plt.xticks( [x+0.4 for x in lefts], ['{} P: {:.3f}'.format( x[1], epitope_zps[x[
 plt.ylabel('Z-score\n(abs. values greater than 2 or 3 start to look significant')
 plt.suptitle('Z-scores for intra- versus inter-mouse distances\nLarger Z means intra-mouse distances are smaller than inter-mouse distances\ni.e. greater heterogeneity across mice')
 pngfile = '{}_subject_heterogeneity.png'.format( outfile_prefix )
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig( pngfile )
 util.readme( pngfile, """This summary plot is aimed at answering the question: are some mice (or humans) sampling from a different repertoire than others?
 There is a companion plot later on (_subject_trees.png) which adds a little more detail. The idea behind the analysis is to compute
@@ -666,7 +666,7 @@ plt.figure(3,figsize=(14,8))
 l = [ ( epitope_zp2s[x][0], x ) for x in sorted( epitope_zp2s.keys()) ]
 l.sort()
 
-lefts = range( len(l) )
+lefts = list(range( len(l)))
 heights = [x[0] for x in l ]
 
 plt.bar( lefts, heights, width=0.8 )
@@ -674,7 +674,7 @@ plt.subplots_adjust(bottom=0.25)
 plt.xticks( [x+0.4 for x in lefts], ['{} P: {:.3f}'.format( x[1], epitope_zp2s[x[1]][1] ) for x in l], rotation='vertical', fontsize=9 )
 plt.suptitle("Z-scores for mouse NNdistance rank score distributions\nHigher Z means more tendency for 'head-like' mice and 'tail-like' mice")
 pngfile = '{}_mouse_nbrdist_rank_score_heterogeneity.png'.format( outfile_prefix )
-print 'making:',pngfile
+print('making:',pngfile)
 plt.savefig( pngfile )
 util.readme( pngfile, """Phil write something here""")
 

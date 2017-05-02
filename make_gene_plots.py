@@ -52,7 +52,7 @@ with Parser(locals()) as p:
 
 if not countrep_enrichments_file and exists( clones_file[:-4]+'_gene_probs.tsv' ):
     countrep_enrichments_file = clones_file[:-4]+'_gene_probs.tsv'
-    print 'countrep_enrichments_file:',countrep_enrichments_file
+    print('countrep_enrichments_file:',countrep_enrichments_file)
 
 
 if not outfile_prefix:
@@ -81,13 +81,13 @@ segtype2greek_label = { 'VA':'V'+greek_alpha, 'JA':'J'+greek_alpha,
 epitope_jsds = {}
 jsd_tsvfile = clones_file[:-4] + '_JS_divergence.tsv'
 if not exists( jsd_tsvfile ):
-    print 'Sorry, you need to run analyze_gene_frequencies.py before running make_gene_plots.py'
+    print('Sorry, you need to run analyze_gene_frequencies.py before running make_gene_plots.py')
     exit()
 
 lines = parse_tsv_file( jsd_tsvfile, [], ['epitope'] + [x+'_jsd_normed' for x in segtypes_lowercase] )
 for line in lines:
     epitope = line[0]
-    vals = map(float,line[1:])
+    vals = list(map(float,line[1:]))
     epitope_jsds[epitope] = {}
     assert len(vals)== len(segtypes)
     for segtype,val in zip( segtypes, vals ):
@@ -160,7 +160,7 @@ if make_enrichment_glyphs:
 
 
 if not epitopes:
-    epitopes = all_tcrs.keys()[:]
+    epitopes = list(all_tcrs.keys())[:]
     epitopes.sort()
 
 for epitope in epitopes:
@@ -192,7 +192,7 @@ for epitope in epitopes:
         for s in segtypes[i+1:]:
             repcounts2[(r,s)] = {}
 
-    rep_index = dict(zip(segtypes,range(len(segtypes))))
+    rep_index = dict(list(zip(segtypes,list(range(len(segtypes))))))
 
     for tcr in tcrs:
         assert len(tcr) == 6
@@ -234,10 +234,10 @@ for epitope in epitopes:
     ## compute entropies, mutual informations
     for r in segtypes:
         entropy=0
-        for rep,count in repcounts[r].iteritems():
+        for rep,count in repcounts[r].items():
             prob=float(count)/N
             entropy -= prob * math.log(prob,2)
-        print 'ENT {:4s} {} entropy: {:7.3f} entropy_pow2: {:7.3f} N: {:6d}'.format(epitope,r,entropy,2**entropy,N)
+        print('ENT {:4s} {} entropy: {:7.3f} entropy_pow2: {:7.3f} N: {:6d}'.format(epitope,r,entropy,2**entropy,N))
         epitope_entropies[epitope][r] = entropy
 
 
@@ -253,7 +253,7 @@ for epitope in epitopes:
 
         mi=0.0
         entropy=0
-        for (rep1,rep2),count in repcounts2[rs].iteritems():
+        for (rep1,rep2),count in repcounts2[rs].items():
             pxy = float(count)/N
             if pxy>0: entropy -= pxy*math.log(pxy,2)
             count1 = repcounts[rs[0]][rep1]
@@ -274,8 +274,8 @@ for epitope in epitopes:
                 sf  = hypergeom.sf( x, N, count1, count2 )
                 pval = sf[count-1] ## now greater than or equal to count
                 if pval<1e-3:
-                    print 'PVAL: {:4s} {:12.3e} {}-{} {:15s} {:15s} overlap: {:4d} expect: {:7.1f} count1: {:4d} count2: {:4d} '\
-                        .format(epitope,pval,rs[0],rs[1],str(rep1),str(rep2),count,expected,count1,count2)
+                    print('PVAL: {:4s} {:12.3e} {}-{} {:15s} {:15s} overlap: {:4d} expect: {:7.1f} count1: {:4d} count2: {:4d} '\
+                        .format(epitope,pval,rs[0],rs[1],str(rep1),str(rep2),count,expected,count1,count2))
                 #exit()
 
                 if pval<pval_threshold_for_svg_correlations:
@@ -291,8 +291,8 @@ for epitope in epitopes:
                 sf  = hypergeom.sf( x, N, count1, count2 )
                 pval = cdf[count] ## less than or equal to count
                 if pval<1e-3:
-                    print 'PVAL: {:4s} {:12.3e} {}-{} {:15s} {:15s} overlap: {:4d} expect: {:7.1f} count1: {:4d} count2: {:4d} '\
-                        .format(epitope,pval,rs[0],rs[1],str(rep1),str(rep2),count,expected,count1,count2)
+                    print('PVAL: {:4s} {:12.3e} {}-{} {:15s} {:15s} overlap: {:4d} expect: {:7.1f} count1: {:4d} count2: {:4d} '\
+                        .format(epitope,pval,rs[0],rs[1],str(rep1),str(rep2),count,expected,count1,count2))
                 #exit()
                 if pval<pval_threshold_for_svg_correlations:
                     #print 'svg pval!',rep1,rep2,pval
@@ -333,8 +333,8 @@ for epitope in epitopes:
         all_amis[ (rs[0],rs[1]) ] = ami
         all_amis[ (rs[1],rs[0]) ] = ami
 
-        print 'MI {:4s} {}-{} MI: {:7.3f} AMI: {:7.3f} MI_pow2 {:7.3f} entropy: {:7.3f} entropy_pow2: {:7.3f}'\
-            .format(epitope,rs[0],rs[1],mi,ami,2**mi,entropy,2**entropy)
+        print('MI {:4s} {}-{} MI: {:7.3f} AMI: {:7.3f} MI_pow2 {:7.3f} entropy: {:7.3f} entropy_pow2: {:7.3f}'\
+            .format(epitope,rs[0],rs[1],mi,ami,2**mi,entropy,2**entropy))
 
         epitope_entropies[epitope][rs] = entropy
         epitope_mis[epitope][rs] = (mi,ami)
@@ -345,7 +345,7 @@ for epitope in epitopes:
     all_ab_amis.reverse()
 
     top_pairing = all_ab_amis[0]
-    print 'top ab pairing:',top_pairing
+    print('top ab pairing:',top_pairing)
 
     middle_alpha = top_pairing[1][0]
     middle_beta  = top_pairing[1][1]
@@ -436,14 +436,14 @@ for epitope in epitopes:
                                                           12, font_family=ff  ))
 
 
-        vl = [ (y,x) for x,y in repcounts[r0].iteritems() ]
-        jl = [ (y,x) for x,y in repcounts[r1].iteritems() ]
+        vl = [ (y,x) for x,y in repcounts[r0].items() ]
+        jl = [ (y,x) for x,y in repcounts[r1].items() ]
 
         vl.sort() ; vl.reverse()
         jl.sort() ; jl.reverse()
 
-        vcolors = dict(zip( [x[1] for x in vl], html_colors.get_rank_colors_no_lights( len(vl) ) ) )
-        jcolors = dict(zip( [x[1] for x in jl], html_colors.get_rank_colors_no_lights( len(jl) ) ) )
+        vcolors = dict(list(zip( [x[1] for x in vl], html_colors.get_rank_colors_no_lights( len(vl) ) )) )
+        jcolors = dict(list(zip( [x[1] for x in jl], html_colors.get_rank_colors_no_lights( len(jl) ) )) )
 
         reps2tcrs = {}
 
@@ -718,14 +718,14 @@ if no_pairing_text:
     pairing_svg_cmds = []
     for cmd in tmpcmds:
         if '<text' in cmd:
-            print 'skip:',cmd
+            print('skip:',cmd)
         else:
             pairing_svg_cmds.append( cmd )
 
 
 ## make svg file
 svgfile = '{}_vj_pairings.svg'.format( outfile_prefix)
-print 'making',svgfile
+print('making',svgfile)
 bg_color = None if paper_figs else 'white'
 svg_basic.create_file( pairing_svg_cmds, pairing_svg_width, pairing_svg_y_offset+bottom_margin,
                        svgfile, create_png = True, background_color = bg_color )
@@ -787,7 +787,7 @@ for segtype in segtypes:
             jcounts = epitope_repcounts[ep2][segtype]
             jtot = sum( jcounts.values() )
             js_div = 0.0
-            for k in set( icounts.keys() + jcounts.keys() ):
+            for k in set( list(icounts.keys()) + list(jcounts.keys()) ):
                 p = float( icounts.get(k,0) ) / itot
                 q = float( jcounts.get(k,0) ) / jtot
                 m = 0.5 * ( p + q )
@@ -800,7 +800,7 @@ for segtype in segtypes:
 for i,ep1 in enumerate( epitopes ):
     for j,ep2 in enumerate( epitopes ):
         if j<=i:continue
-        print 'epitope_divergences: {:9.3f} {} {}'.format( epitope_divergences[i,j], ep1, ep2 )
+        print('epitope_divergences: {:9.3f} {} {}'.format( epitope_divergences[i,j], ep1, ep2 ))
 
 
 if len(epitopes)>1:
@@ -815,11 +815,11 @@ if len(epitopes)>1:
     c,coph_dists = hierarchy.cophenet(Z,y)
 
     leaves = hierarchy.leaves_list( Z )
-    print 'old epitopes:',epitopes
-    print 'leaves:',leaves
+    print('old epitopes:',epitopes)
+    print('leaves:',leaves)
     epitopes = [ epitopes[x] for x in leaves ]
-    print 'new epitopes:',epitopes
-    print 'coph:',c
+    print('new epitopes:',epitopes)
+    print('coph:',c)
 
 
 ######################################################################################
@@ -853,7 +853,7 @@ for epitope in epitopes:
         plotno += 1
         plt.subplot(nrows,ncols,plotno)
 
-        all_l = [ (y,x) for x,y in all_counts.iteritems() ]
+        all_l = [ (y,x) for x,y in all_counts.items() ]
         all_l.sort()
         all_l.reverse()
 
@@ -861,7 +861,7 @@ for epitope in epitopes:
 
         reps_sorted = [x[1] for x in all_l]
 
-        rep_colors = dict( zip( reps_sorted, html_colors.get_rank_colors_no_lights(len(reps_sorted))) )
+        rep_colors = dict( list(zip( reps_sorted, html_colors.get_rank_colors_no_lights(len(reps_sorted)))) )
 
         min_count_for_label = 0.05 * all_total
 
@@ -883,7 +883,7 @@ for epitope in epitopes:
             total_this_len = sum( counts.values() )
             frac = float( total_this_len )/total
 
-            l = [ (y,x) for x,y in counts.iteritems() ]
+            l = [ (y,x) for x,y in counts.items() ]
             l.sort() # smallest to largest
             #l.reverse()
 
@@ -948,7 +948,7 @@ for epitope in epitopes:
 plt.subplots_adjust(left=0.05,right=0.9,bottom=bottom_margin,top=top_margin )
 
 pngfile = '{}_cdr3lens.png'.format(outfile_prefix)
-print 'making',pngfile
+print('making',pngfile)
 plt.savefig(pngfile)
 util.readme(pngfile,"""These bar plots show the cdr3-length distributions for each epitope, colored by
 gene segment. Each epitope is a single row. The left two columns show CDR3-alpha length distributions,
@@ -995,7 +995,7 @@ for repeat in range(3):
 
 fontsize_labels = max(5,int(floor(0.5+fontsize_labels)))
 
-epitope_labels = dict( zip( epitopes, ( '{} ({})'.format(x,len(all_tcrs[x])) for x in epitopes ) ) )
+epitope_labels = dict( list(zip( epitopes, ( '{} ({})'.format(x,len(all_tcrs[x])) for x in epitopes ) )) )
 
 
 fudge = 1.2
@@ -1033,7 +1033,7 @@ for segtype in segtypes:
         plotno += 1
         plt.subplot(nrows,ncols,plotno)
 
-        l = [ (y,x) for x,y in counts.iteritems() ]
+        l = [ (y,x) for x,y in counts.items() ]
         l.sort()
         l.reverse()
 
@@ -1042,9 +1042,9 @@ for segtype in segtypes:
             if tempr not in repslist:
                 repslist.append(tempr)
         if consistentfigcolors:
-            rep_colors = dict( zip( repslist, html_colors.get_rank_colors_no_lights(len(repslist)))) ##This will keep colors the same across pies
+            rep_colors = dict( list(zip( repslist, html_colors.get_rank_colors_no_lights(len(repslist))))) ##This will keep colors the same across pies
         else:
-            rep_colors = dict( zip( reps_sorted, html_colors.get_rank_colors_no_lights(len(reps_sorted))) )
+            rep_colors = dict( list(zip( reps_sorted, html_colors.get_rank_colors_no_lights(len(reps_sorted)))) )
 
         total = sum(counts.values())
 
@@ -1089,7 +1089,7 @@ if len(epitopes)>1:
     ax.axis('off')
 
 pngfile = '{}_gene_segment_pies.png'.format(outfile_prefix)
-print 'making',pngfile
+print('making',pngfile)
 plt.savefig(pngfile)
 util.readme(pngfile,"""These pie charts depict the gene segment composition of the epitope-specific datasets,
 with each column corresponding to an epitope (labeled at the bottom, with total number of clones given in
@@ -1126,8 +1126,8 @@ aspect = 'auto'
 plt.imshow( A, aspect = aspect, interpolation='nearest',
             vmin=min_entropy_for_colorscale, vmax=max_entropy_for_colorscale )
 
-plt.xticks( range(len(epitopes)), epitopes, rotation='vertical' )
-plt.yticks( range(len(entropy_keys_single)), entropy_keys_single )
+plt.xticks( list(range(len(epitopes))), epitopes, rotation='vertical' )
+plt.yticks( list(range(len(entropy_keys_single))), entropy_keys_single )
 
 plt.title('gene entropies (colorscale: {:.2f}-{:.2f})'\
           .format(min_entropy_for_colorscale,max_entropy_for_colorscale))
@@ -1155,8 +1155,8 @@ if max_jsd_for_colorscale==0.0: #not set on cmdline
 plt.imshow( A, aspect = aspect, interpolation='nearest',
             vmin=min_jsd_for_colorscale, vmax=max_jsd_for_colorscale )
 
-plt.xticks( range(len(epitopes)), epitopes, rotation='vertical' )
-plt.yticks( range(len(entropy_keys_single)), entropy_keys_single )
+plt.xticks( list(range(len(epitopes))), epitopes, rotation='vertical' )
+plt.yticks( list(range(len(entropy_keys_single))), entropy_keys_single )
 
 plt.title('gene J-S divergence to background (colorscale: {:.3f}-{:.3f})'\
           .format(min_jsd_for_colorscale,max_jsd_for_colorscale))
@@ -1191,14 +1191,14 @@ plt.subplot(313)
 plt.imshow( A, aspect = aspect, interpolation='nearest',
             vmin = min_ami_for_colorscale, vmax=max_ami_for_colorscale )
 
-plt.xticks( range(len(epitopes)), epitopes, rotation='vertical' )
-plt.yticks( range(len(entropy_keys_double)), ['{}-{}'.format(x[0],x[1]) for x in entropy_keys_double ] )
+plt.xticks( list(range(len(epitopes))), epitopes, rotation='vertical' )
+plt.yticks( list(range(len(entropy_keys_double))), ['{}-{}'.format(x[0],x[1]) for x in entropy_keys_double ] )
 
 plt.title('gene-gene adjusted mutual information (colorscale: {:.3f}-{:.3f})'\
           .format(min_ami_for_colorscale,max_ami_for_colorscale))
 plt.subplots_adjust( hspace=0.35, top=0.95 )
 pngfile = '{}_gene_entropies_and_mi.png'.format(outfile_prefix)
-print 'making',pngfile
+print('making',pngfile)
 plt.savefig(pngfile)
 if paper_figs: plt.savefig(pngfile+'.svg')
 util.readme(pngfile,"""These three plots contain information on the gene-segment distributions and
@@ -1277,7 +1277,7 @@ plt.title('alpha-beta gene correlations')
 plt.subplots_adjust(left=0.05,right=0.95,bottom=0.05,top=0.95 )
 
 pngfile = '{}_gene_gene_correlations.png'.format(outfile_prefix)
-print 'making',pngfile
+print('making',pngfile)
 plt.savefig(pngfile)
 ## this is not currently being used
 # util.readme(pngfile,"""
