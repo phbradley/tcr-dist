@@ -43,6 +43,10 @@ TRBV7-9*01,TRBV7-9*02,TRBV7-9*03 CASSSSGGAYNEQFF
 TRBV19*01,TRBV19*02 CASSIEGSGANVLTF
 TRBV7-8*01 CASSSSGGMNIQYF""".split('\n')
 
+
+    lines = """TRBV6-1*01 CASSEAPLLGGNEQYF
+TRBV29-1*01 CSVEARLF""".split('\n')
+
     organism = 'human'
 
     tcrs = []
@@ -63,3 +67,4 @@ TRBV7-8*01 CASSSSGGMNIQYF""".split('\n')
             dist = calculator.distance( t1, t2, chains = 'B' )
             if dist<100:
                 print((t1.vb_reps, t1.cdr3b, t2.vb_reps, t2.cdr3b, dist))
+            print t1.vb_reps, t1.cdr3b, t2.vb_reps, t2.cdr3b, dist
