@@ -8,9 +8,9 @@ import math
 from math import floor,sqrt
 from sys import stderr,argv,exit
 import random
-import paths
+from . import paths
 from blargs import Parser
-from parse_tsv import *
+from .parse_tsv import *
 
 ############################################################################################
 ############################################################################################
@@ -128,5 +128,3 @@ def get_median(l_in):
     n = len(l)
     if n%2: return l[n/2]  ## n is odd
     else: return 0.5 * ( l[n/2] + l[n/2 - 1 ] ) ## n is even
-
-

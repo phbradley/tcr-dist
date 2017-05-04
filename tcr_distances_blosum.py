@@ -1,7 +1,7 @@
 ## read blosum matrix
 #from paths import path_to_scripts
 from os.path import exists
-from amino_acids import amino_acids
+from .amino_acids import amino_acids
 
 
 ## the BLOSUM62 scoring matrix
@@ -39,5 +39,3 @@ if __name__ == '__main__':
                 dev = bsd4[(a,c)] - ( bsd4[(a,b)] + bsd4[(b,c)] )
                 if dev>0:
                     print('DEV:',tag, dev, a+c, bsd4[(a,c)], a+b,bsd4[(a,b)], b+c,bsd4[(b,c)])
-
-

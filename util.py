@@ -1,9 +1,9 @@
-from basic import *
-import cdr3s_human
+from .basic import *
+from . import cdr3s_human
 from scipy.cluster import hierarchy
 from scipy.spatial import distance
 import os
-import html_colors
+from . import html_colors
 
 verbose = __name__ == '__main__'
 

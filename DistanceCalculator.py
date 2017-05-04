@@ -1,5 +1,5 @@
-import util
-import tcr_distances
+from . import util
+from . import tcr_distances
 import copy
 
 class DistanceTCR:

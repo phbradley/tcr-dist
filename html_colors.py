@@ -1,4 +1,4 @@
-from paths import path_to_scripts
+from .paths import path_to_scripts
 import os.path
 
 
@@ -279,5 +279,3 @@ if __name__=='__main__':
     colors = get_rank_colors_no_lights(20)
     for i,col in enumerate(colors):
         print(i,col,sum(all_rgb[col]))
-
-

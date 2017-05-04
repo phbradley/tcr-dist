@@ -1,7 +1,7 @@
-from basic import *
-from amino_acids import amino_acids
-from tcr_distances_blosum import blosum
-from paths import path_to_db
+from .basic import *
+from .amino_acids import amino_acids
+from .tcr_distances_blosum import blosum
+from .paths import path_to_db
 
 ## these are indexed by organism
 ## these are potentially used outside this python file #########################
@@ -607,4 +607,3 @@ if __name__ == '__main__':
                 num = all_num_genome_j_positions_in_loop[org][ab][id]
                 jseq = all_fasta[org][id]
                 print('jseq %10s %15s %10s %s'%(org,id,jseq[:num],jseq[num:]))
-

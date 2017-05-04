@@ -1,7 +1,7 @@
-from basic import *
-import cdr3s_human
-from amino_acids import amino_acids
-from tcr_distances_blosum import blosum, bsd4
+from .basic import *
+from . import cdr3s_human
+from .amino_acids import amino_acids
+from .tcr_distances_blosum import blosum, bsd4
 
 class DistanceParams:
     def __init__(self, config_string=None ):
@@ -307,6 +307,3 @@ def sort_and_compute_weighted_nbrdist_from_distances( l, nbrdist_percentile, don
         nbrdist += wt * val
 
     return nbrdist / total_wt
-
-
-
