@@ -1,9 +1,13 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
 from os import system
 from os.path import exists
-from html_colors import CB_RED, CB_GREEN, CB_BLUE, CB_ORANGE, CB_PURPLE
+from .html_colors import CB_RED, CB_GREEN, CB_BLUE, CB_ORANGE, CB_PURPLE
 import base64 ## png encoding
 import math
-import basic ## convert_svg_to_png
+from . import basic ## convert_svg_to_png
 
 #make a stack of letters
 

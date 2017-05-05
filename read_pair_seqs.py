@@ -1,8 +1,12 @@
-from basic import *
-import read_sanger_data
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
+from . import read_sanger_data
 import sys
-import logo_tools
-import util
+from . import logo_tools
+from . import util
 
 with Parser(locals()) as p:
     p.str('infile').required()

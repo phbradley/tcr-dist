@@ -1,4 +1,8 @@
-import amino_acids
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from . import amino_acids
 import sys
 
 def get_alphabet( pwm ):
@@ -91,4 +95,3 @@ def reverse_complement( seq ):
         newseq += base_partner[ seq[ pos ] ]
     assert len( newseq ) == L
     return newseq
-

@@ -1,3 +1,8 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+
 ## trees from distances
 
 import string
@@ -462,6 +467,3 @@ def Canvas_tree(tree, names, sizes, upper_left, lower_right, branch_width_fracti
             plotter.make_text(l[0], [Transform(l[1][0]),l[1][1]], font)
 
     return ( node_position, Transform, min_rmsd, w_factor ) ## nuisance
-
-
-

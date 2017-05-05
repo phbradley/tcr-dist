@@ -1,7 +1,11 @@
-from basic import *
-import html_colors
-import tcr_distances
-import util
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
+from . import html_colors
+from . import tcr_distances
+from . import util
 
 with Parser(locals()) as p:
     #p.str('args').unspecified_default().multiple().required()
@@ -538,7 +542,3 @@ summary plots.
 
 if show:
     plt.show()
-
-
-
-

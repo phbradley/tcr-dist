@@ -1,3 +1,7 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
 from .basic import *
 from . import cdr3s_human
 from scipy.cluster import hierarchy

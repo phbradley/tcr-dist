@@ -1,15 +1,19 @@
-from basic import *
-import parse_tsv
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
+from . import parse_tsv
 import scipy
-from amino_acids import HP, GES, KD, aa_charge, amino_acids
+from .amino_acids import HP, GES, KD, aa_charge, amino_acids
 from operator import add
-import html_colors
+from . import html_colors
 import matplotlib
 from functools import reduce
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
-import util
+from . import util
 
 with Parser(locals()) as p:
     p.str('clones_file').required()
@@ -320,6 +324,3 @@ for ab in ['a','b','ab']:
 
 print('making:',pngfile)
 plt.savefig(pngfile)
-
-
-

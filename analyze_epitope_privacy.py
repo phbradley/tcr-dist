@@ -1,12 +1,16 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
 import sys
-from basic import *
-import tcr_distances
-import cdr3s_human
-import parse_tsv
+from .basic import *
+from . import tcr_distances
+from . import cdr3s_human
+from . import parse_tsv
 import numpy as np
 from scipy.cluster import hierarchy
 from scipy.spatial import distance
-import util
+from . import util
 import html_colors
 
 with Parser(locals()) as p:
@@ -677,9 +681,3 @@ pngfile = '{}_mouse_nbrdist_rank_score_heterogeneity.png'.format( outfile_prefix
 print('making:',pngfile)
 plt.savefig( pngfile )
 util.readme( pngfile, """Phil write something here""")
-
-
-
-
-
-

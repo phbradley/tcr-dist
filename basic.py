@@ -1,3 +1,8 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+
 ## LAZY-- some basic imports and shared params
 ##
 ##

@@ -1,13 +1,17 @@
-from basic import *
-import score_trees_devel
-import svg_basic
-import cdr3s_human
-from amino_acids import amino_acids
-from tcr_distances import align_cdr3s
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
+from . import score_trees_devel
+from . import svg_basic
+from . import cdr3s_human
+from .amino_acids import amino_acids
+from .tcr_distances import align_cdr3s
 #from tcr_distances_blosum import blosum
 import numpy as np
-import util
-import tcr_sampler ## for analyze_junction
+from . import util
+from . import tcr_sampler ## for analyze_junction
 
 
 

@@ -1,3 +1,7 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
 from . import util
 from . import tcr_distances
 import copy
@@ -13,10 +17,7 @@ class DistanceTCR:
 class DistanceCalculator:
     def __init__( self, organism, params = None ):
         self.organism = organism[:]
-        if params is None:
-            self.params = tcr_distances.DistanceParams()
-        else:
-            self.params = copy.deepcopy( params )
+        self.params = tcr_distances.DistanceParams(params)
         self.rep_dists = tcr_distances.compute_all_v_region_distances( organism, self.params )
 
     ## set chains == 'A' (or 'B') for single-chain alpha (or beta) distances
@@ -66,5 +67,4 @@ TRBV29-1*01 CSVEARLF""".split('\n')
             if j<=i:continue
             dist = calculator.distance( t1, t2, chains = 'B' )
             if dist<100:
-                print((t1.vb_reps, t1.cdr3b, t2.vb_reps, t2.cdr3b, dist))
-            print t1.vb_reps, t1.cdr3b, t2.vb_reps, t2.cdr3b, dist
+                print(t1.vb_reps, t1.cdr3b, t2.vb_reps, t2.cdr3b, dist)

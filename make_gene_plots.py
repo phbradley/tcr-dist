@@ -1,8 +1,12 @@
-from basic import *
-import cdr3s_human
-import html_colors
-import svg_basic
-import util
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
+from . import cdr3s_human
+from . import html_colors
+from . import svg_basic
+from . import util
 import numpy as np
 
 

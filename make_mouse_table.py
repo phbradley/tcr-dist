@@ -1,6 +1,10 @@
-from basic import *
-import html_colors
-import util
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
+from . import html_colors
+from . import util
 from functools import reduce
 
 with Parser(locals()) as p:
@@ -266,5 +270,3 @@ a clone. The size of the top clone is shown in red near the red wedge, and the t
 
 if show:
     plt.show()
-
-

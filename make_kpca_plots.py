@@ -1,10 +1,14 @@
-from basic import *
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
 import numpy as np
 from sklearn.decomposition import KernelPCA
-import cdr3s_human
-import html_colors
-import parse_tsv
-import util
+from . import cdr3s_human
+from . import html_colors
+from . import parse_tsv
+from . import util
 from operator import add
 from functools import reduce
 

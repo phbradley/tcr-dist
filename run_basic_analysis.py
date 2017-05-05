@@ -1,4 +1,8 @@
-from basic import *
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
 
 ## what gets checked to decide if we re-run certain steps?
 ##
@@ -817,4 +821,3 @@ out.write("""
 """)
 
 out.close()
-

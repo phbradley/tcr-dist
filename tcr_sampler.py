@@ -1,9 +1,13 @@
-from basic import *
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
 import sys
-import read_sanger_data
-import cdr3s_human
-from genetic_code import genetic_code, reverse_genetic_code
-import logo_tools
+from . import read_sanger_data
+from . import cdr3s_human
+from .genetic_code import genetic_code, reverse_genetic_code
+from . import logo_tools
 #from math import log2
 
 if pipeline_params['new_probs']:
@@ -891,4 +895,3 @@ def sample_tcr_sequences( organism, nsamples, v_gene, j_gene,
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
-

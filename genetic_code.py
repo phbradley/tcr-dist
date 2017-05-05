@@ -1,3 +1,8 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+
 ## http://python.genedrift.org/2007/04/19/genetic-code-part-i/
 
 gencode = {

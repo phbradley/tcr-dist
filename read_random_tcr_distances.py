@@ -1,12 +1,16 @@
-from basic import *
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
 import numpy as np
-import parse_tsv
+from . import parse_tsv
 from scipy.stats import gaussian_kde
-import util
+from . import util
 #from tcr_distances_blosum
-import tcr_distances
-import html_colors
-import cdr3s_human
+from . import tcr_distances
+from . import html_colors
+from . import cdr3s_human
 
 with Parser(locals()) as p:
     #p.str('organism').required()
@@ -410,4 +414,3 @@ Superimposed KDE-smoothed NNdistance ({}) distributions (left) and ROC curves (r
 
 if show:
     plt.show()
-

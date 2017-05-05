@@ -1,3 +1,8 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+
 ##
 ## Run this script in the main repository directory by typing
 ##
@@ -215,4 +220,3 @@ system(cmd)
 cmd = 'mv {}/testing_ref ../'.format(download_dir)
 print(cmd)
 system(cmd)
-

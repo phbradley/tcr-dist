@@ -1,6 +1,10 @@
-from basic import *
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
 import sys
-from paths import path_to_db
+from .paths import path_to_db
 
 ## these guys are for external sharing, as well as
 ## get_alpha_trim_probs

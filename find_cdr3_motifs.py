@@ -1,12 +1,15 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
-from basic import *
-import tcr_sampler
-from amino_acids import amino_acids
+from __future__ import print_function, division
+from .basic import *
+from . import tcr_sampler
+from .amino_acids import amino_acids
 import re
-import cdr3s_human
+from . import cdr3s_human
 import sys
-from paths import path_to_db
-import util
+from .paths import path_to_db
+from . import util
 
 
 with Parser(locals()) as p:
@@ -488,5 +491,3 @@ for epitope in all_tcrs:
             sys.stdout.flush()
         #exit()
         #print random_seqs
-
-

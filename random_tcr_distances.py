@@ -1,9 +1,13 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
 import sys
-from basic import *
-import tcr_distances
-import cdr3s_human
-import parse_tsv
-from paths import path_to_db
+from .basic import *
+from . import tcr_distances
+from . import cdr3s_human
+from . import parse_tsv
+from .paths import path_to_db
 
 with Parser(locals()) as p:
     p.str('organism').required()

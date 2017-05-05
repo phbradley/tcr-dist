@@ -1,15 +1,20 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+
 #import math
 import sys
-from basic import *
-import cdr3s_human
-from util import get_top_genes
+from .basic import *
+from . import cdr3s_human
+from .util import get_top_genes
 #import matplotlib
 #if make_png: matplotlib.use('Agg')
 #import matplotlib.pyplot as plt
 #import numpy as np
-import tcr_sampler
-import read_sanger_data
-from amino_acids import amino_acids
+from . import tcr_sampler
+from . import read_sanger_data
+from .amino_acids import amino_acids
 
 new_probs = pipeline_params['new_probs']
 

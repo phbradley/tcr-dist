@@ -1,10 +1,14 @@
-from basic import *
-import score_trees_devel
-import svg_basic
-import cdr3s_human
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
+from . import score_trees_devel
+from . import svg_basic
+from . import cdr3s_human
 import numpy as np
-import util
-import html_colors
+from . import util
+from . import html_colors
 import scipy.stats
 import copy
 from operator import add
@@ -681,4 +685,3 @@ for epitope in epitopes:
             print('create: {}.png'.format(prefix))
 
             svg_basic.create_file( cmds, total_svg_width, total_svg_height, prefix+'.svg', create_png=True)
-

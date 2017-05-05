@@ -1,3 +1,8 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+
 from .basic import *
 from .amino_acids import amino_acids
 from .tcr_distances_blosum import blosum

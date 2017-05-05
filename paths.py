@@ -1,3 +1,7 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
 import os
 import sys
 
@@ -29,4 +33,3 @@ sys.path.append(path_to_blargs)
 if __name__ == '__main__':
     for p in sys.path:
         print('sys.path:',p)
-

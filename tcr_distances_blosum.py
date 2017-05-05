@@ -1,5 +1,9 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 ## read blosum matrix
 #from paths import path_to_scripts
+
+from __future__ import print_function, division
 from os.path import exists
 from .amino_acids import amino_acids
 

@@ -1,13 +1,18 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+
 ## this script will compute distances between all the tcrs and write out a distance matrix
 ## the order of rows and columns in the distance matrix will match that in the input file
 ## it will also compute the rank scores for each tcr with respect to all the epitopes present
 ##
 
-from basic import *
-from util import get_top_genes
-import cdr3s_human
+from .basic import *
+from .util import get_top_genes
+from . import cdr3s_human
 #from scipy import stats, optimize
-import tcr_distances
+from . import tcr_distances
 
 #import matplotlib
 #if make_png: matplotlib.use('Agg')
@@ -253,5 +258,3 @@ for outl in all_info:
     out.write( make_tsv_line( outl, outfields )+'\n' )
 
 out.close()
-
-

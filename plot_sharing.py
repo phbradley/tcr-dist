@@ -1,7 +1,11 @@
-from basic import *
-import html_colors
-import util
-from paths import path_to_db
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
+from . import html_colors
+from . import util
+from .paths import path_to_db
 
 with Parser(locals()) as p:
     p.str('clones_file').required()

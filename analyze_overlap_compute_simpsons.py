@@ -1,7 +1,12 @@
-from basic import *
-import util
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+
+from .basic import *
+from . import util
 from scipy import stats
-from tcr_distances import get_rank
+from .tcr_distances import get_rank
 
 import numpy as np
 

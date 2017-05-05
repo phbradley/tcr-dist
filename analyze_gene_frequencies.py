@@ -1,3 +1,8 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+
 ## look at frequencies and enrichments of genes
 ##
 ## what makes this a little tricky is that gene assignments can be ambiguous: sequence reads
@@ -250,8 +255,3 @@ for epitope,tcrs in all_tcrs.items():
 
 out_probs.close()
 out_summary.close()
-
-
-
-
-

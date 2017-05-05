@@ -1,3 +1,7 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
 import string
 
 amino_acids = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', \
@@ -59,4 +63,3 @@ if __name__ == '__main__':
     print('r_ges_kd:',r_ges_kd)
     print('r_ges_hp:',r_ges_hp)
     print('r_kd_hp:',r_kd_hp)
-

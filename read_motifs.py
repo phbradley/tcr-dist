@@ -1,14 +1,18 @@
-from basic import *
-from amino_acids import amino_acids
-import cdr3s_human
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
+from .amino_acids import amino_acids
+from . import cdr3s_human
 import re
-import logo_tools
-import svg_basic
-import tcr_sampler
-import util
-from paths import path_to_db
-import parse_tsv
-from basic import *
+from . import logo_tools
+from . import svg_basic
+from . import tcr_sampler
+from . import util
+from .paths import path_to_db
+from . import parse_tsv
+from .basic import *
 
 
 nbr_distance_default = pipeline_params[ 'distance_threshold_25' ]
@@ -1461,4 +1465,3 @@ for ( epitope, chain, num_motifs_ec ) in tree_infos:
     for (label,tsv_outl) in infos:
         out.write( make_tsv_line( tsv_outl, tsv_outfields )+'\n' )
 out.close()
-

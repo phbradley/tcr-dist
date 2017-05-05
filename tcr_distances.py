@@ -1,3 +1,7 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
 from .basic import *
 from . import cdr3s_human
 from .amino_acids import amino_acids
@@ -121,7 +125,7 @@ def sequence_distance_with_gappos( shortseq, longseq, gappos, params ):
     ctrim = 2 if params.trim_cdr3s else 0
     remainder = len(shortseq)-gappos
     dist = 0.0
-    count =0
+    count = 0
     if ntrim < gappos:
         for i in range(ntrim,gappos):
             #print i,shortseq[i],longseq[i],params.distance_matrix[(shortseq[i],longseq[i])]
@@ -154,7 +158,7 @@ def weighted_cdr3_distance( seq1, seq2, params ):
     if not params.align_cdr3s:
         ## try to replicate old (strange) behavior: "gap_spot = min( 3, len(shortseq)/2 )" in ../tcr_distances.py
         ## shortseq in that code had already been trimmed by 3,2 residues
-        gappos = min( 6, 3 + (lenshort-5)/2 )
+        gappos = min( 6, 3 + (lenshort-5)//2 )
         best_dist,count = sequence_distance_with_gappos( shortseq, longseq, gappos, params )
 
     else:
@@ -270,7 +274,7 @@ def get_rank( val, l ): ## does not require that the list l is sorted
 
     else:
         assert upper_neighbor>lower_neighbor
-        interp = (val-lower_neighbor)/(upper_neighbor-lower_neighbor)
+        interp = (val-lower_neighbor)//(upper_neighbor-lower_neighbor)
 
         #if num_equal>0:print 'num_equal:',num_equal
 

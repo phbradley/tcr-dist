@@ -1,10 +1,15 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+
 #import math
 #import sys
-from basic import *
-import cdr3s_human
-import util
+from .basic import *
+from . import cdr3s_human
+from . import util
 #from util import get_top_genes
-import logo_tools
+from . import logo_tools
 #import matplotlib
 #if make_png: matplotlib.use('Agg')
 #import matplotlib.pyplot as plt

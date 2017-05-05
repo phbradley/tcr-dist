@@ -1,4 +1,8 @@
-from basic import *
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
 import time
 
 with Parser(locals()) as p:
@@ -35,4 +39,3 @@ for organism in ['mouse','human']:
         print(cmd)
         system(cmd)
         time.sleep(1.0) ## short pause
-

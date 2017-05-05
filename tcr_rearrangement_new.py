@@ -1,6 +1,10 @@
-from basic import *
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
 import sys
-from paths import path_to_db
+from .paths import path_to_db
 
 ## these guys are for external sharing, as well as
 ## get_alpha_trim_probs
@@ -265,5 +269,3 @@ def get_beta_trim_probs( organism, d_id, v_trim, d0_trim, d1_trim, j_trim, vd_in
             return 0.0
         total_prob *= probs[val]
     return total_prob
-
-

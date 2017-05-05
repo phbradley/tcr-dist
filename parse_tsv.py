@@ -1,3 +1,7 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
 
 def parse_tsv_line(line,infields):
     if line[-1]=='\n': line = line[:-1] #doh
@@ -66,4 +70,3 @@ def parse_tsv_file( filename, key_fields, store_fields, save_l=False ):
         return D
     else:
         return L
-

@@ -1,11 +1,15 @@
-from basic import *
-import logo_tools
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, division
+from .basic import *
+from . import logo_tools
 import sys
 import random
-import blast
-from genetic_code import genetic_code
-import cdr3s_human
-from paths import path_to_db, path_to_blast_executables
+from . import blast
+from .genetic_code import genetic_code
+from . import cdr3s_human
+from .paths import path_to_db, path_to_blast_executables
 
 
 AB = 'AB'
@@ -572,4 +576,3 @@ def parse_paired_dna_sequences( program, organism, aseq, bseq, info = '',
         evalues[tag] = evalue
 
     return ab_genes, evalues, a_status+b_status, [a_hits,b_hits]
-
