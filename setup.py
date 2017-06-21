@@ -176,10 +176,10 @@ if not exists( tarfile ):
 ## md5sum check
 lines = popen('md5sum '+tarfile).readlines()
 if lines and len(lines[0].split()) == 2:
-    # rhino1 tcr-dist$ md5sum tcrdist_extras_v1.tgz
-    # 4aadc2e956cd61acb1d20a638fb2c32f  tcrdist_extras_v1.tgz
+    # rhino2 tcr-dist$ md5sum tcrdist_extras_v1.tgz
+    # 3d4f3d8cfb6d3041e6e53d8637d53934  tcrdist_extras_v1.tgz
     checksum = lines[0].split()[0]
-    expected_checksum = '4aadc2e956cd61acb1d20a638fb2c32f'
+    expected_checksum = '3d4f3d8cfb6d3041e6e53d8637d53934'
     if checksum == expected_checksum:
         print "\n[SUCCESS] md5sum checksum for tarfile matches expected, phew!\n"
     else:
