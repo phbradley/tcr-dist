@@ -330,7 +330,7 @@ cmd = 'python {}/make_tall_trees.py --organism {} --clones_file {} --junction_ba
       .format( path_to_scripts, organism, clones_file, clones_file, clones_file )
 run(cmd)
 
-## analyze intra-mouse privacy
+## analyze intra-subject privacy
 cmd = 'python {}/analyze_epitope_privacy.py {} --organism {} --clones_file {} --all_chains AB --nrepeat 1000 --tree_height_inches 5.0 --nbrdist_percentile 10 > {}_aep.log 2> {}_aep.err'\
       .format( path_to_scripts, distance_params_args, organism, clones_file, clones_file, clones_file )
 run(cmd)
