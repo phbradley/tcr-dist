@@ -169,6 +169,13 @@ spawn multiple, independent processes.
 CITING
 ###########################
 
+Quantifiable predictive features define epitope-specific T cell receptor repertoires
+
+Pradyot Dash,	Andrew J. Fiore-Gartland,	Tomer Hertz,	George C. Wang,	Shalini Sharma,
+Aisha Souquette,	Jeremy Chase Crawford,	E. Bridie Clemens,	Thi H. O. Nguyen,
+Katherine Kedzierska,	Nicole L. La Gruta,	Philip Bradley	& Paul G. Thomas
+
+Nature (2017) doi:10.1038/nature22383
 
 ###########################
 THANKS
