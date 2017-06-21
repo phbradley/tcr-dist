@@ -14,7 +14,7 @@ with Parser(locals()) as p:
 ## So that is the new default; here the scale_factor term accounts for the difference in TCRdist values
 ## (lower overall w/ classic gap penalty of 8)
 ##
-distance_params='gap_penalty_v_region:4,gap_penalty_cdr3_region:8,weight_cdr3_region:3,align_cdr3s:False,distance_matrix:bsd4,trim_cdr3s:True,scale_factor:1.0439137134052388'
+distance_params='gap_penalty_v_region:4,gap_penalty_cdr3_region:8,weight_cdr3_region:3,align_cdr3s:False,trim_cdr3s:True,scale_factor:1.0439137134052388'
 
 
 for organism in ['mouse','human']:
