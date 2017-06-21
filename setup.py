@@ -156,7 +156,8 @@ if not isdir( blastdir ):
 ## download other db files
 #https://www.dropbox.com/s/ex3vm75hypnvrer/tcrdist_extras_v1.tgz?dl=0
 address = 'http://xfiles.fhcrc.org:7007/bradley_p/pub/tcrdist_extras_v1.tgz'
-backup_address = 'https://www.dropbox.com/s/ex3vm75hypnvrer/tcrdist_extras_v1.tgz'
+backup_address = 'https://www.dropbox.com/s/nnjm9015aewuc7f/tcrdist_extras_v1.tgz'
+
 
 tarfile = address.split('/')[-1]
 assert tarfile == backup_address.split('/')[-1]
