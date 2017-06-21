@@ -6,7 +6,7 @@ from tcr_distances_blosum import blosum, bsd4
 class DistanceParams:
     def __init__(self, config_string=None ):
         self.gap_penalty_v_region = 4
-        self.gap_penalty_cdr3_region = 12
+        self.gap_penalty_cdr3_region = 12 # same as gap_penalty_v_region=4 since weight_cdr3_region=3 is not applied
         self.weight_v_region = 1
         self.weight_cdr3_region = 3
         self.distance_matrix = bsd4
@@ -152,7 +152,7 @@ def weighted_cdr3_distance( seq1, seq2, params ):
         assert lenshort > 3+2 ## something to align...
 
     if not params.align_cdr3s:
-        ## if we are not aligning, use a fixed gap position relative to the end of V
+        ## if we are not aligning, use a fixed gap position relative to the start of the CDR3
         ## that reflects the typically longer and more variable-length contributions to
         ## the CDR3 from the J than from the V. For a normal-length
         ## CDR3 this would be after the Cys+5 position (ie, gappos = 6; align 6 rsds on N-terminal side of CDR3).
@@ -186,6 +186,9 @@ def weighted_cdr3_distance( seq1, seq2, params ):
         #print 'align1:',shortseq[:best_gappos] + '-'*lendiff + shortseq[best_gappos:], best_gappos, best_dist
         #print 'align2:',longseq, best_gappos, best_dist
 
+
+    ## Note that weight_cdr3_region is not applied to the gap penalty
+    ##
     return  params.weight_cdr3_region * best_dist + lendiff * params.gap_penalty_cdr3_region
 
 def compute_all_v_region_distances( organism, params ):
