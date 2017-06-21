@@ -14,11 +14,6 @@ Jeremy Chase Crawford (Jeremy.Crawford@stjude.org)
 
 See LICENSE.txt for details on the (MIT) license.
 
-**WARNING** (June 21 2017) I am currently updating a few input files
-and recomputing the "testing" inputs; this message will be removed
-when the work is done, in an hour or two. If you clone the repository
-now be sure to pull changes at the end of today.
-
 ###########################
 REQUIREMENTS
 ###########################
