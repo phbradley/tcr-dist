@@ -9,6 +9,7 @@ import util
 from paths import path_to_db
 import parse_tsv
 from basic import *
+import random
 
 
 nbr_distance_default = pipeline_params[ 'distance_threshold_25' ]
@@ -24,6 +25,7 @@ with Parser(locals()) as p:
     p.float('nbr_distance').default( nbr_distance_default ) ## single-chain nbr distance threshold
     p.float('motifs_clustering_threshold').default(0.3)
     p.flag('verbose')
+    p.flag('constant_seed')
     p.flag('paper_figs')
     p.flag('paper_supp')
     p.flag('junction_bars')
@@ -31,6 +33,9 @@ with Parser(locals()) as p:
     p.int('target_num')
     p.multiword('epitopes').cast(lambda x:x.split())
     p.multiword('ABs').cast(lambda x:x.split())
+
+if constant_seed:
+    random.seed(1)
 
 if outfile_prefix is None:
     outfile_prefix = clones_file[:-4]

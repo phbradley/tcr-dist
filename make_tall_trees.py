@@ -24,7 +24,8 @@ with Parser(locals()) as p:
     #p.int('int_arg').shorthand('i')
     #p.float('float_arg')     # --float_arg 9.6
     p.flag('verbose')       # --flag_arg  (no argument passed)
-    p.int('constant_seed')       # --flag_arg  (no argument passed)
+    p.flag('constant_seed')       # --flag_arg  (no argument passed)
+    p.int('random_seed')       # --flag_arg  (no argument passed)
     p.flag('hacking')       # --flag_arg  (no argument passed)
     p.flag('paper_figs')       # --flag_arg  (no argument passed)
     p.flag('junction_bars')       # --flag_arg  (no argument passed)
@@ -40,9 +41,12 @@ with Parser(locals()) as p:
 if outfile_prefix is None:
     outfile_prefix = clones_file[:-4]
 
-if constant_seed != None:
-    print 'constant_seed:',constant_seed
-    random.seed(constant_seed)
+if constant_seed:
+    random.seed(1)
+
+if random_seed != None:
+    print 'random_seed:',random_seed
+    random.seed(random_seed)
 
 if paper_figs and ABs == None:
     ABs = ['AB']

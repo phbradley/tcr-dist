@@ -18,6 +18,7 @@ with Parser(locals()) as p:
     p.flag('only_parsed_seqs')
     p.flag('find_cdr3_motifs_in_parallel').described_as('Will spawn multiple simultaneous CDR3 motif finding jobs')
     p.flag('only_clones')
+    p.flag('constant_seed')
     p.str('extra_make_really_tall_trees_args').shorthand('mrtt_args')
     p.str('extra_find_clones_args').shorthand('fc_args')
     p.str('organism').required()
@@ -167,7 +168,12 @@ if parsed_seqs_file:
 if distance_params:
     distance_params_args = ' --distance_params {} '.format( distance_params )
 else:
-    distance_params_args = ''
+    distance_params_args = ' '
+
+if constant_seed:
+    constant_seed_args = ' --constant_seed '
+else:
+    constant_seed_args = ' '
 
 if not webdir:
     webdir = '{}_web'.format(clones_file[:-4])
@@ -300,8 +306,9 @@ run(cmd)
 ## compare with random tcrs
 random_nbrdists_file = '{}_random_nbrdists.tsv'.format(clones_file[:-4] )
 if not exists( random_nbrdists_file ):
-    cmd = 'python {}/random_tcr_distances.py {} --organism {} --clones_file {} > {}_rtd.log 2> {}_rtd.err'\
-          .format( path_to_scripts, distance_params_args, organism, clones_file, clones_file, clones_file )
+    cmd = 'python {}/random_tcr_distances.py {} {} --organism {} --clones_file {} > {}_rtd.log 2> {}_rtd.err'\
+          .format( path_to_scripts, constant_seed_args, distance_params_args, organism,
+                   clones_file, clones_file, clones_file )
     run(cmd)
 
 ## now read the output of the random nbrdists
@@ -326,13 +333,14 @@ run(cmd)
 
 
 ## make tall trees
-cmd = 'python {}/make_tall_trees.py --organism {} --clones_file {} --junction_bars > {}_mtt.log 2> {}_mtt.err'\
-      .format( path_to_scripts, organism, clones_file, clones_file, clones_file )
+cmd = 'python {}/make_tall_trees.py {} --organism {} --clones_file {} --junction_bars > {}_mtt.log 2> {}_mtt.err'\
+      .format( path_to_scripts, constant_seed_args, organism, clones_file, clones_file, clones_file )
 run(cmd)
 
 ## analyze intra-subject privacy
-cmd = 'python {}/analyze_epitope_privacy.py {} --organism {} --clones_file {} --all_chains AB --nrepeat 1000 --tree_height_inches 5.0 --nbrdist_percentile 10 > {}_aep.log 2> {}_aep.err'\
-      .format( path_to_scripts, distance_params_args, organism, clones_file, clones_file, clones_file )
+cmd = 'python {}/analyze_epitope_privacy.py {} {} --organism {} --clones_file {} --all_chains AB --nrepeat 1000 --tree_height_inches 5.0 --nbrdist_percentile 10 > {}_aep.log 2> {}_aep.err'\
+      .format( path_to_scripts, constant_seed_args, distance_params_args, organism,
+               clones_file, clones_file, clones_file )
 run(cmd)
 
 ## find motifs #################################################
@@ -374,8 +382,8 @@ if 1: #force or not motifs_files:
         extra_args = ' --chi_squared_threshold_for_seeds {} '.format( my_seed_threshold_for_motifs ) \
                      if my_seed_threshold_for_motifs else ''
 
-        cmd = 'python {}/find_cdr3_motifs.py --organism {} {} --clones_file {} --min_count {} --epitopes {} {} {} --verbose --big --nsamples {} --max_motif_len {} --max_ng_lines {} > {} 2> {}'\
-            .format( path_to_scripts, organism, extra_args, clones_file, min_count, ep,
+        cmd = 'python {}/find_cdr3_motifs.py {} --organism {} {} --clones_file {} --min_count {} --epitopes {} {} {} --verbose --big --nsamples {} --max_motif_len {} --max_ng_lines {} > {} 2> {}'\
+            .format( path_to_scripts, constant_seed_args, organism, extra_args, clones_file, min_count, ep,
                      ' --nofilter '*nofilter,
                      ' --force_random_len '*fixlen,
                      nsamples, max_motif_len, max_ng_lines,
@@ -411,8 +419,8 @@ if 1: #force or not motifs_files:
 
 ## make motifs summary
 
-cmd = 'python {}/read_motifs.py --junction_bars --max_ng_lines {} --organism {} --clones_file {} > {}_rm.log 2> {}_rm.err'\
-      .format( path_to_scripts, max_ng_lines, organism, clones_file, clones_file, clones_file )
+cmd = 'python {}/read_motifs.py {} --junction_bars --max_ng_lines {} --organism {} --clones_file {} > {}_rm.log 2> {}_rm.err'\
+      .format( path_to_scripts, constant_seed_args, max_ng_lines, organism, clones_file, clones_file, clones_file )
 run(cmd)
 
 ## make kpca landscape plots

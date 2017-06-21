@@ -48,7 +48,7 @@ for filetag, max_epitopes, max_subjects, max_tcrs_per_subject in examples:
 
         ## use intrasubject_nbrdists here because these mini-repertoires may contain only a single subject
         ## if there's only one subject, then we can't compute a nbrdist if we exclude intra-subject distances
-        cmd = 'python run_basic_analysis.py --intrasubject_nbrdists --organism {} --pair_seqs_file {} > {}.log 2> {}.err &'\
+        cmd = 'python run_basic_analysis.py --constant_seed --intrasubject_nbrdists --organism {} --pair_seqs_file {} > {}.log 2> {}.err &'\
               .format( organism, newfile, newfile, newfile )
         print cmd
         system(cmd)

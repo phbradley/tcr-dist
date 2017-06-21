@@ -208,7 +208,11 @@ for line in colors_string.split('\n'):
 
 
 ## get some colors for objects sorted by frequency
+## fiddle with random seed/state to get consistent colors; legacy silliness...
+##
 import random
+initial_random_state = random.getstate()
+
 random.seed(2)
 
 if COLOR_BREWER:
@@ -252,7 +256,7 @@ rank_colors = starter_colors + other_colors
 random.shuffle( other_colors_no_lights )
 rank_colors_no_lights = starter_colors + other_colors_no_lights
 
-random.seed() ## restore randomness
+random.setstate(initial_random_state)
 
 def get_rank_colors( num ):
     n_rank_colors = len(rank_colors)
