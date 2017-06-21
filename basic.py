@@ -27,7 +27,8 @@ pipeline_params= {
     ## distances decreased by a factor of 1.355, so as a temporary hack we introduced
     ## this parameter so that clustering and diversity calculations can be run with
     ## default parameters and give similar results.
-    'distance_threshold_25': 25.0 / 1.355,
+    #'distance_threshold_25': 25.0 / 1.355,
+    'distance_threshold_25': 25.0 / 1.298, ## now moving to a gap penalty in the CDR3 region of 12
 }
 
 
@@ -38,12 +39,6 @@ segtypes_lowercase = ['va','ja','vb','jb']
 
 ############################################################################################
 ############################################################################################
-
-def Log(s): ## silly legacy helper function
-    stderr.write(s)
-    if s and not s.endswith('\n'):
-        stderr.write('\n')
-
 
 ## you could modify this function if you have a different cmdline tool for converting svg to png
 ## like inkscape or cairosvg
@@ -128,5 +123,11 @@ def get_median(l_in):
     n = len(l)
     if n%2: return l[n/2]  ## n is odd
     else: return 0.5 * ( l[n/2] + l[n/2 - 1 ] ) ## n is even
+
+
+def Log(s): ## silly legacy helper function
+    stderr.write(s)
+    if s and not s.endswith('\n'):
+        stderr.write('\n')
 
 
