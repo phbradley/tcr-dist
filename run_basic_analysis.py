@@ -442,8 +442,9 @@ assert exists( summary_table_file ) and exists( cdr3_table_file )
 ## make a bunch of trees
 tree_files = glob('{}_tree_AB_*png'.format(clones_file[:-4]))
 if force or not tree_files or extra_make_really_tall_trees_args:
-    cmd = 'python {}/make_really_tall_trees.py {} --organism {} --clones_file {} > {}_mrtt.log 2> {}_mrtt.err'\
-        .format( path_to_scripts, extra_make_really_tall_trees_args if extra_make_really_tall_trees_args else ' ',
+    cmd = 'python {}/make_really_tall_trees.py {} {} --organism {} --clones_file {} > {}_mrtt.log 2> {}_mrtt.err'\
+        .format( path_to_scripts, constant_seed_args,
+                 extra_make_really_tall_trees_args if extra_make_really_tall_trees_args else ' ',
                  organism, clones_file, clones_file, clones_file )
     run(cmd)
 
