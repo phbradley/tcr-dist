@@ -327,20 +327,20 @@ if __name__ == '__main__':
     params = DistanceParams()
 
     for aa in amino_acids:
-        print 'AAdist',aa,
+        print('AAdist',aa)
         for bb in amino_acids:
-            print '{:.3f}'.format( bsd4[(aa,bb)] ),
-        print
+            print('{:.3f}'.format( bsd4[(aa,bb)] ))
+        print()
 
     rep_dists = compute_all_v_region_distances( 'human', params )
 
     vb_genes = [ x for x in rep_dists.keys() if x[2] == 'B' ]
     vb_genes.sort()
 
-    print 'num_v_genes',len(vb_genes)
+    print('num_v_genes',len(vb_genes))
 
     for v1 in vb_genes:
-        print 'Vdist',v1,
+        print('Vdist',v1)
         for v2 in vb_genes:
             print('{:.3f}'.format(rep_dists[v1][v2]))
         print()
