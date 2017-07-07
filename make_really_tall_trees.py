@@ -11,6 +11,7 @@ from . import util
 from . import html_colors
 import scipy.stats
 import copy
+import random
 from operator import add
 from functools import reduce
 #from mannwhitneyu import mannwhitneyu as mannwhitneyu_exact #too slow
@@ -22,8 +23,11 @@ with Parser(locals()) as p:
     p.float('distance_scale_factor').default(0.01)
     p.float('extra_color_schemes_none_score').shorthand('none_score')
     p.flag('dont_trim_labels')
+    p.flag('constant_seed')
     p.multiword('only_epitopes').cast(lambda x:x.split())
     p.multiword('extra_color_schemes').shorthand('colors').cast(lambda x:x.split())
+
+if constant_seed: random.seed(1)
 
 probs_cs            = 'probs'
 sharing_cs          = 'sharing'

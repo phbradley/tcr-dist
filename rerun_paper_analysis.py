@@ -11,6 +11,16 @@ with Parser(locals()) as p:
     p.set_help_prefix( "\nThis script will re-run the analysis from the primary citation; it will take a few hours. Use --multicore to speed things up if you have multiple cores to burn\n" )
 
 
+
+## These are the distance parameters used in the original publication in Nature.
+##
+## Since then, we've seen evidence that a gap penalty in the CDR3 region of 12 performs slightly better.
+## So that is the new default; here the scale_factor term accounts for the difference in TCRdist values
+## (lower overall w/ classic gap penalty of 8)
+##
+distance_params='gap_penalty_v_region:4,gap_penalty_cdr3_region:8,weight_cdr3_region:3,align_cdr3s:False,trim_cdr3s:True,scale_factor:1.0439137134052388'
+
+
 for organism in ['mouse','human']:
 
     if from_pair_seqs:
@@ -21,8 +31,8 @@ for organism in ['mouse','human']:
         extra_args = ' --find_cdr3_motifs_in_parallel ' if multicore else ''
         cmd_suffix = ' &' if multicore else ''
 
-        cmd = 'nice python run_basic_analysis.py {} --organism {} --pair_seqs_file {} > {}.log 2> {}.err {}'\
-            .format( extra_args, organism, pair_seqs_file, pair_seqs_file, pair_seqs_file, cmd_suffix )
+        cmd = 'nice python run_basic_analysis.py {} --distance_params {} --organism {} --pair_seqs_file {} > {}.log 2> {}.err {}'\
+            .format( extra_args, distance_params, organism, pair_seqs_file, pair_seqs_file, pair_seqs_file, cmd_suffix )
         print(cmd)
         system(cmd)
         time.sleep(1.0) ## short pause
@@ -34,8 +44,8 @@ for organism in ['mouse','human']:
         extra_args = ' --find_cdr3_motifs_in_parallel ' if multicore else ''
         cmd_suffix = ' &' if multicore else ''
 
-        cmd = 'nice python run_basic_analysis.py {} --organism {} --clones_file {} > {}.log 2> {}.err {}'\
-            .format( extra_args, organism, clones_file, clones_file, clones_file, cmd_suffix )
+        cmd = 'nice python run_basic_analysis.py {} --distance_params {} --organism {} --clones_file {} > {}.log 2> {}.err {}'\
+            .format( extra_args, distance_params, organism, clones_file, clones_file, clones_file, cmd_suffix )
         print(cmd)
         system(cmd)
         time.sleep(1.0) ## short pause

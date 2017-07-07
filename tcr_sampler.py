@@ -158,9 +158,7 @@ def analyze_junction( organism, v_gene, j_gene, cdr3_protseq, cdr3_nucseq, force
     if num_matched_v + num_matched_j > len(cdr3_nucseq):
         ## some overlap!
         extra = num_matched_v + num_matched_j - len(cdr3_nucseq )
-        #print 'TRIM extra',extra
-        #fake_v_trim = random.randint(0,extra)
-        fake_v_trim = extra/2 ## now dterministic
+        fake_v_trim = extra/2 ## now deterministic
         fake_j_trim = extra - fake_v_trim
         num_matched_v -= fake_v_trim
         num_matched_j -= fake_j_trim
@@ -235,19 +233,11 @@ def analyze_junction( organism, v_gene, j_gene, cdr3_protseq, cdr3_nucseq, force
 
 
         else:
-            best_d_id = 0 #random.randint( 1, 2)
+            best_d_id = 0
             n_vd_insert = 0
             n_dj_insert = 0
             d0_trim = 0
             d1_trim = 0
-            # pos = random.randint( 0, len(nseq) )
-            # best_overlap_seq = ''
-            # nucseq = trbd_nucseq[best_id]
-            # start = random.randint( 0, len(nucseq) )
-            # stop = start-1
-            # best_trim = (start,len(nucseq)-1-stop)
-
-        #d_info = ' %d D%d %d '%(best_trim[0],best_id,best_trim[1])
 
 
 
@@ -366,7 +356,6 @@ def alpha_cdr3_protseq_probability( organism, v_gene, j_gene, cdr3_protseq,
                 ## some overlap!
                 extra = max_v + max_j - len(cdr3_nucseq )
                 #print 'TRIM extra',extra
-                #fake_v_trim = random.randint(0,extra)
                 fake_v_trim = extra/2 ## now dterministic
                 fake_j_trim = extra - fake_v_trim
                 max_v -= fake_v_trim
@@ -508,7 +497,6 @@ def beta_cdr3_protseq_probability( organism, v_gene, j_gene, cdr3_protseq,
                 ## some overlap!
                 extra = max_v + max_j - len(cdr3_nucseq )
                 #print 'TRIM extra',extra
-                #fake_v_trim = random.randint(0,extra)
                 fake_v_trim = extra/2 ## now dterministic
                 fake_j_trim = extra - fake_v_trim
                 max_v -= fake_v_trim

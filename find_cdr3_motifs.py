@@ -28,6 +28,7 @@ with Parser(locals()) as p:
     p.float('min_extended_count_ratio').default(0.6)
     p.flag('use_fake_seqs')
     p.flag('big')
+    p.flag('constant_seed')
     p.flag('force_random_len')
     p.flag('verbose')
     p.flag('nofilter')
@@ -35,6 +36,8 @@ with Parser(locals()) as p:
     p.flag('test_random')
     p.flag('hacking')
     p.multiword('epitopes').cast(lambda x:x.split())
+
+if constant_seed: random.seed(1)
 
 assert big
 

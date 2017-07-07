@@ -8,7 +8,6 @@ from __future__ import print_function, division
 import string
 from os import popen,system,getcwd
 import sys
-from random import random
 from math import floor,log,exp
 #from popen2 import popen2
 #from os.path import exists
