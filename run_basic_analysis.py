@@ -22,6 +22,7 @@ with Parser(locals()) as p:
     p.str('extra_make_really_tall_trees_args').shorthand('mrtt_args')
     p.str('extra_find_clones_args').shorthand('fc_args')
     p.str('organism').required()
+    p.str('single_chain').described_as("To analyze only a single chain; e.g. \"--single_chain alpha\" ")
     p.str('webdir').described_as('Location where the index.html summary output file will be generated. Default is <clones_file>_web/')
     p.str('distance_params')
     p.int('min_quality_for_singletons').default(20).described_as('Minimum CDR3 region quality score for singleton clones')
