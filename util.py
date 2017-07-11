@@ -4,6 +4,7 @@ from scipy.cluster import hierarchy
 from scipy.spatial import distance
 import os
 import html_colors
+import parse_tsv
 
 verbose = __name__ == '__main__'
 
@@ -218,6 +219,18 @@ def assign_label_reps_and_colors_based_on_most_common_genes_in_repertoire( tcr_i
     return ## we modified the elements of the tcr_infos list in place
 
 
+## this is not exactly perfect, but probably OK to start with...
+##
+def detect_fake_chains( clones_file, Achain='A', Bchain='B' ):
+    tcrs = parse_tsv.parse_tsv_file( clones_file, key_fields = [], store_fields = ['va_gene','cdr3a','vb_gene','cdr3b'] )
+    fake_chains = []
+    if len( set( [ (x[0],x[1]) for x in tcrs ] ) )==1:
+        fake_chains.append( Achain )
+    if len( set( [ (x[2],x[3]) for x in tcrs ] ) )==1:
+        fake_chains.append( Bchain )
+    if fake_chains:
+        print 'Fake sequence data detected for chains: {}'.format( ' '.join( fake_chains ) )
+    return fake_chains
 
 
 # if __name__ == '__main__':

@@ -26,6 +26,8 @@ import numpy as np
 clones_file_with_nbrdists = '{}_nbrdists.tsv'.format(clones_file[:-4])
 assert exists( clones_file_with_nbrdists )
 
+fake_chains = util.detect_fake_chains( clones_file )
+
 ##
 all_tcrs = {}
 all_info = []
@@ -91,7 +93,8 @@ for suffix in suffixes_corr:
             tag = '{}_{}{}'.format( ep, chains, suffix )
             all_vals.append( [ float( x[tag] ) for x in all_info ] )
 
-
+        if chains in fake_chains:
+            continue
 
         A = np.zeros( ( len(epitopes),len(epitopes) ) )
         D = np.zeros( ( len(epitopes),len(epitopes) ) )
@@ -386,6 +389,8 @@ for ii_suffix,suffix in enumerate(suffixes):
         plotno += 1
         plt.subplot( nrows, ncols, plotno )
 
+        if chains in fake_chains: continue
+
         mn,mx = all_min_max[chains ]
 
         sortl = []
@@ -453,6 +458,8 @@ for nbrdist_perc in nbrdist_percentiles:
         for ii_chains, chains in enumerate( ['A','B','AB'] ):
             plotno += 1
             plt.subplot( nrows, ncols, plotno )
+
+            if chains in fake_chains: continue
 
             mn,mx = all_min_max[chains ]
 
