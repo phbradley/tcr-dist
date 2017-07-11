@@ -89,19 +89,19 @@ try:
     import numpy
 except:
     print '[ERROR] failed to import numpy'
-    exit()
+    exit(1)
 
 try:
     import scipy
 except:
     print '[ERROR] failed to import scipy'
-    exit()
+    exit(1)
 
 try:
     import matplotlib
 except:
     print '[ERROR] failed to import matplotlib'
-    exit()
+    exit(1)
 
 try:
     import sklearn
@@ -146,7 +146,7 @@ if not isdir( blastdir ):
 
         if not exists( tarfile ):
             print '[ERROR] download BLAST failed!'
-            exit()
+            exit(1)
 
     cmd = 'tar -xzf '+tarfile
     print cmd
@@ -172,7 +172,7 @@ if not exists( tarfile ):
 
         if not exists( tarfile ):
             print '[ERROR] download database files failed'
-            exit()
+            exit(1)
 
 ## md5sum check
 lines = popen('md5sum '+tarfile).readlines()
@@ -199,7 +199,7 @@ if not isdir( download_dir ):
 
     if not isdir( download_dir ):
         print '[ERROR] tar failed or the database download was corrupted!'
-        exit()
+        exit(1)
 
 cmd = 'mv {}/external/* .'.format(download_dir)
 print cmd
@@ -216,4 +216,3 @@ system(cmd)
 cmd = 'mv {}/testing_ref ../'.format(download_dir)
 print cmd
 system(cmd)
-
