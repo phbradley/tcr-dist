@@ -183,7 +183,7 @@ def get_mm1_rep_gene_for_counting( allele, organism ):
 
 def countreps_from_genes( genes, organism ):
     global allele2mm1_rep_gene_for_counting
-    reps = set( ( allele2mm1_rep_gene_for_counting(x,organism) for x in genes ) )
+    reps = set( ( allele2mm1_rep_gene_for_counting[ organism ][ x ] for x in genes ) )
     return reps
 
 

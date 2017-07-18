@@ -10,7 +10,6 @@ with Parser(locals()) as p:
     p.str('organism').required()
     #p.str('Achain').default('A').described_as("Use 'G' for gamma delta") ### coming soon!
     #p.str('Bchain').default('B').described_as("Use 'D' for gamma delta") ### coming soon!
-    p.str('single_chain').described_as("To analyze only a single chain; e.g. \"--single_chain alpha\" ")
     p.flag('verbose')       # --flag_arg  (no argument passed)
     p.flag('clobber').shorthand('c')       # --flag_arg  (no argument passed)
     p.flag('dry_run')       # --flag_arg  (no argument passed)
@@ -162,12 +161,19 @@ for line in open( infile,'r'):
     epitope = l[ 'epitope' ]
     mouse = l[ 'subject' ]
 
+    if not epitope or not mouse or epitope=='-' or mouse=='-':
+        print 'skipping line with bad epitope/subject',epitope,mouse
+        continue
+
     ## nucseqs and quals
     if make_fake_alpha:
         aseq = fake_nucseqs[organism]['A']
         aquals = [60]*len(aseq)
     else:
         aseq = l[ 'a_nucseq' ]
+        if not aseq or aseq == '-':
+            print 'skipping line with bad a_nucseq:',aseq,line[:-1]
+            continue
         if make_fake_quals:
             aquals = [60]*len(aseq)
         else:
@@ -178,6 +184,9 @@ for line in open( infile,'r'):
         bquals = [60]*len(bseq)
     else:
         bseq = l[ 'b_nucseq' ]
+        if not bseq or bseq == '-':
+            print 'skipping line with bad b_nucseq:',bseq,line[:-1]
+            continue
         if make_fake_quals:
             bquals = [60]*len(bseq)
         else:
