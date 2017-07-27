@@ -37,6 +37,7 @@ with Parser(locals()) as p:
     p.flag('add_masked_seqs')       # --flag_arg  (no argument passed)
     p.flag('filter')       # --flag_arg  (no argument passed)
     p.int('max_cdr3_length_for_filtering').default(30)       # --flag_arg  (no argument passed)
+    p.flag('no_probabilities').described_as('Assign a probability of 1 to all TCRs.')
     #p.flag('find_exact_matches')       # --flag_arg  (no argument passed)
     #p.range('range_arg')     # --range_arg 1:2
     #p.multiword('multi_arg') # --multi_arg hello world
@@ -117,20 +118,24 @@ for line in open(infile,'r'):
     va_cdr3_protseq,codons = read_sanger_data.get_translation( va_cdr3_nucseq, '+1' )
     ja_cdr3_protseq,codons = read_sanger_data.get_translation( ja_cdr3_nucseq, '+{}'.format(1+len(ja_cdr3_nucseq)%3))
 
-    aprob_nucseq,new_cdr3a_nucseq = tcr_sampler.alpha_cdr3_protseq_probability( organism, va_gene, ja_gene,
+    if no_probabilities: ##all probabilities will be set to 1 if this flag is set
+        aprob_nucseq = 1
+        aprob_protseq = 1
+    else:
+        aprob_nucseq,new_cdr3a_nucseq = tcr_sampler.alpha_cdr3_protseq_probability( organism, va_gene, ja_gene,
                                                                                 cdr3_protseq='',
                                                                                 cdr3_nucseq=cdr3a_nucseq,  verbose=verbose,
                                                                                 return_final_cdr3_nucseq=True )
 
-    if new_cdr3a_nucseq != cdr3a_nucseq: ## note note note
-        print 'new_cdr3a_nucseq:',len(new_cdr3a_nucseq),new_cdr3a_nucseq
-        print 'old_cdr3a_nucseq:',len(cdr3a_nucseq),cdr3a_nucseq
-        new_cdr3a_protseq = read_sanger_data.get_translation( new_cdr3a_nucseq, '+1' )[0]
-    else:
-        new_cdr3a_protseq = cdr3a_protseq[:]
-        assert new_cdr3a_protseq == read_sanger_data.get_translation( cdr3a_nucseq, '+1' )[0]
+        if new_cdr3a_nucseq != cdr3a_nucseq: ## note note note
+            print 'new_cdr3a_nucseq:',len(new_cdr3a_nucseq),new_cdr3a_nucseq
+            print 'old_cdr3a_nucseq:',len(cdr3a_nucseq),cdr3a_nucseq
+            new_cdr3a_protseq = read_sanger_data.get_translation( new_cdr3a_nucseq, '+1' )[0]
+        else:
+            new_cdr3a_protseq = cdr3a_protseq[:]
+            assert new_cdr3a_protseq == read_sanger_data.get_translation( cdr3a_nucseq, '+1' )[0]
 
-    aprob_protseq = tcr_sampler.alpha_cdr3_protseq_probability( organism, va_gene, ja_gene, new_cdr3a_protseq,
+        aprob_protseq = tcr_sampler.alpha_cdr3_protseq_probability( organism, va_gene, ja_gene, new_cdr3a_protseq,
                                                                 verbose=verbose )
 
     ## BETA
@@ -143,20 +148,23 @@ for line in open(infile,'r'):
     vb_cdr3_protseq,codons = read_sanger_data.get_translation( vb_cdr3_nucseq, '+1' )
     jb_cdr3_protseq,codons = read_sanger_data.get_translation( jb_cdr3_nucseq, '+{}'.format(1+len(jb_cdr3_nucseq)%3))
 
-
-    bprob_nucseq, new_cdr3b_nucseq \
+    if no_probabilities: ##all probabilities will be set to 1 if this flag is set
+        bprob_nucseq = 1
+        bprob_protseq = 1
+    else:
+        bprob_nucseq, new_cdr3b_nucseq \
         = tcr_sampler.beta_cdr3_protseq_probability( organism, vb_gene, jb_gene, cdr3_protseq='',
                                                      verbose=verbose, cdr3_nucseq=cdr3b_nucseq,
                                                      allow_early_nucseq_mismatches=True,
                                                      return_final_cdr3_nucseq=True )
 
-    if new_cdr3b_nucseq != cdr3b_nucseq: ## note note note
-        new_cdr3b_protseq = read_sanger_data.get_translation( new_cdr3b_nucseq, '+1' )[0]
-    else:
-        new_cdr3b_protseq = cdr3b_protseq[:]
-        assert new_cdr3b_protseq == read_sanger_data.get_translation( cdr3b_nucseq, '+1' )[0]
+        if new_cdr3b_nucseq != cdr3b_nucseq: ## note note note
+            new_cdr3b_protseq = read_sanger_data.get_translation( new_cdr3b_nucseq, '+1' )[0]
+        else:
+            new_cdr3b_protseq = cdr3b_protseq[:]
+            assert new_cdr3b_protseq == read_sanger_data.get_translation( cdr3b_nucseq, '+1' )[0]
 
-    bprob_protseq = tcr_sampler.beta_cdr3_protseq_probability( organism, vb_gene, jb_gene, new_cdr3b_protseq,
+        bprob_protseq = tcr_sampler.beta_cdr3_protseq_probability( organism, vb_gene, jb_gene, new_cdr3b_protseq,
                                                                verbose=verbose )
 
     vals = dict(l)  #line.split('\t') + ['']*(len(outfields)-len(infields))
@@ -189,7 +197,12 @@ for line in open(infile,'r'):
         vals[ 'cdr3b_new_nucseq' ] = cdr3b_new_nucseq
 
     ## there's a little bit of a bias toward guys with more blast hits, ie shorted reads? since we take a max
-    if new_probs:
+    if no_probabilities: ##all probabilities will be set to 1 if this flag is set
+        va_rep_prob = 1
+        ja_rep_prob = 1
+        vb_rep_prob = 1
+        jb_rep_prob = 1
+    elif new_probs:
         va_rep_prob = max( [ tcr_rearrangement.all_countrep_pseudoprobs[organism][x] for x in va_countreps ] )
         ja_rep_prob = max( [ tcr_rearrangement.all_countrep_pseudoprobs[organism][x] for x in ja_countreps ] )
         vb_rep_prob = max( [ tcr_rearrangement.all_countrep_pseudoprobs[organism][x] for x in vb_countreps ] )
