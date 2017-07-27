@@ -105,11 +105,11 @@ for organism in [ 'mouse','human' ]:
     for line in open( align_file,'r'):
         if line[0] == '>':
             id = line.split('|')[1]
-            print "JCC"
-            print line
-            print id
-            print id[:4]
-            print tr_prefixes
+#            print "JCC"
+#            print line
+#            print id
+#            print id[:4]
+#            print tr_prefixes
             if id[:4] in tr_prefixes: assert id not in align_fasta
             align_fasta[id] = ''
         else:
