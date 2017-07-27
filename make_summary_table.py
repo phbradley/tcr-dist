@@ -134,6 +134,8 @@ logfile = '{}_aep.log'.format(clones_file)
 assert exists( logfile )
 for line in open( logfile,'r'):
     l = line.split()
+    if not l:
+        continue
     if l[0] == 'rep':
         epitope = l[-1]
         chains = l[-2]

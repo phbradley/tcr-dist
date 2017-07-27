@@ -37,7 +37,7 @@ trbd_nucseq_human = {
 
 all_trbd_nucseq = {'mouse':trbd_nucseq_mouse, 'human':trbd_nucseq_human}
 
-
+##The following hard-coded probabilities are actually derived from the probabilities files in the /db/ directory. This will eventually be re-coded to obtain the relevant probabilities directly from those files.
 alpha_trim_prob_lines_mouse = """
 PROB_A_v_trim  0.421946  0.141516  0.113666  0.114740  0.063751  0.045711  0.034423  0.029273  0.013622  0.009955  0.007622  0.002139  0.000761  0.000254  0.000527  0.000095
 PROB_A_j_trim  0.209729  0.139163  0.128939  0.148367  0.110268  0.110984  0.060651  0.036761  0.027030  0.011851  0.006179  0.004318  0.001836  0.002154  0.001070  0.000701
