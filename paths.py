@@ -9,7 +9,11 @@ assert not path_to_scripts.endswith('/')
 ## They will hopefully get created when you run the setup.py script.
 ##
 
-path_to_db = path_to_scripts+'/db'
+if os.path.isdir(path_to_scripts + "/tempdbs/fasta/"):
+    print "Database folder " + path_to_scripts + "/tempdbs/fasta/ detected-- attempting to use this instead of default."
+    path_to_db = path_to_scripts + "/tempdbs"
+else:
+    path_to_db = path_to_scripts+'/db'
 assert os.path.isdir( path_to_db )
 
 ## used for making nice sortable tables

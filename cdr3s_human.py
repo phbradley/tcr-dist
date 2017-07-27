@@ -19,7 +19,6 @@ gap_character = '.'
 
 #################################################################################
 
-
 fasta_dir = path_to_db+'/fasta/'
 
 verbose = ( __name__ == '__main__' )
@@ -106,6 +105,11 @@ for organism in [ 'mouse','human' ]:
     for line in open( align_file,'r'):
         if line[0] == '>':
             id = line.split('|')[1]
+            print "JCC"
+            print line
+            print id
+            print id[:4]
+            print tr_prefixes
             if id[:4] in tr_prefixes: assert id not in align_fasta
             align_fasta[id] = ''
         else:
@@ -130,6 +134,8 @@ for organism in [ 'mouse','human' ]:
     tr_prefixes = ['TRBV','TRBJ','TRAV','TRAJ']
     for line in open( fastafile,'r'):
         if line[0] == '>':
+            print tr_prefixes
+            print line
             id = line.split('|')[1]
             if id[:4] in tr_prefixes: assert id not in fasta
             fasta[id] = ''
