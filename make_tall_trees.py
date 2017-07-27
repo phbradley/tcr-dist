@@ -51,6 +51,15 @@ if random_seed != None:
 if paper_figs and ABs == None:
     ABs = ['AB']
 
+if ABs == None:
+    ABs = ['A','B','AB']
+
+fake_chains = util.detect_fake_chains( clones_file )
+for ch in fake_chains:
+    if ch in ABs:
+        del ABs[ ABs.index(ch)]
+
+
 font_family = "Droid Sans Mono"
 
 greek_alpha = '&#x3b1;'
@@ -245,8 +254,6 @@ if color_scheme == 'probs':
         color_score_range['AB'] = ( -20.0, -14.0 )
 
 
-if ABs == None:
-    ABs = ['A','B','AB']
 
 for epitope in epitopes:
     if hacking and epitope != 'M158': continue

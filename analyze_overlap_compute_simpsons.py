@@ -28,6 +28,8 @@ outlogfile = '{}_sharing.log'.format( clones_file[:-4] )
 print 'making:',outlogfile
 outlog =open( outlogfile,'w')
 
+fake_chains = util.detect_fake_chains( clones_file )
+
 import matplotlib
 if not show: matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -726,6 +728,7 @@ for comparison_mode in range(3): ## normal, genes only, distance-based
                     all_div = {}
 
                     for chains in ['A','B','AB']:
+                        if chains in fake_chains: continue
 
                         overlaps = []
 
@@ -764,7 +767,7 @@ for comparison_mode in range(3): ## normal, genes only, distance-based
                         all_div[chains] = diversity
 
                         if chains == 'AB':
-                            est = all_div['A']*all_div['B']
+                            est = all_div.get('A',1.0)*all_div.get('B',1.0)
                             estimate = ' est_unpaired: {:9.1f} ratio: {:9.3f} '.format( est, 0 if diversity==0 else est/diversity)
                         else:
                             estimate = ' '

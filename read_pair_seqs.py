@@ -8,10 +8,14 @@ with Parser(locals()) as p:
     p.str('infile').required()
     p.str('outfile').required()
     p.str('organism').required()
+    #p.str('Achain').default('A').described_as("Use 'G' for gamma delta") ### coming soon!
+    #p.str('Bchain').default('B').described_as("Use 'D' for gamma delta") ### coming soon!
     p.flag('verbose')       # --flag_arg  (no argument passed)
     p.flag('clobber').shorthand('c')       # --flag_arg  (no argument passed)
     p.flag('dry_run')       # --flag_arg  (no argument passed)
     p.flag('save_results')       # --flag_arg  (no argument passed)
+    p.flag('make_fake_alpha').described_as("Create a fictitious alpha chain sequence")
+    p.flag('make_fake_beta').described_as("Create a fictitious beta chain sequence")
     p.flag('make_fake_quals').described_as("Create a fictitious quality string for each nucleotide sequence")
     p.flag('make_fake_ids').described_as("Create an id for each line based on index in the file")
     p.set_help_prefix("""
@@ -62,6 +66,20 @@ default_outfields = ['id','epitope','subject',
 assert outfile.endswith('tsv') ## stupid
 
 if exists(outfile): assert clobber
+
+
+fake_nucseqs = {
+    'human': { 'A':'CGTACATAAGNTATTTGTCTGTGATATACACATCAGAATCCTTACTTTGTGACACATTTGTTTGAGAATCAAAATCGGTGAATAGGCAGACAGACTTGTCACTGGATTTAGAGTCTCTCAGCTGGTACACGGCAGGGTCAGGCTTCTGGATATTGGGCTTCACCACCAGCTGAGTTCCATCTCCAAACATGAGTCTGGCATTGTTATTCCGGACAGCACAGAAGTACAAAGCGGAGTCGCTCACAAGGGCAGATGGTTTCTTCAGGTGGAAGGAGGTTTGACTCTAGTTAAATTCAGCTTCAAAGCCATAGCTGCCTTTAACCAGGTTATCCCCTGTGATGTATTTCAGAAGGAACTGGAGGCCTCGGTTGGGGTATTGAACATACCAAAAAAGATAAGGGTTTCCAGAGACTGAATATGTGCATAAAA',
+               'B':'CCGGGGGTGAAACCTTGATTAGGTCCTCTACAACTGTGAGTCTGGTGCCTTGTCCAAAGAAAGCTTCGTTTACAATGCTGCTGGCACAGAAGTACACAGCTGAGTCCCTGGGTTCTGAGGGCTGGATCTTCAGAGTGGAAACAAN',
+               'G':'',
+               'D':'',
+               },
+    'mouse': {'A':'GGGAAAGCGTAGGGGTGCTGTCCTGAGACCGAGGATCTTTTAACTGGTACACAGCAGGTTCTGGGTTCTGGATGTCTGGCTTTATAATTAGCTTGGTCCCAGAGCCCCAGATCAACTGATAGTTGCTATCCATGTCAGTAGCACAGAAGTACACAGCGGTGTCTTCACACCGAGTAGCAGTGATGGACAAGGAGCTGCTCTGGCTGGAGGTGTCAAGGGTGGCTCTAAAAN',
+              'B':'CACCGGGGGGGTCGGGGAAGAAGCCCCTNGGCCAGCACACGAGGGTAGCCTTTTGTTTGTTTGCAATCTCTGCTTTTGATGGCTCAAACAAGGAGACCTTGGGTGGAGTCACATTTCTCAGATCCTCCAGGACAGACAGCTTGGTTCCATGACCGAAAAATAATCTTTCGTTGGCCCCCATACTGCTGGCACAGAGAAAAACGGCCATCTCGTTCTTCTGGGCAGATGTCACAGTGAGAGAAAAAGATGACTTCTTCTCTCGAGACGCATCATAGCCTTCAGATAGATCGCCTTTTTGAAGATCGTTTTCAGTTATTGAATAGTAGATCAGTCTCAATCCTTTCCCTGAATCCTGTCGGTACCAGN',
+              'G':'',
+              'D':''
+              }
+    }
 
 
 def get_qualstring( cdr3seqtag, nucseq_in, quals_in ):
@@ -142,14 +160,37 @@ for line in open( infile,'r'):
         id = l[ 'id' ]
     epitope = l[ 'epitope' ]
     mouse = l[ 'subject' ]
-    aseq = l[ 'a_nucseq' ]
-    bseq = l[ 'b_nucseq' ]
-    if make_fake_quals:
+
+    if not epitope or not mouse or epitope=='-' or mouse=='-':
+        print 'skipping line with bad epitope/subject',epitope,mouse
+        continue
+
+    ## nucseqs and quals
+    if make_fake_alpha:
+        aseq = fake_nucseqs[organism]['A']
         aquals = [60]*len(aseq)
+    else:
+        aseq = l[ 'a_nucseq' ]
+        if not aseq or aseq == '-':
+            print 'skipping line with bad a_nucseq:',aseq,line[:-1]
+            continue
+        if make_fake_quals:
+            aquals = [60]*len(aseq)
+        else:
+            aquals = map( int, l[ 'a_quals' ].split('.') )
+
+    if make_fake_beta:
+        bseq = fake_nucseqs[organism]['B']
         bquals = [60]*len(bseq)
     else:
-        aquals = map( int, l[ 'a_quals' ].split('.') )
-        bquals = map( int, l[ 'b_quals' ].split('.') )
+        bseq = l[ 'b_nucseq' ]
+        if not bseq or bseq == '-':
+            print 'skipping line with bad b_nucseq:',bseq,line[:-1]
+            continue
+        if make_fake_quals:
+            bquals = [60]*len(bseq)
+        else:
+            bquals = map( int, l[ 'b_quals' ].split('.') )
 
     assert len(aseq) == len(aquals)
     assert len(bseq) == len(bquals)

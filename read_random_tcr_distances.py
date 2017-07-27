@@ -29,6 +29,7 @@ import matplotlib.pyplot as plt
 def greek_seg( seg ):
     return seg.replace( 'A', r'$\alpha$' ).replace( 'B', r'$\beta$' )
 
+fake_chains = util.detect_fake_chains( clones_file )
 
 ## don't exclude xr guys just for discrimination vs random
 ##
@@ -237,6 +238,8 @@ for ii_epitope, epitope in enumerate(epitopes):
             mn = min( positive_nbrdists + negative_nbrdists_random + negative_nbrdists_others )
             mx = max( positive_nbrdists + negative_nbrdists_random + negative_nbrdists_others )
 
+            if chains in fake_chains:
+                continue ## the next line will fail if all positive_nbrdists are 0
             positive_density = gaussian_kde( positive_nbrdists )
             negative_density_random = gaussian_kde( negative_nbrdists_random )
             if other_epitopes: negative_density_others = gaussian_kde( negative_nbrdists_others )

@@ -28,6 +28,8 @@ with Parser(locals()) as p:
     p.float('seed_threshold_for_motifs')
     p.flag('make_fake_quals').described_as("(for --pair_seqs_file I/O, arg is passed to read_pair_seqs.py) Create a fictitious quality string for each nucleotide sequence")
     p.flag('make_fake_ids').described_as("(for --pair_seqs_file I/O, arg passed to read_pair_seqs.py) Create an id for each line based on index in the pair_seqs file")
+    p.flag('make_fake_alpha').described_as("Create a fictitious alpha chain sequence")
+    p.flag('make_fake_beta').described_as("Create a fictitious beta chain sequence")
     p.flag('force')
     p.flag('webstatus')
     p.flag('dry_run')
@@ -268,10 +270,12 @@ if not ( only_clones or only_parsed_seqs ):
         print '\nWill generate summary output file: {}\n'.format(webfile)
 
 if pair_seqs_file and ( force or not exists( parsed_seqs_file ) ):
-    cmd = 'python {}/read_pair_seqs.py {} {} --organism {} --infile {} --outfile {} -c > {}.log 2> {}.err'\
+    cmd = 'python {}/read_pair_seqs.py {} {} {} {} --organism {} --infile {} --outfile {} -c > {}.log 2> {}.err'\
           .format( path_to_scripts,
                    ' --make_fake_ids ' if make_fake_ids else '',
                    ' --make_fake_quals ' if make_fake_quals else '',
+                   ' --make_fake_alpha ' if make_fake_alpha else '',
+                   ' --make_fake_beta ' if make_fake_beta else '',
                    organism, pair_seqs_file, parsed_seqs_file, parsed_seqs_file, parsed_seqs_file )
     run( cmd )
 
