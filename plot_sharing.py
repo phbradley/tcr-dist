@@ -17,7 +17,7 @@ with Parser(locals()) as p:
 logfile = clones_file[:-4]+'_sharing.log'
 auc_logfile= clones_file[:-4]+'_random_aucs.log'
 
-
+fake_chains = util.detect_fake_chains( clones_file )
 
 if not exists( logfile ):
     print 'Sorry, you need to run analyze_overlap_compute_simpsons.py before this script'
@@ -506,6 +506,7 @@ epitopes = epitope_diversity['A'].keys()
 plotno=0
 
 for chains in ['A','B','AB']:
+    if chains in fake_chains: continue
     #for ( divindex, divtype ) in [ ( 0, 'inv_simpson_gaussdist' ), (1, 'shannon_gaussdist'), (2, 'avg_nbrdist') ]:
     for ( divindex, divtype ) in [ ( 0, 'TCRdiv' ),
                                    ( 2, 'avg_nbrdist10p aka NN-distance'),

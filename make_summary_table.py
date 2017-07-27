@@ -14,6 +14,7 @@ with Parser(locals()) as p:
     p.str('clones_file').required()
     p.str('organism')
 
+fake_chains = util.detect_fake_chains( clones_file )
 
 table1_file_prefix = clones_file[:-4]+'_summary_table'
 table2_file_prefix = clones_file[:-4]+'_CDR3_table'
@@ -288,6 +289,7 @@ ncols = len(scoretag_suffixes)
 plt.figure(1,figsize=(12,12))
 plotno=0
 for ab in ['a','b','ab']:
+    if ab.upper() in fake_chains: continue
     for suf in scoretag_suffixes:
         plotno += 1
         plt.subplot(nrows,ncols,plotno)

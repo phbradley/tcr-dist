@@ -23,6 +23,7 @@ with Parser(locals()) as p:
     p.multiword('extra_color_schemes').shorthand('colors').cast(lambda x:x.split())
 
 if constant_seed: random.seed(1)
+fake_chains = util.detect_fake_chains( clones_file )
 
 probs_cs            = 'probs'
 sharing_cs          = 'sharing'
@@ -44,7 +45,15 @@ if extra_color_schemes:
 gap_character = '-' ## different from some other places
 min_cluster_size = 1
 
-cluster_radius = {'AB':1.0, 'A':0.5, 'B':0.5}
+#cluster_radius = {'AB':1.0, 'A':0.5, 'B':0.5}
+distance_threshold_25_scaled = distance_scale_factor * pipeline_params[ 'distance_threshold_25' ]
+
+cluster_radius = {
+    'A' : distance_threshold_25_scaled*2, ## was 0.5
+    'B' : distance_threshold_25_scaled*2, ## was 0.5
+    'AB': distance_threshold_25_scaled*4  ## was 1.0
+}
+
 
 tree_width = 750
 ymargin = 30 ## right now we dont want top text to get cut off
@@ -336,6 +345,8 @@ for epitope in epitopes:
 
 
     for ab in ['A','B','AB']:
+        if ab in fake_chains: continue
+
         radius = cluster_radius[ab]
         distfile = '{}_{}_{}.dist'.format( clones_file[:-4], ab, epitope )
         assert exists(distfile)
