@@ -33,7 +33,7 @@ with Parser(locals()) as p:
     p.flag('dry_run')
     p.flag('intrasubject_nbrdists').described_as('Include TCRs from the same subject when computing the nbrdist (aka NNdistance) score')
     p.flag('consistentfigcolors')
-
+    p.flag('no_probabilities').described_as('Assign a probability of 1 to all TCRs.')
     p.set_help_prefix("""
 
 ################
@@ -244,11 +244,14 @@ if only_parsed_seqs:
     exit()
 
 if parsed_seqs_file and ( force or not exists( clones_file ) ):
-
+    if no_probabilities:
+        noprobsarg = "--no_probabilities"
+    else:
+        noprobsarg = " "
     ## compute probs
     if force or not exists( probs_file ):
-        cmd = 'python {}/compute_probs.py --organism {}  --infile {} --outfile {}  -c --filter --add_masked_seqs > {}.log 2> {}.err'\
-              .format( path_to_scripts, organism, parsed_seqs_file, probs_file, probs_file, probs_file )
+        cmd = 'python {}/compute_probs.py --organism {}  --infile {} --outfile {} {}  -c --filter --add_masked_seqs > {}.log 2> {}.err'\
+              .format( path_to_scripts, organism, parsed_seqs_file, probs_file, noprobsarg, probs_file, probs_file )
         run(cmd)
 
     ## find the clones
