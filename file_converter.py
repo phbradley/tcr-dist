@@ -24,6 +24,7 @@ with Parser(locals()) as p:
     p.str('epitope').described_as( 'Use this value for the epitope field')
     p.str('subject').described_as( 'Use this value for the subject field')
     p.flag('auto_ids').described_as('Auto-generate numbered TCR ids')
+    p.str('id_base').described_as('If using --auto_ids, you can specify a base name for the IDs.')
     p.flag('clobber').shorthand('c')
     p.flag('only_reps').described_as( 'Only representative TCRs are included in input file.')
     p.set_help_prefix("""
@@ -267,8 +268,10 @@ for inline in open( input_file,'r'):
         if l is None: continue
 
         if auto_ids:
+            if not id_base:
+                id_base = 'id'
             idcounter += 1
-            l['id'] = 'id{}'.format(idcounter)
+            l['id'] = '{}{}'.format(id_base,idcounter)
 
         if epitope: ## danger if we are using this cmdline option as a variable...
             l['epitope'] = epitope
