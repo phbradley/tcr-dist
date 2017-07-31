@@ -7,6 +7,7 @@
 from basic import *
 import util
 import copy
+import sys
 #import matplotlib
 #if make_png: matplotlib.use('Agg')
 #import matplotlib.pyplot as plt
@@ -24,7 +25,7 @@ with Parser(locals()) as p:
     p.str('subject').described_as( 'Use this value for the subject field')
     p.flag('auto_ids').described_as('Auto-generate numbered TCR ids')
     p.flag('clobber').shorthand('c')
-
+    p.flag('only_reps').described_as( 'Only representative TCRs are included in input file.')
     p.set_help_prefix("""
 
     Usage examples:
@@ -119,7 +120,6 @@ def remove_wonky_characters_from_the_end_of_line( inline ):
 #     exit(1)
 
 def reconstruct_field_from_data( field, l, organism ):
-
     try:
         if field in l:
             return l[ field ]
@@ -160,12 +160,21 @@ def reconstruct_field_from_data( field, l, organism ):
                     return l[ prefix+'gene' ]
             elif tag == 'rep':
                 if prefix+'gene' in l:
-                    return util.get_rep( l[ prefix+'gene' ], organism )
+                    if only_reps:
+                        return l[prefix + 'gene']
+                    else:
+                        return util.get_rep( l[ prefix+'gene' ], organism )
             elif tag == 'reps':
                 ## we should already have hit 'genes' in the list of fields we are trying to fill !!!
-                return listsep.join( sorted( ( util.get_rep(x,organism) for x in l[prefix+'genes'].split(listsep) ) ) )
+                if only_reps:
+                    return l[prefix + 'gene']
+                else:
+                    return listsep.join( sorted( ( util.get_rep(x,organism) for x in l[prefix+'genes'].split(listsep) ) ) )
             elif tag == 'countreps':
-                return listsep.join( sorted( util.countreps_from_genes( l[prefix+'genes'].split(listsep), organism ) ) )
+                if only_reps:
+                    return l[prefix + 'gene']
+                else:
+                    return listsep.join( sorted( util.countreps_from_genes( l[prefix+'genes'].split(listsep), organism ) ) )
 
         elif field.endswith('_quals'):
             seqfield = field[:5]+'_nucseq'
@@ -175,9 +184,11 @@ def reconstruct_field_from_data( field, l, organism ):
 
     except Exception as inst: ## this is not the best way to handle it...
         print 'Hit an exception trying to get field {} from line'.format(field),inst
-
+    
     print 'Failed to reconstruct {} from the input fields: {}'\
         .format( field, ' '.join( sorted( l.keys() ) ) )
+    if "rep" in field:
+        print "Should you be using the --only_reps flag? Use this if your upstream processing only gives you a single, representative TCR."
     return None
 
 
@@ -186,25 +197,43 @@ def map_field_names( l, input_format, output_format ):
     outl = copy.deepcopy( l )
 
     if input_format == 'cdrblast':
+#        print l
         ## the problem is that this line could be either alpha or beta; they can occur in the same file
-        v_genestring = l['V segments']
-        j_genestring = l['J segments']
+        if 'V segments' in l.keys():
+            v_genestring = l['V segments']
+            j_genestring = l['J segments']
+            cdr3aa = l['CDR3 amino acid sequence']
+            cdr3nt = l['CDR3 nucleotide sequence']
+            clonecount = l['Count']
+        elif "cdr3nt" in l.keys():
+            v_genestring = l['v']
+            j_genestring = l['j']
+            cdr3aa = l['cdr3aa']
+            cdr3nt = l['cdr3nt']
+            clonecount = l['count']
+        else:
+            print "Bad format detected."
+            sys.exit(1)
         outl = {} # ditch the old info
         if 'TRA' in v_genestring or 'TRA' in j_genestring:
             outl['va_genes'] = listsep.join( v_genestring.split(',') )
             outl['ja_genes'] = listsep.join( j_genestring.split(',') )
-            outl['cdr3a'] = l['CDR3 amino acid sequence']
-            outl['cdr3a_nucseq'] = l['CDR3 nucleotide sequence']
+            outl['cdr3a'] = cdr3aa
+            outl['cdr3a_nucseq'] = cdr3nt
+#            outl['cdr3a'] = l['CDR3 amino acid sequence']
+#            outl['cdr3a_nucseq'] = l['CDR3 nucleotide sequence']
         elif 'TRB' in v_genestring or 'TRB' in j_genestring:
             outl['vb_genes'] = listsep.join( v_genestring.split(',') )
             outl['jb_genes'] = listsep.join( j_genestring.split(',') )
-            outl['cdr3b'] = l['CDR3 amino acid sequence']
-            outl['cdr3b_nucseq'] = l['CDR3 nucleotide sequence']
+            outl['cdr3b'] = cdr3aa
+            outl['cdr3b_nucseq'] = cdr3nt
+            #outl['cdr3b'] = l['CDR3 amino acid sequence']
+            #outl['cdr3b_nucseq'] = l['CDR3 nucleotide sequence']
         else:
             print 'cant determine whether this cdrblast line is alpha or beta:',l
             return None ## NOTE EARLY RETURN
 
-        outl['clone_size'] = l['Count']
+        outl['clone_size'] = clonecount
         if cdrblast_clone_size_warning not in warnings:
             print cdrblast_clone_size_warning
             warnings.add( cdrblast_clone_size_warning )
@@ -226,13 +255,13 @@ idcounter=0
 for inline in open( input_file,'r'):
     line = remove_wonky_characters_from_the_end_of_line( inline )
     if not infields:
-        if line[0] == '#': line = line[1:]
+        if line[0] == '#':
+            line = line[1:]
         infields = line.split('\t')
         assert infields
         ## we may want to add some fields to outfields
     else:
         l = parse_tsv_line( line, infields )
-
         l = map_field_names( l, input_format, output_format )
 
         if l is None: continue
