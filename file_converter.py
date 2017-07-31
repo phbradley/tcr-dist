@@ -98,12 +98,12 @@ outfields = all_required_fields[ output_format ]
 
 if single_chain:
     assert single_chain in ['alpha','beta']
-    for pos in reversed( range( len(outfields ) ) ):
-        field = outfields[pos]
-        if   single_chain=='alpha' and ( field[:3] in ['vb_','jb_'] or field.startswith('cdr3b') ):
-            del outfields[pos]
-        elif single_chain== 'beta' and ( field[:3] in ['va_','ja_'] or field.startswith('cdr3a') ):
-            del outfields[pos]
+#    for pos in reversed( range( len(outfields ) ) ):
+#        field = outfields[pos]
+#        if   single_chain=='alpha' and ( field[:3] in ['vb_','jb_'] or field.startswith('cdr3b') ):
+#            del outfields[pos]
+#        elif single_chain== 'beta' and ( field[:3] in ['va_','ja_'] or field.startswith('cdr3a') ):
+#            del outfields[pos]
 
 
 listsep = ';' # for lists within fields
@@ -282,6 +282,15 @@ for inline in open( input_file,'r'):
         for field in outfields:
             val = reconstruct_field_from_data( field, l, organism )
             if val is None:
+                if single_chain:
+                    if single_chain=='alpha' and ( field[:3] in ['vb_','jb_'] or field.startswith('cdr3b') ):
+                        val = "-"
+                        l[ field ] = val
+                        break
+                    elif single_chain== 'beta' and ( field[:3] in ['va_','ja_'] or field.startswith('cdr3a') ):
+                        val = "-"
+                        l[ field ] = val
+                        break
                 print 'ERROR bad line: field= {} failed, line= {}'.format( field, line[:-1] )
                 badline = True
                 break
@@ -291,6 +300,15 @@ for inline in open( input_file,'r'):
             continue
         outl = {}
         for field in outfields:
+            if not field in l.keys():
+                if "prob" in field:
+                    outl[field] = 1.0
+                    if prob_warning not in warnings:
+                        print prob_warning
+                        warnings.add( prob_warning )
+                else:
+                    outl[field] = "-"
+                continue
             outl[ field ] = l[ field ]
 
         out.write( make_tsv_line( outl, outfields ) + '\n' )
