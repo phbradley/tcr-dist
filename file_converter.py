@@ -62,7 +62,7 @@ cdr3b cdr3b_nucseq cdr3b_quals
 
 
 required_fields_clones_file = """
-id epitope subject
+clone_id epitope subject
 clone_size
 va_gene va_genes va_rep va_reps va_countreps
 ja_gene ja_genes ja_rep ja_reps ja_countreps
@@ -167,15 +167,15 @@ def reconstruct_field_from_data( field, l, organism ):
                         return util.get_rep( l[ prefix+'gene' ], organism )
             elif tag == 'reps':
                 ## we should already have hit 'genes' in the list of fields we are trying to fill !!!
-                if only_reps:
-                    return l[prefix + 'gene']
-                else:
-                    return listsep.join( sorted( ( util.get_rep(x,organism) for x in l[prefix+'genes'].split(listsep) ) ) )
+                #if only_reps:
+                #    return l[prefix + 'gene']
+                #else:
+                return listsep.join( sorted( ( util.get_rep(x,organism) for x in l[prefix+'genes'].split(listsep) ) ) )
             elif tag == 'countreps':
-                if only_reps:
-                    return l[prefix + 'gene']
-                else:
-                    return listsep.join( sorted( util.countreps_from_genes( l[prefix+'genes'].split(listsep), organism ) ) )
+                #if only_reps:
+                #    return l[prefix + 'gene']
+                #else:
+                return listsep.join( sorted( util.countreps_from_genes( l[prefix+'genes'].split(listsep), organism ) ) )
 
         elif field.endswith('_quals'):
             seqfield = field[:5]+'_nucseq'
@@ -221,6 +221,15 @@ def map_field_names( l, input_format, output_format ):
             outl['ja_genes'] = listsep.join( j_genestring.split(',') )
             outl['cdr3a'] = cdr3aa
             outl['cdr3a_nucseq'] = cdr3nt
+            if single_chain=='alpha':
+                if organism == "mouse":
+                    outl['vb_genes'] = "TRBV19*01"
+                    outl['jb_genes'] = "TRBJ1-4*02"
+                    outl['cdr3b'] = "CASSMGANERLFF"
+                    outl['cdr3b_nucseq'] = "tgtgccagcagtatgggggccaacgaaagattatttttc"
+                else:
+                    print "error: need to add organism info in script"
+                    sys.exit()
 #            outl['cdr3a'] = l['CDR3 amino acid sequence']
 #            outl['cdr3a_nucseq'] = l['CDR3 nucleotide sequence']
         elif 'TRB' in v_genestring or 'TRB' in j_genestring:
@@ -228,6 +237,12 @@ def map_field_names( l, input_format, output_format ):
             outl['jb_genes'] = listsep.join( j_genestring.split(',') )
             outl['cdr3b'] = cdr3aa
             outl['cdr3b_nucseq'] = cdr3nt
+            if single_chain == 'beta':
+                if organism == "mouse":
+                    outl['va_genes'] = "TRAV8D-1*02"
+                    outl['ja_genes'] = "TRAJ33*01"
+                    outl['cdr3a'] = "CATDMDSNYQLIW"
+                    outl['cdr3a_nucseq'] = "tgtgctactgacatggatagcaactatcagttgatctgg"
             #outl['cdr3b'] = l['CDR3 amino acid sequence']
             #outl['cdr3b_nucseq'] = l['CDR3 nucleotide sequence']
         else:
@@ -271,7 +286,10 @@ for inline in open( input_file,'r'):
             if not id_base:
                 id_base = 'id'
             idcounter += 1
-            l['id'] = '{}{}'.format(id_base,idcounter)
+            if output_format == "clones":
+                l['id'] = '{}{}{}'.format(id_base,idcounter,".clone")
+            else:
+                l['id'] = '{}{}'.format(id_base,idcounter)
 
         if epitope: ## danger if we are using this cmdline option as a variable...
             l['epitope'] = epitope
@@ -280,6 +298,8 @@ for inline in open( input_file,'r'):
 
         badline = False
         for field in outfields:
+            if field == "clone_id":
+                l['clone_id'] = l['id']
             val = reconstruct_field_from_data( field, l, organism )
             if val is None:
                 if single_chain:
@@ -294,8 +314,13 @@ for inline in open( input_file,'r'):
                 print 'ERROR bad line: field= {} failed, line= {}'.format( field, line[:-1] )
                 badline = True
                 break
+            if field in ["cdr3a", "cdr3b"]:
+                if len(l[field]) <= 5:
+                    print 'bad line: length of ' + field + " is only " + str(len(l[field]))
+                    badline = True
+                    break
             l[ field ] = val
-
+            
         if badline:
             continue
         outl = {}
