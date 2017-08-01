@@ -26,7 +26,6 @@ with Parser(locals()) as p:
     p.flag('auto_ids').described_as('Auto-generate numbered TCR ids')
     p.str('id_base').described_as('If using --auto_ids, you can specify a base name for the IDs.')
     p.flag('clobber').shorthand('c')
-    p.flag('only_reps').described_as( 'Only representative TCRs are included in input file.')
     p.set_help_prefix("""
 
     Usage examples:
@@ -42,7 +41,7 @@ warnings = set()
 prob_warning = '[WARNING] Setting a value of 1.0 for missing TCR probabilities'
 clone_size_warning = '[WARNING] Setting a default clone_size of 1 for lines without clone_size info'
 cdrblast_clone_size_warning = '[WARNING] Using the cdrblast "Count" field as the TCR clone_size value'
-
+rep_warning = '[WARNING] Blast results do not seem to be specific to allele'
 
 if exists( output_file ) and not clobber:
     print output_file,'already exists, use --clobber or remove it'
@@ -161,22 +160,30 @@ def reconstruct_field_from_data( field, l, organism ):
                     return l[ prefix+'gene' ]
             elif tag == 'rep':
                 if prefix+'gene' in l:
-                    if only_reps:
-                        return l[prefix + 'gene']
-                    else:
+                    if "*" in l[prefix + 'gene']:
                         return util.get_rep( l[ prefix+'gene' ], organism )
+                    else:
+                        if rep_warning not in warnings:
+                            print rep_warning
+                            warnings.add( rep_warning )
+                        return l[prefix + 'gene']
             elif tag == 'reps':
                 ## we should already have hit 'genes' in the list of fields we are trying to fill !!!
-                #if only_reps:
-                #    return l[prefix + 'gene']
-                #else:
-                return listsep.join( sorted( ( util.get_rep(x,organism) for x in l[prefix+'genes'].split(listsep) ) ) )
+                if "*" in l[prefix + 'gene']:
+                    return listsep.join( sorted( ( util.get_rep(x,organism) for x in l[prefix+'genes'].split(listsep) ) ) )
+                else:
+                    if rep_warning not in warnings:
+                        print rep_warning
+                        warnings.add( rep_warning )                        
+                    return l[prefix + 'gene']
             elif tag == 'countreps':
-                #if only_reps:
-                #    return l[prefix + 'gene']
-                #else:
-                return listsep.join( sorted( util.countreps_from_genes( l[prefix+'genes'].split(listsep), organism ) ) )
-
+                if "*" in l[prefix + 'gene']:
+                    return listsep.join( sorted( util.countreps_from_genes( l[prefix+'genes'].split(listsep), organism ) ) )
+                else:
+                    if rep_warning not in warnings:
+                        print rep_warning
+                        warnings.add( rep_warning )
+                    return l[prefix + 'gene']                                                                                        
         elif field.endswith('_quals'):
             seqfield = field[:5]+'_nucseq'
             if seqfield not in l:
@@ -188,8 +195,6 @@ def reconstruct_field_from_data( field, l, organism ):
     
     print 'Failed to reconstruct {} from the input fields: {}'\
         .format( field, ' '.join( sorted( l.keys() ) ) )
-    if "rep" in field:
-        print "Should you be using the --only_reps flag? Use this if your upstream processing only gives you a single, representative TCR."
     return None
 
 
@@ -198,7 +203,6 @@ def map_field_names( l, input_format, output_format ):
     outl = copy.deepcopy( l )
 
     if input_format == 'cdrblast':
-#        print l
         ## the problem is that this line could be either alpha or beta; they can occur in the same file
         if 'V segments' in l.keys():
             v_genestring = l['V segments']
