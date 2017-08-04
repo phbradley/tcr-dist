@@ -28,9 +28,11 @@ with Parser(locals()) as p:
     p.flag('clobber').shorthand('c')
     p.set_help_prefix("""
 
+    This script is for converting old TCR-dist formats to the new format and for converted MIGEC output to an input format suitable for TCR-dist.
+
     Usage examples:
 
-python ../file_converter.py  --input_format cdrblast --output_format clones --input_file d2_SH2_3.filtered.cdrblast.txt --output_file tmp.d2.tsv --organism human -c  --auto_ids --epitope ring1 --subject frodo --single_chain beta
+python ../file_converter.py  --input_format cdrblast --output_format clones --input_file MIGEC_d2_SH2_3.filtered.cdrblast.txt --output_file tmp.d2.tsv --organism human -c --auto_ids --epitope ring1 --subject frodo --single_chain beta
 
 python ../file_converter.py --input_format parsed_seqs --output_format parsed_seqs --input_file JCC42_EpiMouse_AsEpi.tsv --output_file tmp.tsv --organism mouse -c
 
