@@ -87,6 +87,7 @@ if Dmax is None:
 
 ## now do kpca
 all_xys = []
+jc_all_xys = {}
 for epitope,D in zip(epitopes,all_Ds):
     old_Dmax = D.max()
     D = np.minimum( D, np.full( D.shape, Dmax ) )
@@ -100,7 +101,7 @@ for epitope,D in zip(epitopes,all_Ds):
     ys = xy[:,1]
 
     all_xys.append( xy )
-
+    jc_all_xys[epitope] = xy
 all_vals = reduce( add, [list(xy[:,0]) for xy in all_xys ] ) + \
            reduce( add, [list(xy[:,1]) for xy in all_xys ] )
 
@@ -240,7 +241,7 @@ def add_new_label_and_update_gridl( xy, minval, maxval, step, nx, ny, label_text
         plt.text( x0, y0, label_text, color=label_color, va = 'bottom', ha='left', fontsize=6 )
 
 
-
+kPCAset = set()
 for ii_epitope, epitope in enumerate( epitopes ):
     plt.figure(1,figsize=(fig_width,fig_height))
     xy = all_xys[ ii_epitope ]
@@ -425,8 +426,17 @@ for ii_epitope, epitope in enumerate( epitopes ):
                 plt.scatter( [ xs[i] for i in range(num_tcrs) if tcr_colors[i] == color ],
                              [ ys[i] for i in range(num_tcrs) if tcr_colors[i] == color ],
                              s=10, c=color, edgecolors='none' )
-
-
+             
+            for ji in range(num_tcrs): #JCC--adding ability to output kPC info
+                templi = []
+                for jx in tcr_infos[ji]:
+                    templi.append(tcr_infos[ji][jx].strip())
+                tempstr = tcrs[ji][0] + "\t" +  tcr_infos[ji]["epitope"] + "\t" +  str(xs[ji]) + "\t" +  str(ys[ji]) + "\t" +  tcr_colors[ji] + "\t" + "\t".join(str(x) for x in jc_all_xys[epitope][ji])
+                try:
+                    jcmaxlen = max(jcmaxlen, len(tempstr.split("\t")))
+                except NameError:
+                    jcmaxlen = len(tempstr.split("\t"))
+                kPCAset.add(tempstr) #--JCC
             print '{} {} matched: {} {:.6f}'.format(epitope,motifchain,len(all_matched_ids),
                                                     float(len(all_matched_ids))/num_tcrs)
             plt.xticks(ticks,[])
@@ -592,3 +602,8 @@ colored by gene usage for the four different segments (left to right: Va,Ja,Vb,J
 
 if show:
     plt.show()
+
+print "kPCA results:"
+print "clone.id" + "\t" + "epitope" + "\t" + "XS" + "\t" + "YS" + "\t" + "Color" + "\t" + "\t".join([("kPC" + str(i)) for i in range(jcmaxlen-5)])
+for l in kPCAset:
+    print l
