@@ -149,7 +149,7 @@ def weighted_cdr3_distance( seq1, seq2, params ):
     assert lenshort > 1##JCC testing
     assert lendiff>=0
     if params.trim_cdr3s:
-        assert lenshort > 3+2 ## something to align...
+        assert lenshort > 3+2 ## something to align... NOTE: Minimum length of cdr3 protein carried into clones file is currently set in the read_sanger_data.py script!
 
     if not params.align_cdr3s:
         ## if we are not aligning, use a fixed gap position relative to the start of the CDR3

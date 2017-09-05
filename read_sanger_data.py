@@ -381,6 +381,11 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
                             cdr3 = '{}-{}'.format(protseq,nucseq)
 
                 genes = ( v_gene, v_rep, v_mm, j_gene, j_rep, j_mm, cdr3 )
+                
+                if cdr3 != "-":
+                    cdr3aa = cdr3.split("-")[0]
+                    if len(cdr3aa) < 5:
+                        status.append('cdr3{}_len_too_short'.format(ab))
 
     if not nocleanup:
         files = glob(blast_tmpfile+'*')
@@ -515,7 +520,11 @@ def parse_unpaired_dna_sequence_blastx( organism, ab, blast_seq, info,
 
                 genes = ( v_gene, v_rep, v_mm, j_gene, j_rep, j_mm, cdr3 )
 
-
+                if cdr3 != "-":
+                    cdr3aa = cdr3.split("-")[0]
+                    if len(cdr3aa) < 5:
+                        status.append('cdr3{}_len_too_short'.format(ab))                                                                                        
+                
     if not nocleanup:
         files = glob(blast_tmpfile+'*')
         for file in files:
