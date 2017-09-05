@@ -62,7 +62,7 @@ default_outfields = ['id','epitope','subject',
                      'vb_blast_hits','jb_blast_hits',
                      'status' ]
 
-#assert infile.endswith('tsv') ## stupid
+
 assert outfile.endswith('tsv') ## stupid
 
 if exists(outfile): assert clobber
