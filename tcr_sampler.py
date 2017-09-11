@@ -307,7 +307,7 @@ def get_coding_probability( nucseq, protseq ):
 
 
 
-def alpha_cdr3_protseq_probability( organism, v_gene, j_gene, cdr3_protseq,
+def alpha_cdr3_protseq_probability( theid, organism, v_gene, j_gene, cdr3_protseq,
                                     cdr3_nucseq = '', error_threshold = 0.05, verbose=False,
                                     allow_early_nucseq_mismatches = True,
                                     return_final_cdr3_nucseq = False ):
@@ -361,7 +361,7 @@ def alpha_cdr3_protseq_probability( organism, v_gene, j_gene, cdr3_protseq,
                           cdr3_nucseq[ max_v : len_cdr3_nucseq-max_j ] + \
                           j_nucseq[len_j_nucseq-max_j:]
             if old_cdr3_nucseq != cdr3_nucseq:
-                Log('early_cdr3a_nucseq_mismatch: {} {} before {} after {}'.format( v_gene, j_gene,
+                Log('{} early_cdr3a_nucseq_mismatch: {} {} before {} after {}'.format(theid, v_gene, j_gene,
                                                                                     old_cdr3_nucseq, cdr3_nucseq ) )
                 assert len(cdr3_nucseq) == len(old_cdr3_nucseq)
     else:
@@ -451,7 +451,7 @@ def alpha_cdr3_protseq_probability( organism, v_gene, j_gene, cdr3_protseq,
 
 
 
-def beta_cdr3_protseq_probability( organism, v_gene, j_gene, cdr3_protseq,
+def beta_cdr3_protseq_probability( theid, organism, v_gene, j_gene, cdr3_protseq,
                                    cdr3_nucseq = '', error_threshold = 0.05, verbose=False,
                                    allow_early_nucseq_mismatches = True,
                                    return_final_cdr3_nucseq = False ):
@@ -502,7 +502,7 @@ def beta_cdr3_protseq_probability( organism, v_gene, j_gene, cdr3_protseq,
                           cdr3_nucseq[ max_v : len_cdr3_nucseq-max_j ] + \
                           j_nucseq[len_j_nucseq-max_j:]
             if old_cdr3_nucseq != cdr3_nucseq:
-                Log('early_cdr3a_nucseq_mismatch: before {} after {}'.format( old_cdr3_nucseq, cdr3_nucseq ) )
+                Log('{} early_cdr3a_nucseq_mismatch: before {} after {}'.format(theid, old_cdr3_nucseq, cdr3_nucseq ) )
                 assert len(cdr3_nucseq) == len(old_cdr3_nucseq)
 
     else:

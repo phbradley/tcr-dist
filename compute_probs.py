@@ -78,6 +78,7 @@ for line in open(infile,'r'):
 
     if filter and 'status' in l and l['status'] != 'OK':continue
 
+    theid = line.split("\t")[0]
 
     ## ALPHA
     va_gene = l['va_gene']
@@ -101,7 +102,7 @@ for line in open(infile,'r'):
             if a not in amino_acids:
                 assert a in 'X*'
                 if ( a == '*' and not allow_stop_codons) or ( a == 'X' and not allow_X ):
-                    Log('skipping: badseq: {} {}'.format(cdr3a_protseq,cdr3b_protseq))
+                    Log('{} skipping: badseq: {} {}'.format(theid, cdr3a_protseq,cdr3b_protseq))
                     skip_me = True
                     break
 
@@ -122,7 +123,7 @@ for line in open(infile,'r'):
         aprob_nucseq = 1
         aprob_protseq = 1
     else:
-        aprob_nucseq,new_cdr3a_nucseq = tcr_sampler.alpha_cdr3_protseq_probability( organism, va_gene, ja_gene,
+        aprob_nucseq,new_cdr3a_nucseq = tcr_sampler.alpha_cdr3_protseq_probability( theid, organism, va_gene, ja_gene,
                                                                                 cdr3_protseq='',
                                                                                 cdr3_nucseq=cdr3a_nucseq,  verbose=verbose,
                                                                                 return_final_cdr3_nucseq=True )
@@ -135,7 +136,7 @@ for line in open(infile,'r'):
             new_cdr3a_protseq = cdr3a_protseq[:]
             assert new_cdr3a_protseq == read_sanger_data.get_translation( cdr3a_nucseq, '+1' )[0]
 
-        aprob_protseq = tcr_sampler.alpha_cdr3_protseq_probability( organism, va_gene, ja_gene, new_cdr3a_protseq,
+        aprob_protseq = tcr_sampler.alpha_cdr3_protseq_probability( theid, organism, va_gene, ja_gene, new_cdr3a_protseq,
                                                                 verbose=verbose )
 
     ## BETA
@@ -153,7 +154,7 @@ for line in open(infile,'r'):
         bprob_protseq = 1
     else:
         bprob_nucseq, new_cdr3b_nucseq \
-        = tcr_sampler.beta_cdr3_protseq_probability( organism, vb_gene, jb_gene, cdr3_protseq='',
+        = tcr_sampler.beta_cdr3_protseq_probability( theid, organism, vb_gene, jb_gene, cdr3_protseq='',
                                                      verbose=verbose, cdr3_nucseq=cdr3b_nucseq,
                                                      allow_early_nucseq_mismatches=True,
                                                      return_final_cdr3_nucseq=True )
@@ -164,7 +165,7 @@ for line in open(infile,'r'):
             new_cdr3b_protseq = cdr3b_protseq[:]
             assert new_cdr3b_protseq == read_sanger_data.get_translation( cdr3b_nucseq, '+1' )[0]
 
-        bprob_protseq = tcr_sampler.beta_cdr3_protseq_probability( organism, vb_gene, jb_gene, new_cdr3b_protseq,
+        bprob_protseq = tcr_sampler.beta_cdr3_protseq_probability( theid, organism, vb_gene, jb_gene, new_cdr3b_protseq,
                                                                verbose=verbose )
 
     vals = dict(l)  #line.split('\t') + ['']*(len(outfields)-len(infields))
