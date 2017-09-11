@@ -303,7 +303,7 @@ for em in all_tcrs:
         aq,bq = quals[t1]
 
         if clone_size==1 and ( aq < min_quality_for_singletons or bq<min_quality_for_singletons ):
-            if verbose: print 'skipping:',aq,bq,t1[:4]
+            print 'skipping singleton because min_quality lower than ' + str(min_quality_for_singletons)+':',aq,bq,t1[:4]
             skipcount+=1
             continue
 
