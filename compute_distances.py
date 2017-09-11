@@ -62,7 +62,7 @@ all_infields = []
 
 for clones_file, epitope_prefix in zip(clones_files,epitope_prefixes):
     infields = []
-    for line in open( clones_file,'r'):
+    for line in open( clones_file,'rU'):
         if not infields:
             if line[0] == '#':
                 infields = line[1:-1].split('\t')

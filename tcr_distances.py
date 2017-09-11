@@ -83,8 +83,10 @@ def align_cdr3s( a, b, gap_character ):
     lendiff = len(s1)-len(s0)
 
     best_score=-1000
+    best_gappos=0 # in case len(s0) == 1
 
     # the gap comes after s0[gappos]
+
     for gappos in range(len(s0)-1):
         score=0
         for i in range(gappos+1):
@@ -315,6 +317,14 @@ def sort_and_compute_weighted_nbrdist_from_distances( l, nbrdist_percentile, don
 
     return nbrdist / total_wt
 
+
+
+# if __name__ == '__main__': ## hacking
+#     a,b = "DVGYKL DPAGNTGKL".split()
+#     #a,b = "GEGSNNRI GYNTNTGKL".split()
+#     #a,b = "GDRYAQGL GDVDYAQGL".split()
+#     print align_cdr3s( a,b,'.')
+#     exit()
 
 
 if __name__ == '__main__':

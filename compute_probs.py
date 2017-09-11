@@ -55,7 +55,7 @@ out = open(outfile,'w')
 infields = []
 outfields = []
 
-for line in open(infile,'r'):
+for line in open(infile,'rU'):
     if not infields:
         if line[0] == '#':
             infields = line[1:-1].split('\t')

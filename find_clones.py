@@ -53,7 +53,7 @@ total_lines, total_clones, skipcount = (0,0,0)
 #TRAV10N*01:111;TRAV10D*01:111;TRAV10*02:111;TRAV10*01:111;TRAV10D*02:105;TRAV10*05:105;TRAV10*04:105;TRAV10*03:98
 
 
-for line in open(infile,'r'):
+for line in open(infile,'rU'):
     if not infields:
         if line[0] == '#':
             infields = line[1:-1].split('\t')

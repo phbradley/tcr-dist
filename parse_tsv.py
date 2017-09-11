@@ -28,7 +28,7 @@ def parse_tsv_file( filename, key_fields, store_fields, save_l=False ):
     L = []
 
     infields = []
-    for line in open( filename,'r'):
+    for line in open( filename,'rU'):
         if not infields:
             if line[0] == '#':
                 infields = line[1:-1].split('\t')

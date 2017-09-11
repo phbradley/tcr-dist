@@ -125,7 +125,7 @@ infields = []
 saved_results = {}
 
 
-for line in open( infile,'r'):
+for line in open( infile,'rU'):
     if line[0] == '#' or not infields:
         assert not infields
         if line[0] == '#':

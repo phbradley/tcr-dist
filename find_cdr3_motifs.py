@@ -247,7 +247,7 @@ for ab in 'AB':
 all_tcrs = {}
 
 infields = []
-for line in open( clones_file,'r'):
+for line in open( clones_file,'rU'):
     if not infields:
         if line[0] == '#':
             infields = line[1:-1].split('\t')

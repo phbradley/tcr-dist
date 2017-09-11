@@ -176,7 +176,7 @@ def reconstruct_field_from_data( field, l, organism ):
                 else:
                     if rep_warning not in warnings:
                         print rep_warning
-                        warnings.add( rep_warning )                        
+                        warnings.add( rep_warning )
                     return l[prefix + 'gene']
             elif tag == 'countreps':
                 if "*" in l[prefix + 'gene']:
@@ -185,7 +185,7 @@ def reconstruct_field_from_data( field, l, organism ):
                     if rep_warning not in warnings:
                         print rep_warning
                         warnings.add( rep_warning )
-                    return l[prefix + 'gene']                                                                                        
+                    return l[prefix + 'gene']
         elif field.endswith('_quals'):
             seqfield = field[:5]+'_nucseq'
             if seqfield not in l:
@@ -194,7 +194,7 @@ def reconstruct_field_from_data( field, l, organism ):
 
     except Exception as inst: ## this is not the best way to handle it...
         print 'Hit an exception trying to get field {} from line'.format(field),inst
-    
+
     print 'Failed to reconstruct {} from the input fields: {}'\
         .format( field, ' '.join( sorted( l.keys() ) ) )
     return None
@@ -274,7 +274,7 @@ out = open( output_file,'w')
 out.write( '\t'.join( outfields ) + '\n' )
 
 idcounter=0
-for inline in open( input_file,'r'):
+for inline in open( input_file,'rU'):
     line = remove_wonky_characters_from_the_end_of_line( inline )
     if not infields:
         if line[0] == '#':
@@ -326,7 +326,7 @@ for inline in open( input_file,'r'):
                     badline = True
                     break
             l[ field ] = val
-            
+
         if badline:
             continue
         outl = {}

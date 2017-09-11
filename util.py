@@ -5,6 +5,7 @@ from scipy.spatial import distance
 import os
 import html_colors
 import parse_tsv
+import tcr_sampler
 
 verbose = __name__ == '__main__'
 
@@ -231,6 +232,44 @@ def detect_fake_chains( clones_file, Achain='A', Bchain='B' ):
     if fake_chains:
         print 'Fake sequence data detected for chains: {}'.format( ' '.join( fake_chains ) )
     return fake_chains
+
+
+def add_masked_CDR3_sequences_to_tcr_dict( organism, vals ):
+    ## this code is mostly taken from compute_probs.py
+    va_gene = vals['va_gene']
+    ja_gene = vals['ja_gene']
+    vb_gene = vals['vb_gene']
+    jb_gene = vals['jb_gene']
+    cdr3a_protseq = vals['cdr3a']
+    cdr3a_nucseq  = vals['cdr3a_nucseq']
+    cdr3b_protseq = vals['cdr3b']
+    cdr3b_nucseq  = vals['cdr3b_nucseq']
+
+    a_junction_results = tcr_sampler.analyze_junction( organism, va_gene, ja_gene, cdr3a_protseq, cdr3a_nucseq )
+    b_junction_results = tcr_sampler.analyze_junction( organism, vb_gene, jb_gene, cdr3b_protseq, cdr3b_nucseq )
+
+    cdr3a_new_nucseq, cdr3a_protseq_masked, cdr3a_protseq_new_nucleotide_countstring,a_trims,a_inserts \
+        = a_junction_results
+    cdr3b_new_nucseq, cdr3b_protseq_masked, cdr3b_protseq_new_nucleotide_countstring,b_trims,b_inserts \
+        = b_junction_results
+
+    # from tcr_sampler.py:
+    # trims = ( v_trim, d0_trim, d1_trim, j_trim )
+    # inserts = ( best_d_id, n_vd_insert, n_dj_insert, n_vj_insert )
+
+    assert a_trims[1] + a_trims[2] + a_inserts[0] + a_inserts[1] + a_inserts[2] + b_inserts[3] == 0
+    assert a_inserts[3] == len( cdr3a_new_nucseq )
+
+    ita = '+%d-%d'%(sum(a_inserts[1:]),sum(a_trims))
+    itb = '+%d-%d'%(sum(b_inserts[1:]),sum(b_trims))
+
+    vals[ 'cdr3a_protseq_masked'] = cdr3a_protseq_masked
+    vals[ 'a_indels'] = ita
+    vals[ 'cdr3a_new_nucseq' ] = cdr3a_new_nucseq
+    vals[ 'cdr3b_protseq_masked'] = cdr3b_protseq_masked
+    vals[ 'b_indels'] = itb
+    vals[ 'cdr3b_new_nucseq' ] = cdr3b_new_nucseq
+
 
 
 # if __name__ == '__main__':
