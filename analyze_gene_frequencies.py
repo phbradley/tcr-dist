@@ -5,7 +5,6 @@
 ## highly sequence-similar genes.
 
 from basic import *
-import cdr3s_human
 #from util import get_rep, get_mm1_rep, get_mm1_rep_gene_for_counting
 import util
 from tcr_rearrangement_new import all_countrep_pseudoprobs

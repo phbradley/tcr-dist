@@ -1,7 +1,6 @@
 from basic import *
 import score_trees_devel
 import svg_basic
-import cdr3s_human
 from amino_acids import amino_acids
 from tcr_distances import align_cdr3s
 #from tcr_distances_blosum import blosum

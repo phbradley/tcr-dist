@@ -1,5 +1,4 @@
 from basic import *
-import cdr3s_human
 import html_colors
 import svg_basic
 import util

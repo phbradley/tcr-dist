@@ -9,6 +9,7 @@ def parse_tsv_line(line,infields):
     return vals
 
 def make_tsv_line(vals,outfields,empty_string_replacement=''):
+    """Does not have the \n at the end"""
     l = []
     for tag in outfields:
         val = vals[tag]
@@ -23,7 +24,9 @@ def make_tsv_line(vals,outfields,empty_string_replacement=''):
 
 
 
-def parse_tsv_file( filename, key_fields, store_fields, save_l=False ):
+def parse_tsv_file( filename, key_fields=[], store_fields=[], save_l=False ):
+    if not key_fields and not store_fields:
+        save_l = True
     D = {}
     L = []
 

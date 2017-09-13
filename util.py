@@ -1,33 +1,33 @@
 from basic import *
-import cdr3s_human
+from all_genes import all_genes
 from scipy.cluster import hierarchy
 from scipy.spatial import distance
 import os
 import html_colors
 import parse_tsv
 import tcr_sampler
+from paths import path_to_db
 
 verbose = __name__ == '__main__'
 
+
+def get_db_files_directory():
+    """Without the trailing /"""
+    db_file = path_to_db+'/'+pipeline_params['db_file']
+    assert exists(db_file)
+    db_files_dir = db_file+'_files'
+    if not exists(db_files_dir):
+        mkdir(db_files_dir)
+    return db_files_dir
+
+
 def get_rep( gene, organism ):
     assert gene.startswith('TR')
-    vj = gene[3]
-    if vj == 'V':
-        rep = cdr3s_human.all_loopseq_representative[ organism ][ gene ]
-    else:
-        rep = cdr3s_human.all_jseq_representative[ organism ][ gene ]
-    return rep
-
+    return all_genes[organism][gene].rep
 
 def get_mm1_rep( gene, organism ):
     assert gene.startswith('TR')
-    vj = gene[3]
-    if vj == 'V':
-        rep = cdr3s_human.all_loopseq_representative_mm1[ organism ][ gene ]
-    else:
-        rep = cdr3s_human.all_jseq_representative[ organism ][ gene ]
-    return rep
-
+    return all_genes[organism][gene].mm1_rep
 
 def get_rep_ignoring_allele( gene, organism ):
     rep = get_rep( gene, organism )
@@ -62,29 +62,31 @@ def get_top_genes( blast_hits_string ):
 def get_top_reps( blast_hits_string, organism ):
     hits = dict( [ ( x.split(':')[0], int( x.split(':')[1] ) ) for x in blast_hits_string.split(';') ] )
     top_score = max( hits.values() )
-    vj = hits.keys()[0][3]
-    if vj == 'V':
-        rep_map = cdr3s_human.all_loopseq_representative[ organism ]
-    else:
-        assert vj == 'J'
-        rep_map = cdr3s_human.all_jseq_representative[ organism ]
-    return set( [ rep_map[x] for x,y in hits.iteritems() if y >= top_score ] )
+    # vj = hits.keys()[0][3]
+    # if vj == 'V':
+    #     rep_map = cdr3s_human.all_loopseq_representative[ organism ]
+    # else:
+    #     assert vj == 'J'
+    #     rep_map = cdr3s_human.all_jseq_representative[ organism ]
+    return set( [ all_genes[organism][x].rep for x,y in hits.iteritems() if y >= top_score ] )
 
 
 def reps_from_genes( genes, organism, mm1=False, trim_allele=False ):
     ## if genes is a set we can't index into it
-    vj = [ x[3] for x in genes ][0]
+    # vj = [ x[3] for x in genes ][0]
 
-    if vj == 'V':
-        if mm1:
-            rep_map = cdr3s_human.all_loopseq_representative_mm1[ organism ]
-        else:
-            rep_map = cdr3s_human.all_loopseq_representative[ organism ]
-    else:
-        assert vj == 'J'
-        rep_map = cdr3s_human.all_jseq_representative[ organism ]
+    # if vj == 'V':
+    #     if mm1:
+    #         rep_map = cdr3s_human.all_loopseq_representative_mm1[ organism ]
+    #     else:
+    #         rep_map = cdr3s_human.all_loopseq_representative[ organism ]
+    # else:
+    #     assert vj == 'J'
+    #     rep_map = cdr3s_human.all_jseq_representative[ organism ]
 
-    reps = set( [ rep_map[x] for x in genes ] )
+    # reps = set( [ rep_map[x] for x in genes ] )
+    reps = set( ( all_genes[organism][x].mm1_rep for x in genes ) ) if mm1 else \
+           set( ( all_genes[organism][x].rep     for x in genes ) )
     if trim_allele:
         reps = set( ( x[:x.index('*')] for x in reps ) )
     return reps
@@ -123,9 +125,8 @@ for organism in ['human','mouse']:
     for chain in 'AB':
 
         ## look at gene/allele maps
-        ## V
-        vj_alleles = { 'V': [ x for x in cdr3s_human.all_loopseq_representative[ organism ].keys() if x[2] == chain ],
-                       'J': [ x for x in cdr3s_human.all_jseq_representative[ organism ].keys() if x[2] == chain ] }
+        vj_alleles = { 'V': [ id for (id,g) in all_genes[organism].iteritems() if g.chain==chain and g.region=='V'],
+                       'J': [ id for (id,g) in all_genes[organism].iteritems() if g.chain==chain and g.region=='J'] }
 
         for vj, alleles in vj_alleles.iteritems():
             gene2rep = {}
@@ -133,7 +134,7 @@ for organism in ['human','mouse']:
             rep_gene2alleles = {}
 
             for allele in alleles:
-                assert allele[2] == chain
+                #assert allele[2] == chain
                 gene = allele[:allele.index('*')]
                 rep_gene = get_mm1_rep_ignoring_allele( allele, organism )
                 if rep_gene not in rep_gene2alleles:
@@ -153,7 +154,7 @@ for organism in ['human','mouse']:
                     if verbose:
                         print 'multireps:',organism, gene, reps
                         for allele in gene2alleles[gene]:
-                            print cdr3s_human.all_merged_loopseqs[organism][allele], allele, \
+                            print ' '.join(all_genes[organism][allele].cdrs), allele, \
                                 get_rep(allele,organism), get_mm1_rep(allele,organism)
 
                     ## we are going to merge these reps

@@ -1,14 +1,13 @@
 #import math
 import sys
 from basic import *
-import cdr3s_human
 from util import get_top_genes
 #import matplotlib
 #if make_png: matplotlib.use('Agg')
 #import matplotlib.pyplot as plt
 #import numpy as np
 import tcr_sampler
-import read_sanger_data
+from translation import get_translation
 from amino_acids import amino_acids
 
 new_probs = pipeline_params['new_probs']
@@ -116,8 +115,8 @@ for line in open(infile,'rU'):
     ja_countreps = l['ja_countreps'].split(';')
     va_cdr3_nucseq = tcr_sampler.get_v_cdr3_nucseq( organism, va_gene )
     ja_cdr3_nucseq = tcr_sampler.get_j_cdr3_nucseq( organism, ja_gene )
-    va_cdr3_protseq,codons = read_sanger_data.get_translation( va_cdr3_nucseq, '+1' )
-    ja_cdr3_protseq,codons = read_sanger_data.get_translation( ja_cdr3_nucseq, '+{}'.format(1+len(ja_cdr3_nucseq)%3))
+    va_cdr3_protseq,codons = get_translation( va_cdr3_nucseq, '+1' )
+    ja_cdr3_protseq,codons = get_translation( ja_cdr3_nucseq, '+{}'.format(1+len(ja_cdr3_nucseq)%3))
 
     if no_probabilities: ##all probabilities will be set to 1 if this flag is set
         aprob_nucseq = 1
@@ -131,10 +130,10 @@ for line in open(infile,'rU'):
         if new_cdr3a_nucseq != cdr3a_nucseq: ## note note note
             print 'new_cdr3a_nucseq:',len(new_cdr3a_nucseq),new_cdr3a_nucseq
             print 'old_cdr3a_nucseq:',len(cdr3a_nucseq),cdr3a_nucseq
-            new_cdr3a_protseq = read_sanger_data.get_translation( new_cdr3a_nucseq, '+1' )[0]
+            new_cdr3a_protseq = get_translation( new_cdr3a_nucseq, '+1' )[0]
         else:
             new_cdr3a_protseq = cdr3a_protseq[:]
-            assert new_cdr3a_protseq == read_sanger_data.get_translation( cdr3a_nucseq, '+1' )[0]
+            assert new_cdr3a_protseq == get_translation( cdr3a_nucseq, '+1' )[0]
 
         aprob_protseq = tcr_sampler.alpha_cdr3_protseq_probability( theid, organism, va_gene, ja_gene, new_cdr3a_protseq,
                                                                 verbose=verbose )
@@ -146,8 +145,8 @@ for line in open(infile,'rU'):
     jb_countreps = l['jb_countreps'].split(';')
     vb_cdr3_nucseq = tcr_sampler.get_v_cdr3_nucseq( organism, vb_gene )
     jb_cdr3_nucseq = tcr_sampler.get_j_cdr3_nucseq( organism, jb_gene )
-    vb_cdr3_protseq,codons = read_sanger_data.get_translation( vb_cdr3_nucseq, '+1' )
-    jb_cdr3_protseq,codons = read_sanger_data.get_translation( jb_cdr3_nucseq, '+{}'.format(1+len(jb_cdr3_nucseq)%3))
+    vb_cdr3_protseq,codons = get_translation( vb_cdr3_nucseq, '+1' )
+    jb_cdr3_protseq,codons = get_translation( jb_cdr3_nucseq, '+{}'.format(1+len(jb_cdr3_nucseq)%3))
 
     if no_probabilities: ##all probabilities will be set to 1 if this flag is set
         bprob_nucseq = 1
@@ -160,10 +159,10 @@ for line in open(infile,'rU'):
                                                      return_final_cdr3_nucseq=True )
 
         if new_cdr3b_nucseq != cdr3b_nucseq: ## note note note
-            new_cdr3b_protseq = read_sanger_data.get_translation( new_cdr3b_nucseq, '+1' )[0]
+            new_cdr3b_protseq = get_translation( new_cdr3b_nucseq, '+1' )[0]
         else:
             new_cdr3b_protseq = cdr3b_protseq[:]
-            assert new_cdr3b_protseq == read_sanger_data.get_translation( cdr3b_nucseq, '+1' )[0]
+            assert new_cdr3b_protseq == get_translation( cdr3b_nucseq, '+1' )[0]
 
         bprob_protseq = tcr_sampler.beta_cdr3_protseq_probability( theid, organism, vb_gene, jb_gene, new_cdr3b_protseq,
                                                                verbose=verbose )

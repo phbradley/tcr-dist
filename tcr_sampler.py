@@ -1,7 +1,8 @@
 from basic import *
 import sys
-import read_sanger_data
-import cdr3s_human
+import translation
+import cdr3s_human #debug
+from all_genes import all_genes, gap_character
 from genetic_code import genetic_code, reverse_genetic_code
 import logo_tools
 import random
@@ -39,19 +40,21 @@ def count_matches( a,b,mismatch_score=-3 ):
 
 
 def get_v_cdr3_nucseq( organism, v_gene, paranoid = False ):
+    vg = all_genes[organism][v_gene]
+    ab = vg.chain
 
-    ab = v_gene[2]
-
-    v_nucseq  = read_sanger_data.all_fasta[organism][ab]['V'][read_sanger_data.nuc ][v_gene]
-    v_nucseq_offset = read_sanger_data.all_offsets[organism][ab]['V'][v_gene]
+    v_nucseq  = vg.nucseq
+    v_nucseq_offset = vg.nucseq_offset
     v_nucseq = v_nucseq[ v_nucseq_offset: ]
 
-    if paranoid:
-        v_protseq = read_sanger_data.all_fasta[organism][ab]['V'][read_sanger_data.prot][v_gene]
-        assert read_sanger_data.get_translation( v_nucseq, '+1' )[0].startswith( v_protseq )
-
-    v_alseq = cdr3s_human.all_align_fasta[organism][ v_gene ]
-    alseq_cpos = cdr3s_human.alseq_C_pos[organism][ab]-1 ## 0-indexed
+    old_v_alseq = cdr3s_human.all_align_fasta[organism][ v_gene ]
+    old_alseq_cpos = cdr3s_human.alseq_C_pos[organism][ab]-1 ## 0-indexed
+    v_alseq = vg.alseq
+    alseq_cpos = vg.cdr_columns[-1][0] -1
+    #print organism, v_gene, old_v_alseq
+    #print organism, v_gene, v_alseq
+    assert old_v_alseq[:alseq_cpos] == v_alseq[:alseq_cpos]
+    assert old_alseq_cpos == alseq_cpos
     numgaps = v_alseq[:alseq_cpos].count('.')
     v_cpos = alseq_cpos - numgaps
     v_nucseq = v_nucseq[3*v_cpos:] ## now v_nucseq starts with the 'C' codon
@@ -67,7 +70,7 @@ def get_v_cdr3_nucseq( organism, v_gene, paranoid = False ):
             #tmp.3.whoah:whoah: expected: caaggtatcgtgt consensus: caaggtttcgtgt TRAV13D-1*01 642
             #tmp.la_mc.whoah:whoah  6 act: t  89.0 exp: a   7.0 TRAV13D-1*01 TRAV13-1*01 100
             #tmp.la_mc.whoah:whoah: expected: caaggtatcgtgt consensus: caaggtttcgtgt TRAV13D-1*01 100
-            assert v_nucseq == 'tgtgctatggaac' ## CAM
+            assert v_nucseq == 'tgtgctatggaac' ## CAM ## THIS WILL FAIL SINCE WE ADDED THIS TO THE DB...
             v_nucseq         = 'tgtgctttggaac' ## CAL
 
 
@@ -75,15 +78,17 @@ def get_v_cdr3_nucseq( organism, v_gene, paranoid = False ):
 
 
 def get_j_cdr3_nucseq( organism, j_gene, paranoid = False ):
-    ab = j_gene[2]
-    j_nucseq  = read_sanger_data.all_fasta[organism][ab]['J'][read_sanger_data.nuc ][j_gene]
+    jg = all_genes[organism][j_gene]
+    ab = jg.chain
 
-    j_nucseq_offset = read_sanger_data.all_offsets[organism][ab]['J'][j_gene]
-    if paranoid:
-        j_protseq = read_sanger_data.all_fasta[organism][ab]['J'][read_sanger_data.prot][j_gene]
-        assert read_sanger_data.get_translation( j_nucseq, '+{}'.format(j_nucseq_offset+1) )[0].startswith( j_protseq )
+    j_nucseq  = jg.nucseq
+    j_nucseq_offset = jg.nucseq_offset
 
-    num_genome_j_positions_in_loop = cdr3s_human.all_num_genome_j_positions_in_loop[organism][ab][j_gene] + 2 ## to GXG
+    ## goes up to (but not including) GXG
+    old_num_genome_j_positions_in_loop = cdr3s_human.all_num_genome_j_positions_in_loop[organism][ab][j_gene] + 2
+    num_genome_j_positions_in_loop = len( jg.cdrs[0].replace(gap_character,''))
+    assert old_num_genome_j_positions_in_loop == num_genome_j_positions_in_loop
+
     ## trim j_nucseq so that it extends up to the F/W position
     j_nucseq = j_nucseq[:3*num_genome_j_positions_in_loop + j_nucseq_offset]
 
@@ -139,8 +144,8 @@ def get_j_cdr3_nucseq( organism, j_gene, paranoid = False ):
 
 def analyze_junction( organism, v_gene, j_gene, cdr3_protseq, cdr3_nucseq, force_d_id=0, return_cdr3_nucseq_src=False ):
     #print organism, v_gene, j_gene, cdr3_protseq, cdr3_nucseq
-    assert v_gene.startswith('TR') and v_gene[2] == j_gene[2]
-    ab = v_gene[2]
+    assert v_gene.startswith('TR') #and v_gene[2] == j_gene[2]
+    ab = all_genes[organism][v_gene].chain
     v_nucseq = get_v_cdr3_nucseq( organism, v_gene )
     j_nucseq = get_j_cdr3_nucseq( organism, j_gene )
     ## how far out do we match
@@ -316,11 +321,11 @@ def alpha_cdr3_protseq_probability( theid, organism, v_gene, j_gene, cdr3_protse
     nucleotide_match = ( cdr3_nucseq != '' )
     if nucleotide_match:
         assert not cdr3_protseq
-        cdr3_protseq = read_sanger_data.get_translation( cdr3_nucseq, '+1' )[0]
+        cdr3_protseq = translation.get_translation( cdr3_nucseq, '+1' )[0]
         assert len(cdr3_nucseq) == 3 * len(cdr3_protseq )
 
     ab = 'A'
-    assert v_gene[2] == 'A'
+    assert all_genes[organism][v_gene].chain == ab
 
     v_nucseq = get_v_cdr3_nucseq( organism, v_gene )
     j_nucseq = get_j_cdr3_nucseq( organism, j_gene )
@@ -409,7 +414,7 @@ def alpha_cdr3_protseq_probability( theid, organism, v_gene, j_gene, cdr3_protse
         print 'max_v_germline:',max_v_germline, len_v_nucseq, v_nucseq, cdr3_nucseq
 
         print 'max_j_germline:',max_j_germline, len_j_nucseq, j_nucseq, cdr3_nucseq, \
-            read_sanger_data.all_fasta[organism][ab]['J'][read_sanger_data.prot][j_gene]
+            all_genes[organism][j_gene].protseq
 
         print 'min_insert:',min_insert,max_v_germline,max_j_germline
 
@@ -458,11 +463,11 @@ def beta_cdr3_protseq_probability( theid, organism, v_gene, j_gene, cdr3_protseq
     nucleotide_match = ( cdr3_nucseq != '' )
     if nucleotide_match:
         assert not cdr3_protseq
-        cdr3_protseq = read_sanger_data.get_translation( cdr3_nucseq, '+1' )[0]
+        cdr3_protseq = translation.get_translation( cdr3_nucseq, '+1' )[0]
         assert len(cdr3_nucseq) == 3 * len(cdr3_protseq )
 
     ab = 'B'
-    assert v_gene[2] == 'B'
+    assert all_genes[organism][v_gene].chain == ab
 
     v_nucseq = get_v_cdr3_nucseq( organism, v_gene )
     j_nucseq = get_j_cdr3_nucseq( organism, j_gene )
@@ -553,7 +558,7 @@ def beta_cdr3_protseq_probability( theid, organism, v_gene, j_gene, cdr3_protseq
     min_insert = 3*len_cdr3_protseq - max_v_germline - max_j_germline
     if verbose:
         print 'max_j_germline:',max_j_germline, len_j_nucseq,cdr3_protseq,\
-            read_sanger_data.all_fasta[organism][ab]['J'][read_sanger_data.prot][j_gene]
+            all_genes[organism][j_gene].protseq
 
         print 'min_insert:',min_insert,max_v_germline,max_j_germline
 
@@ -854,7 +859,7 @@ def sample_tcr_sequences( organism, nsamples, v_gene, j_gene,
                           no_stop_codons = True,
                           max_tries = 100000000,
                           include_annotation = False ):
-    ab = v_gene[2]
+    ab = all_genes[organism][v_gene].chain
     assert ab in 'AB'
     if ab == 'A':
         return sample_alpha_sequences( organism, nsamples, v_gene, j_gene, force_aa_length = force_aa_length,

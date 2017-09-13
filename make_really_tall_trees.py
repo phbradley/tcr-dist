@@ -1,7 +1,6 @@
 from basic import *
 import score_trees_devel
 import svg_basic
-import cdr3s_human
 import numpy as np
 import util
 import html_colors

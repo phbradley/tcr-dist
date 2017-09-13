@@ -1,7 +1,6 @@
 from basic import *
 import numpy as np
 from sklearn.decomposition import KernelPCA
-import cdr3s_human
 import html_colors
 import parse_tsv
 import util
@@ -426,7 +425,7 @@ for ii_epitope, epitope in enumerate( epitopes ):
                 plt.scatter( [ xs[i] for i in range(num_tcrs) if tcr_colors[i] == color ],
                              [ ys[i] for i in range(num_tcrs) if tcr_colors[i] == color ],
                              s=10, c=color, edgecolors='none' )
-             
+
             for ji in range(num_tcrs): #JCC--adding ability to output kPC info
                 templi = []
                 for jx in tcr_infos[ji]:
