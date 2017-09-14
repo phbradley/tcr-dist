@@ -4,7 +4,6 @@ import tcr_distances
 import cdr3s_human #debug
 from all_genes import all_genes
 import parse_tsv
-from paths import path_to_db
 
 with Parser(locals()) as p:
     p.str('organism').required()
@@ -26,38 +25,42 @@ all_tcrs = parse_tsv.parse_tsv_file( clones_file, ['epitope'], ['va_genes','vb_g
 random_tcrs = []
 random_info = []
 
-if organism == 'mouse':
-    random_chains = {}
-    for ab in 'AB':
-        random_chains[ab] = []
-        random_tcrs_file = '{}/new_nextgen_chains_{}_{}.tsv'.format(path_to_db,organism,ab)
-        assert exists( random_tcrs_file )
-        Log('reading {}'.format( random_tcrs_file ))
-        header = []
-        for line in open(random_tcrs_file,'r'):
-            l = line[:-1].split('\t')
-            if not header:
-                header = l[:]
-                assert header == ['v_reps','j_reps','cdr3','cdr3_nucseq']
-            else:
-                random_chains[ab].append( ( frozenset( l[0].split(',') ), l[2] ) ) ## (v_reps, cdr3)
-        random.shuffle( random_chains[ab] )
-        assert len(random_chains[ab])>=nrandom
-    for a,b in zip( random_chains['A'][:nrandom], random_chains['B'][:nrandom] ):
-        random_tcrs.append( ( a[0],b[0],a[1],b[1] ) ) #va_reps, vb_reps, cdr3a, cdr3b
-        random_info.append( { 'va_reps': ';'.join( a[0] ),
-                              'vb_reps': ';'.join( b[0] ),
-                              'cdr3a':a[1],
-                              'cdr3b':b[1] } )
-
-else:
-    ##
-    human_paired_tcrs_file = path_to_db+'/randhuman_paired.tsv'
-    assert exists( human_paired_tcrs_file )
-    rtcrs = parse_tsv.parse_tsv_file( human_paired_tcrs_file, [], ['va_reps','vb_reps','cdr3a','cdr3b'] )
+## sometimes we have a paired chains file which is probably better
+paired_tcrs_file = '{}/rand{}_paired.tsv'.format( path_to_current_db_files(), organism )
+if exists( paired_tcrs_file):
+    rtcrs = parse_tsv.parse_tsv_file( paired_tcrs_file, [], ['va_reps','vb_reps','cdr3a','cdr3b'] )
     for l in rtcrs:
         random_tcrs.append( ( frozenset( l[0].split(';') ), frozenset( l[1].split(';') ), l[2], l[3] ) )
         random_info.append( { 'va_reps': l[0], 'vb_reps': l[1], 'cdr3a': l[2], 'cdr3b': l[3] } )
+else:
+    random_tcrs_files = glob('{}/new_nextgen_chains_{}_[AB].tsv'.format( path_to_current_db_files(),organism))
+    if len(random_tcrs_files) == 2:
+        random_chains = {}
+        for ab in 'AB':
+            random_chains[ab] = []
+            random_tcrs_file = '{}/new_nextgen_chains_{}_{}.tsv'.format(path_to_current_db_files(),organism,ab)
+            assert exists( random_tcrs_file )
+            Log('reading {}'.format( random_tcrs_file ))
+            header = []
+            for line in open(random_tcrs_file,'r'):
+                l = line[:-1].split('\t')
+                if not header:
+                    header = l[:]
+                    assert header == ['v_reps','j_reps','cdr3','cdr3_nucseq']
+                else:
+                    random_chains[ab].append( ( frozenset( l[0].split(',') ), l[2] ) ) ## (v_reps, cdr3)
+            random.shuffle( random_chains[ab] )
+            assert len(random_chains[ab])>=nrandom
+        for a,b in zip( random_chains['A'][:nrandom], random_chains['B'][:nrandom] ):
+            random_tcrs.append( ( a[0],b[0],a[1],b[1] ) ) #va_reps, vb_reps, cdr3a, cdr3b
+            random_info.append( { 'va_reps': ';'.join( a[0] ),
+                                  'vb_reps': ';'.join( b[0] ),
+                                  'cdr3a':a[1],
+                                  'cdr3b':b[1] } )
+    else:
+        Log('WARNING:: random_tcr_distances.py: no nextgen TCR chains files ({}) -- nothing to do'\
+            .format( len(random_tcrs_files) ) )
+        exit()
 
 
 print 'precomputing v-region distances'

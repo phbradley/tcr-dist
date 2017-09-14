@@ -8,7 +8,7 @@ from basic import *
 #from util import get_rep, get_mm1_rep, get_mm1_rep_gene_for_counting
 import util
 from tcr_rearrangement_new import all_countrep_pseudoprobs
-from paths import path_to_db
+from all_genes import all_genes
 
 with Parser(locals()) as p:
     #p.str('args').unspecified_default().multiple().required()
@@ -21,8 +21,6 @@ summary_fields = ['epitope']+[x+'_jsd_normed' for x in segtypes_lowercase ]
 
 probs_tsvfile = clones_file[:-4] + '_gene_probs.tsv'
 probs_fields = ['epitope','gene','label_prob','jsd_prob','jsd_prob_enrich','pseudoprob','pseudoprob_enrich']
-
-
 
 def get_freq_from_tuple_counts_and_bias( counts, bias ):
     reps = set()
@@ -104,26 +102,38 @@ def get_jsd_normed( P, Q ):
 
 
 ## read the background gene-tuple counts
-tuplecountsfile = path_to_db+'/nextgen_tuple_counts_v2_{}_max10M.log'.format(organism)
-assert exists( tuplecountsfile )
-
 all_background_tuple_counts = {}
 
-Log('reading {}'.format( tuplecountsfile ))
-for line in open( tuplecountsfile,'r'):
-    if line.startswith('TUPLE_COUNT'):
-        l = line.split()
-        count = int(l[1] )
-        tup = tuple( sorted( l[2].split(',') ) )
-        segtype = tup[0][3] + tup[0][2] ## go from 'TRAV*' to 'VA'
-        assert segtype in segtypes_uppercase
-        if segtype not in all_background_tuple_counts:
-            all_background_tuple_counts[segtype] = {}
-        logfile = l[-1]
-        if logfile not in all_background_tuple_counts[segtype]:
-            all_background_tuple_counts[segtype][logfile] = {}
-        assert tup not in all_background_tuple_counts[segtype][logfile] ## should not be any repeats in the output
-        all_background_tuple_counts[segtype][logfile][ tup ] = count
+tuplecountsfile = path_to_current_db_files()+'/nextgen_tuple_counts_v2_{}_max10M.log'.format(organism)
+
+if exists( tuplecountsfile ):
+    Log('reading {}'.format( tuplecountsfile ))
+    for line in open( tuplecountsfile,'r'):
+        if line.startswith('TUPLE_COUNT'):
+            l = line.split()
+            count = int(l[1] )
+            tup = tuple( sorted( l[2].split(',') ) )
+            g0 = all_genes[organism][tup[0]]
+            segtype = g0.region + g0.chain
+            #segtype = tup[0][3] + tup[0][2] ## go from 'TRAV*' to 'VA'
+            assert segtype in segtypes_uppercase
+            if segtype not in all_background_tuple_counts:
+                all_background_tuple_counts[segtype] = {}
+            logfile = l[-1]
+            if logfile not in all_background_tuple_counts[segtype]:
+                all_background_tuple_counts[segtype][logfile] = {}
+            assert tup not in all_background_tuple_counts[segtype][logfile] ## should not be any repeats in the output
+            all_background_tuple_counts[segtype][logfile][ tup ] = count
+else:
+    Log('WARNING: making up fake tuple counts since dbfile ({}) is missing'.format(tuplecountsfile))
+    logfile = 'fake_logfile'
+    for id,g in all_genes[organism].iteritems():
+        segtype = g.region + g.chain
+        if segtype in segtypes_uppercase:
+            if segtype not in all_background_tuple_counts:
+                all_background_tuple_counts[segtype] = {}
+            tup = tuple( util.get_mm1_rep_gene_for_counting( id ) )
+            all_background_tuple_counts[segtype][logfile][ tup ] = 1 ## flat counts
 
 
 ## here we compute J-S divergences of the gene distributions to background

@@ -7,7 +7,6 @@ import logo_tools
 import svg_basic
 import tcr_sampler
 import util
-from paths import path_to_db
 import parse_tsv
 from basic import *
 import random
@@ -251,8 +250,11 @@ ng_tcrs = { 'A':{}, 'B':{} }
 ## index these by the v_rep and the j_rep
 
 for ab in 'AB':
-    ng_logfile = '{}/new_nextgen_chains_{}_{}.tsv'.format( path_to_db, organism, ab )
-    assert exists(ng_logfile)
+    ng_logfile = '{}/new_nextgen_chains_{}_{}.tsv'.format( path_to_current_db_files(), organism, ab )
+    if not exists(ng_logfile):
+        Log('WARNING:: read_motifs.py: missing nextgen TCR chains file: {}'.format(ng_logfile))
+        continue
+
     counter=0
     num_chains=0
     ab_chains = {}

@@ -139,8 +139,6 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
 
         for ivj,vj in enumerate('VJ'):
             dbfile = get_blast_nucseq_database( organism, ab, vj ) # also ensures that it exists
-            # dbfile = path_to_db+'/fasta/imgt_%s_TR_nucleotide_sequences.fasta.TR%s%s.fasta'\
-            #          %(organism,ab,vj)
             assert exists(dbfile)
             blastall_exe = path_to_blast_executables+'/blastall'
             assert exists( blastall_exe )
@@ -367,145 +365,6 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
         return genes,evalues,status ## status is a list, maybe be empty
 
 
-# def parse_unpaired_dna_sequence_blastx( organism, ab, blast_seq, info,
-#                                         verbose, nocleanup, hide_nucseq,
-#                                         extended_cdr3 ):
-#     blast_tmpfile = 'tmp%f.fa'%(random.random())
-#     #assert not exists(blast_tmpfile)
-
-#     genes =  ( 'UNK', 'UNK', [100,0], 'UNK', 'UNK', [100,0], '-' )
-#     status = []
-#     evalues = {'V'+ab:(1,0),'J'+ab:(1,0)}
-
-#     if verbose:
-#         print 'blast_seq:',info,ab,blast_seq
-
-#     if len(blast_seq) <= 20:
-#         status.append('short_{}_blast_seq_{}'.format(ab,len(blast_seq)))
-#     else:
-
-#         out = open(blast_tmpfile,'w')
-#         out.write('>tmp\n%s\n'%blast_seq)
-#         out.close()
-
-#         ## now blast against V and J
-#         top_hits = []
-
-#         for vj in 'VJ':
-#             dbfile = '%s/fasta/imgt_%s_TR_protein_sequences.fasta.TR%s%s.fasta'\
-#                      %(path_to_db,organism,ab,vj)
-#             assert exists(dbfile)
-#             blastall_exe = path_to_blast_executables+'/blastall'
-#             assert exists(blastall_exe )
-#             cmd = '%s -F F -p blastx -i %s -d %s -v 100 -b 1 -o %s.blast'\
-#                   %( blastall_exe, blast_tmpfile, dbfile, blast_tmpfile )
-#             #print cmd
-#             system(cmd)
-
-#             if verbose:
-#                 print 'blast:',info,ab,vj, '='*50
-#                 print ''.join( open(blast_tmpfile+'.blast','r').readlines())
-#                 print '='*80
-
-#             ## try parsing the results
-#             evalue_threshold = 1e-1
-#             identity_threshold = 20
-#             hits = blast.parse_blast_alignments( blast_tmpfile+'.blast', evalue_threshold, identity_threshold )
-#             hits_scores = get_all_hits_with_evalues_and_scores( blast_tmpfile+'.blast' )
-#             if hits and hits[ hits.keys()[0]]:
-#                 top_hit = hits[ hits.keys()[0] ][0]
-#                 top_id, top_bit_score, top_evalue = hits_scores[0]
-#                 assert top_hit.hit_id == top_id
-#                 ## figure out the score gap to the next non-equivalen
-#                 bit_score_gap = top_bit_score
-#                 if vj == 'V':
-#                     old_rep_map = cdr3s_human.all_loopseq_representative[organism]
-#                 else:
-#                     old_rep_map = cdr3s_human.all_jseq_representative[organism]
-#                 old_top_rep = old_rep_map[top_id]
-#                 top_rep = all_genes[organism][top_id].rep
-#                 for ( id, bit_score, evalue ) in hits_scores[1:]:
-#                     if all_genes[organism][id].rep != top_rep:
-#                         bit_score_gap = top_bit_score - bit_score
-#                         break
-#                 evalues[vj+ab] = ( top_hit.evalue, bit_score_gap )
-#                 top_hits.append( top_hit )
-#             # if hits and hits[ hits.keys()[0]]:
-#             #     top_hits.append( hits[ hits.keys()[0] ][0] )
-#             #     evalues[vj+ab] = top_hits[-1].evalue
-#             else:
-#                 status.append('no_{}{}_blast_hits'.format(vj,ab))
-
-
-#         if len(top_hits) == 2:
-
-#             v_hit = top_hits[0]
-#             j_hit = top_hits[1]
-
-#             v_gene = v_hit.hit_id
-#             j_gene = j_hit.hit_id
-#             old_v_rep = cdr3s_human.all_loopseq_representative[ organism ][ v_gene ]
-#             old_j_rep = cdr3s_human.all_jseq_representative[ organism ][ j_gene ]
-#             v_rep = all_genes[organism][v_gene].rep
-#             j_rep = all_genes[organism][j_gene].rep
-
-#             v_seq = all_fasta[organism][ab]['V'][prot][v_gene]
-
-
-#             if v_hit.frame != j_hit.frame: ## out of frame
-#                 Log(`('ERR frame mismatch:',v_hit.frame, v_hit.evalue, j_hit.frame, j_hit.evalue)`)
-#                 genes = ( v_gene.replace('TRAV','TRaV' ).replace('TRBV','TRbV'),
-#                           v_rep .replace('TRAV','TRaV' ).replace('TRBV','TRbV'), [100,0],
-#                           j_gene.replace('TRAJ','TRaJ' ).replace('TRBJ','TRbJ'),
-#                           j_rep .replace('TRAJ','TRaJ' ).replace('TRBJ','TRbJ'), [100,0], '-' )
-#                 status.append('vj_{}_frame_mismatch'.format(ab))
-#             else:
-
-#                 qseq,codons = get_translation( blast_seq, v_hit.frame )
-#                 matched_qseq = ''.join( v_hit.q_align.split('-'))
-#                 assert matched_qseq in qseq
-#                 real_qstart = qseq.find( matched_qseq )
-#                 fake_qstart = v_hit.q_start
-
-#                 q2v_align = {}
-#                 for qpos in range(len(qseq)):
-#                     fake_qpos = qpos - real_qstart + fake_qstart
-#                     if fake_qpos not in v_hit.q2hmap: continue
-#                     hpos,haa = v_hit.q2hmap[fake_qpos]
-#                     if hpos>=0:
-#                         assert haa == v_seq[hpos]
-#                         q2v_align[ qpos ] = hpos
-
-#                 old_cdr3,v_mm,j_mm,errors = cdr3s_human.parse_cdr3( organism, ab, qseq, v_hit.hit_id, j_hit.hit_id,
-#                                                                     q2v_align, extended_cdr3 = extended_cdr3 )
-#                 cdr3,v_mm,j_mm,errors = parse_cdr3.parse_cdr3( organism, ab, qseq, v_hit.hit_id, j_hit.hit_id,
-#                                                                q2v_align, extended_cdr3 = extended_cdr3 )
-#                 assert old_cdr3 == cdr3
-#                 status.extend(errors)
-
-#                 if cdr3 in qseq:
-#                     if not hide_nucseq:
-#                         offset = qseq.find(cdr3)
-#                         cdr3_codons = codons[ offset:offset+len(cdr3) ]
-#                         cdr3 += '-'+''.join(cdr3_codons)
-#                 else:
-#                     assert cdr3 == '-'
-
-#                 genes = ( v_gene, v_rep, v_mm, j_gene, j_rep, j_mm, cdr3 )
-
-#                 if cdr3 != "-":
-#                     cdr3aa = cdr3.split("-")[0]
-#                     if len(cdr3aa) < 5:
-#                         status.append('cdr3{}_len_too_short'.format(ab))
-
-#     if not nocleanup:
-#         files = glob(blast_tmpfile+'*')
-#         for file in files:
-#             remove( file )
-
-#     assert len(genes) == 7
-
-#     return genes,evalues,status
 
 
 def parse_paired_dna_sequences( program, organism, aseq, bseq, info = '',
@@ -531,6 +390,7 @@ def parse_paired_dna_sequences( program, organism, aseq, bseq, info = '',
                                                                                verbose, nocleanup, hide_nucseq,
                                                                                extended_cdr3, return_all_good_hits )
     elif program == 'blastx':
+        ## can recover this code from early versions of the repository if need be...
         print 'blastx parsing not supported at the moment'
         Log( 'blastx parsing not supported at the moment' )
         exit()

@@ -6,9 +6,7 @@ import re
 import cdr3s_human #debug
 from all_genes import all_genes
 import sys
-from paths import path_to_db
 import util
-
 
 with Parser(locals()) as p:
     p.str('clones_file').required()
@@ -214,8 +212,11 @@ def extend_motif( oldmotif, oldshowmotif, old_chi_squared, seqs, seq_indices, ra
 ## index these by the v_rep and the j_rep
 ng_tcrs = { 'A':{}, 'B':{} }
 for ab in 'AB':
-    ng_logfile = '{}/new_nextgen_chains_{}_{}.tsv'.format(path_to_db,organism,ab)
-    assert exists(ng_logfile)
+    ng_logfile = '{}/new_nextgen_chains_{}_{}.tsv'.format(path_to_current_db_files(),organism,ab)
+    if not exists( ng_logfile ):
+        Log('WARNING:: find_cdr3_motifs.py: missing next-gen chains file {}'.format(ng_logfile))
+        continue
+
     counter=0
     num_chains=0
     ab_chains = {}

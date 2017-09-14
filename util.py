@@ -6,19 +6,8 @@ import os
 import html_colors
 import parse_tsv
 import tcr_sampler
-from paths import path_to_db
 
 verbose = __name__ == '__main__'
-
-
-def get_db_files_directory():
-    """Without the trailing /"""
-    db_file = path_to_db+'/'+pipeline_params['db_file']
-    assert exists(db_file)
-    db_files_dir = db_file+'_files'
-    if not exists(db_files_dir):
-        mkdir(db_files_dir)
-    return db_files_dir
 
 
 def get_rep( gene, organism ):

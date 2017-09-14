@@ -422,13 +422,13 @@ gggactgggggggc""".split('\n')
     d_fasta = {}
     for line in dlines:
         if line[0] == '>':
-            l = line[1:-1].split('|')
+            l = line[1:].split('|')
             id = l[1]
             organism = {'Homo sapiens':'human', 'Mus musculus':'mouse'}[l[2]]
             if organism not in d_fasta:
                 d_fasta[organism] = {}
         else:
-            d_fasta[organism][id] = line[:-1]
+            d_fasta[organism][id] = line
 
 
 
@@ -504,8 +504,8 @@ gggactgggggggc""".split('\n')
     for organism in all_fasta: ## protein sequences
         for chain in 'AB':
             ## what ids are relevant here?
-            v_ids = [x for x in all_merged_loopseqs[organism] if x[2] == chain ]
-            j_ids = [x for x in all_jseq_representative[organism] if x[2] == chain ]
+            v_ids = sorted( [x for x in all_merged_loopseqs[organism] if x[2] == chain ] )
+            j_ids = sorted( [x for x in all_jseq_representative[organism] if x[2] == chain ] )
 
             # some sanity checks
             for id in v_ids + j_ids:
@@ -520,7 +520,7 @@ gggactgggggggc""".split('\n')
                     assert id in v_ids or id in j_ids
                 elif region == 'D':
                     d_ids.append( id )
-
+            d_ids.sort()
 
             max_alseq_length = max( ( len(all_align_fasta[organism][x]) for x in v_ids ) )
 

@@ -1,8 +1,4 @@
 from basic import *
-#from amino_acids import amino_acids
-#from tcr_distances_blosum import blosum
-#from paths import path_to_db
-#import translation
 from all_genes import all_genes, gap_character
 
 

@@ -44,6 +44,18 @@ segtypes_lowercase = ['va','ja','vb','jb']
 ############################################################################################
 ############################################################################################
 
+def path_to_current_db_files():
+    """Without the trailing /"""
+    db_file = paths.path_to_db+'/'+pipeline_params['db_file']
+    assert exists(db_file)
+    db_files_dir = db_file+'_files'
+    if not exists(db_files_dir):
+        mkdir(db_files_dir)
+    return db_files_dir
+
+
+
+
 ## you could modify this function if you have a different cmdline tool for converting svg to png
 ## like inkscape or cairosvg
 ##

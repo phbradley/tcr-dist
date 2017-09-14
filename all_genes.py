@@ -27,8 +27,6 @@ class TCR_Gene:
         assert self.protseq == self.alseq.replace(gap_character,'')
         # sanity check
         if self.cdrs:
-            #print self.cdrs
-            #print [ self.alseq[ x[0]-1 : x[1] ] for x in self.cdr_columns ]
             assert self.cdrs == [ self.alseq[ x[0]-1 : x[1] ] for x in self.cdr_columns ]
 
 ## need to make this a little more configurable (cmdline??)
@@ -64,7 +62,7 @@ for organism,genes in all_genes.iteritems():
             alseq1 = g1.alseq
             minlen = cpos+1
             assert len(alseq1) >= minlen
-            if alseq1[cpos] != 'C':
+            if alseq1[cpos] != 'C' and verbose:
                 print 'funny cpos:',id1,alseq1,g1.cdrs[-1]
 
             all_loopseq_nbrs[id1] = []
@@ -123,7 +121,7 @@ for organism,genes in all_genes.iteritems():
                                 mmstring = ','.join(['%s/%s'%(x[0],x[1]) for x in loop_mismatch_seqs])
                                 gene1 = id1[:id1.index('*')]
                                 gene2 = id2[:id2.index('*')]
-                                if gene1 != gene2:
+                                if gene1 != gene2 and verbose:
                                     print 'v_mismatches:',organism,mmstring,blscore,id1,id2,\
                                         loop_mismatches,loop_mismatches_cdrx,all_mismatches,seq1
                                     print 'v_mismatches:',organism,mmstring,blscore,id1,id2,\
@@ -225,8 +223,6 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
             break
         else:
             min_j_matchlen -= 1
-
-    #print 'min_j_matchlen:',min_j_matchlen,'jatag:',jatag,'ntrim:',ntrim,'ja_seq:',ja_seq,'qseq',qseq
 
     if jatag not in aseq:
         Log(`( 'whoah',ab,aseq,ja_seq )`)
