@@ -1,17 +1,17 @@
 from basic import *
 import sys
 import translation
-import cdr3s_human #debug
+import cdr3s_human #debug -- this will be removed
 from all_genes import all_genes, gap_character
 from genetic_code import genetic_code, reverse_genetic_code
 import logo_tools
 import random
 
 if pipeline_params['new_probs']:
-    print 'tcr_sampler: new_probs'
+    Log( 'tcr_sampler: new_probs' )
     import tcr_rearrangement_new as tcr_rearrangement
 else:
-    print 'tcr_sampler: old_probs'
+    Log( 'tcr_sampler: old_probs' )
     import tcr_rearrangement
 
 
@@ -47,14 +47,15 @@ def get_v_cdr3_nucseq( organism, v_gene, paranoid = False ):
     v_nucseq_offset = vg.nucseq_offset
     v_nucseq = v_nucseq[ v_nucseq_offset: ]
 
-    old_v_alseq = cdr3s_human.all_align_fasta[organism][ v_gene ]
-    old_alseq_cpos = cdr3s_human.alseq_C_pos[organism][ab]-1 ## 0-indexed
     v_alseq = vg.alseq
     alseq_cpos = vg.cdr_columns[-1][0] -1
     #print organism, v_gene, old_v_alseq
     #print organism, v_gene, v_alseq
-    assert old_v_alseq[:alseq_cpos] == v_alseq[:alseq_cpos]
-    assert old_alseq_cpos == alseq_cpos
+    if v_gene in cdr3s_human.all_align_fasta[organism]:
+        old_v_alseq = cdr3s_human.all_align_fasta[organism][ v_gene ]
+        old_alseq_cpos = cdr3s_human.alseq_C_pos[organism][ab]-1 ## 0-indexed
+        assert old_v_alseq[:alseq_cpos] == v_alseq[:alseq_cpos]
+        assert old_alseq_cpos == alseq_cpos
     numgaps = v_alseq[:alseq_cpos].count('.')
     v_cpos = alseq_cpos - numgaps
     v_nucseq = v_nucseq[3*v_cpos:] ## now v_nucseq starts with the 'C' codon
@@ -85,9 +86,10 @@ def get_j_cdr3_nucseq( organism, j_gene, paranoid = False ):
     j_nucseq_offset = jg.nucseq_offset
 
     ## goes up to (but not including) GXG
-    old_num_genome_j_positions_in_loop = cdr3s_human.all_num_genome_j_positions_in_loop[organism][ab][j_gene] + 2
     num_genome_j_positions_in_loop = len( jg.cdrs[0].replace(gap_character,''))
-    assert old_num_genome_j_positions_in_loop == num_genome_j_positions_in_loop
+    if j_gene in cdr3s_human.all_num_genome_j_positions_in_loop[organism][ab]:
+        old_num_genome_j_positions_in_loop = cdr3s_human.all_num_genome_j_positions_in_loop[organism][ab][j_gene] + 2
+        assert old_num_genome_j_positions_in_loop == num_genome_j_positions_in_loop
 
     ## trim j_nucseq so that it extends up to the F/W position
     j_nucseq = j_nucseq[:3*num_genome_j_positions_in_loop + j_nucseq_offset]

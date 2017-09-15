@@ -99,6 +99,15 @@ def get_jsd_normed( P, Q ):
 # def get_relent( freq, base_freq ):
 #     return get_jsd_normed( freq, base_freq ) ## hacking!
 
+# since the files don't have info on chain/region, set up a mapping (note that the tuples are of genes not alleles)
+gene2segtype = {}
+for id,g in all_genes[organism].iteritems():
+    gene = id[:id.index('*')]
+    segtype = g.region + g.chain
+    if gene in gene2segtype:
+        assert gene2segtype[gene] == segtype
+    else:
+        gene2segtype[gene] = segtype
 
 
 ## read the background gene-tuple counts
@@ -113,8 +122,7 @@ if exists( tuplecountsfile ):
             l = line.split()
             count = int(l[1] )
             tup = tuple( sorted( l[2].split(',') ) )
-            g0 = all_genes[organism][tup[0]]
-            segtype = g0.region + g0.chain
+            segtype = gene2segtype[ tup[0] ]
             #segtype = tup[0][3] + tup[0][2] ## go from 'TRAV*' to 'VA'
             assert segtype in segtypes_uppercase
             if segtype not in all_background_tuple_counts:

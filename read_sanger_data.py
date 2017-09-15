@@ -9,14 +9,13 @@ from all_genes import all_genes
 import parse_cdr3
 from paths import path_to_blast_executables
 from translation import get_translation
-import util
 
 AB = 'AB'
 
 def get_blast_nucseq_database( organism, chain, region ):
     """The nucleotide sequence database"""
     assert chain in 'AB' and region in 'VJ'
-    db_dir = util.get_db_files_directory()
+    db_dir = path_to_current_db_files()
     assert exists(db_dir)
     blast_dir = db_dir+'/blast_dbs'
     if not exists(blast_dir): mkdir( blast_dir )

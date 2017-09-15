@@ -35,43 +35,46 @@ for organism in all_genes:
             for file in probs_files:
                 trim_prob_lines[chain].extend( popen('grep "^PROB_{}_" {}'.format( chain, file )).readlines())
 
-    trim_probs = {}
-    for line in trim_prob_lines['A']:
-        l = line.split()
-        if not l:continue
-        assert l[0].startswith('PROB_A')
-        tag = l[0][5:]
-        vals = map(float,l[1:])
-        if tag not in trim_probs:
-            trim_probs[tag] = []
-        trim_probs[tag].append( dict( zip( range(len(vals)), vals ) ) )
 
-    for line in trim_prob_lines['B']:
-        l = line.split()
-        if not l:continue
-        assert l[0].startswith('PROB_B')
-        tag = l[0][5:]
-        if tag not in trim_probs:
-            trim_probs[tag] = []
-        assert len(l)%2==1
-        num_vals = (len(l)-1)/2
-        D = {}
-        for i in range(num_vals):
-            assert l[2*i+1][-1] == ':'
-            key = l[2*i+1][:-1]
-            if ',' in key:
-                key = tuple(map(int,key.split(',')))
-            else:
-                key = int(key)
-            #trim_probs[tag][key] = float(l[2*i+2])
-            D[key] = float(l[2*i+2])
-        trim_probs[tag].append( D )
+
+    trim_probs = {}
+    if trim_prob_lines['A']:
+        for line in trim_prob_lines['A']:
+            l = line.split()
+            if not l:continue
+            assert l[0].startswith('PROB_A')
+            tag = l[0][5:]
+            vals = map(float,l[1:])
+            if tag not in trim_probs:
+                trim_probs[tag] = []
+            trim_probs[tag].append( dict( zip( range(len(vals)), vals ) ) )
+
+    if trim_prob_lines['B']:
+        for line in trim_prob_lines['B']:
+            l = line.split()
+            if not l:continue
+            assert l[0].startswith('PROB_B')
+            tag = l[0][5:]
+            if tag not in trim_probs:
+                trim_probs[tag] = []
+            assert len(l)%2==1
+            num_vals = (len(l)-1)/2
+            D = {}
+            for i in range(num_vals):
+                assert l[2*i+1][-1] == ':'
+                key = l[2*i+1][:-1]
+                if ',' in key:
+                    key = tuple(map(int,key.split(',')))
+                else:
+                    key = int(key)
+                #trim_probs[tag][key] = float(l[2*i+2])
+                D[key] = float(l[2*i+2])
+            trim_probs[tag].append( D )
 
     ## now average to get a single prob distn
     for tag in trim_probs.keys():
         Dlist = trim_probs[tag]
         ks = sorted( set( reduce( add, [D.keys() for D in Dlist] ) ) )
-        print organism, tag, ks
         newD = {}
         for k in ks:
             newD[k] = sum( ( D.get(k,0.) for D in Dlist ) )
@@ -83,46 +86,47 @@ for organism in all_genes:
         trim_probs[tag] = newD
 
 
-    ## fake probability for total trimming of the D gene
-    for did,nucseq in all_trbd_nucseq[organism].iteritems():
-        trimtag = 'B_D{}_d01_trim'.format(did)
-        prob_trim_all_but_1 = 0.0
-        for d0_trim in range(len(nucseq)):
-            d1_trim = (len(nucseq)-1)-d0_trim
-            assert d0_trim + d1_trim == len(nucseq)-1
-            prob_trim_all_but_1 += trim_probs[trimtag].get((d0_trim,d1_trim),0)
-        prob_trim_all = 0.0
-        for d0_trim in range(len(nucseq)+1):
-            d1_trim = (len(nucseq))-d0_trim
-            prob_trim_all += trim_probs[trimtag].get((d0_trim,d1_trim),0)
-        assert prob_trim_all <1e-6
-        #print 'old_prob_trim_all:',prob_trim_all,'prob_trim_all_but_1:',prob_trim_all_but_1,'D',did
-        new_prob_trim_all = 0.75 * prob_trim_all_but_1
-        for d0_trim in range(len(nucseq)+1):
-            d1_trim = (len(nucseq))-d0_trim
-            if d0_trim == 0:
-                #print 'new_prob_trim_all:',new_prob_trim_all
-                trim_probs[trimtag][ (d0_trim,d1_trim) ] = new_prob_trim_all ## concentrate all here
-            else:
-                trim_probs[trimtag][ (d0_trim,d1_trim) ] = 0.0
-        total = sum( trim_probs[trimtag].values())
-        for k in trim_probs[trimtag]:
-            trim_probs[trimtag][k] /= total
-        assert abs( 1.0 - sum( trim_probs[trimtag].values()) ) < 1e-6
+    if trim_prob_lines['B']:
+        ## fake probability for total trimming of the D gene
+        for did,nucseq in all_trbd_nucseq[organism].iteritems():
+            trimtag = 'B_D{}_d01_trim'.format(did)
+            prob_trim_all_but_1 = 0.0
+            for d0_trim in range(len(nucseq)):
+                d1_trim = (len(nucseq)-1)-d0_trim
+                assert d0_trim + d1_trim == len(nucseq)-1
+                prob_trim_all_but_1 += trim_probs[trimtag].get((d0_trim,d1_trim),0)
+            prob_trim_all = 0.0
+            for d0_trim in range(len(nucseq)+1):
+                d1_trim = (len(nucseq))-d0_trim
+                prob_trim_all += trim_probs[trimtag].get((d0_trim,d1_trim),0)
+            assert prob_trim_all <1e-6
+            #print 'old_prob_trim_all:',prob_trim_all,'prob_trim_all_but_1:',prob_trim_all_but_1,'D',did
+            new_prob_trim_all = 0.75 * prob_trim_all_but_1
+            for d0_trim in range(len(nucseq)+1):
+                d1_trim = (len(nucseq))-d0_trim
+                if d0_trim == 0:
+                    #print 'new_prob_trim_all:',new_prob_trim_all
+                    trim_probs[trimtag][ (d0_trim,d1_trim) ] = new_prob_trim_all ## concentrate all here
+                else:
+                    trim_probs[trimtag][ (d0_trim,d1_trim) ] = 0.0
+            total = sum( trim_probs[trimtag].values())
+            for k in trim_probs[trimtag]:
+                trim_probs[trimtag][k] /= total
+            assert abs( 1.0 - sum( trim_probs[trimtag].values()) ) < 1e-6
 
 
 
-    beta_prob_tags_single = ['v_trim','j_trim','vd_insert','dj_insert']
-    for tag in beta_prob_tags_single:
-        tags = [ 'B_D{}_{}'.format(x,tag) for x in all_trbd_nucseq[organism] ]
-        #tag1 = 'B_D1_{}'.format(tag)
-        #tag2 = 'B_D2_{}'.format(tag)
-        avgtag = 'B_{}'.format(tag)
-        trim_probs[avgtag] = {}
-        ks = sorted( set( reduce( add, [ trim_probs[x].keys() for x in tags ] ) ) )
-        #print organism,tag,ks
-        for k in ks:
-            trim_probs[avgtag][k] = sum( ( trim_probs[x].get(k,0) for x in tags ) ) / float(len(tags))
+        beta_prob_tags_single = ['v_trim','j_trim','vd_insert','dj_insert']
+        for tag in beta_prob_tags_single:
+            tags = [ 'B_D{}_{}'.format(x,tag) for x in all_trbd_nucseq[organism] ]
+            #tag1 = 'B_D1_{}'.format(tag)
+            #tag2 = 'B_D2_{}'.format(tag)
+            avgtag = 'B_{}'.format(tag)
+            trim_probs[avgtag] = {}
+            ks = sorted( set( reduce( add, [ trim_probs[x].keys() for x in tags ] ) ) )
+            #print organism,tag,ks
+            for k in ks:
+                trim_probs[avgtag][k] = sum( ( trim_probs[x].get(k,0) for x in tags ) ) / float(len(tags))
 
     countrep_probs = {}
     for ab in rep_freq_files:
