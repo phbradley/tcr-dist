@@ -108,6 +108,14 @@ for chains in ['A','B','AB']:
     epitopes = list( set( [x['epitope'] for x in all_info ] ) )
     epitopes.sort()
 
+    subjects = list( set( [x['subject'] for x in all_info ] ) )
+
+    if len(subjects)==1 and new_nbrdists:
+        Log("""WARNING:: compute_distances.py: It looks like there's only a single subject...
+        Now including intra-subject distances in computing NNdistance values.
+        This just means that any classification results may be a little too rosy""")
+        new_nbrdists = False
+
     ## for computing rank scores
     epitope_self_nbrdists = {}
     for wtd in ['','wtd_']:
