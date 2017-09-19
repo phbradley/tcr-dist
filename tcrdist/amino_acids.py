@@ -55,7 +55,7 @@ if __name__ == '__main__':
     slope, intercept, r_ges_hp, p_value, std_err = stats.linregress(ges,hp)
     slope, intercept, r_kd_hp, p_value, std_err = stats.linregress(kd,hp)
 
-    print 'r_ges_kd:',r_ges_kd
-    print 'r_ges_hp:',r_ges_hp
-    print 'r_kd_hp:',r_kd_hp
+    print('r_ges_kd:',r_ges_kd)
+    print('r_ges_hp:',r_ges_hp)
+    print('r_kd_hp:',r_kd_hp)
 

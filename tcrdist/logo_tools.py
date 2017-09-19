@@ -1,6 +1,9 @@
-import amino_acids
 import sys
 import logging
+
+from .amino_acids import amino_acids
+
+logger = logging.getLogger('logo_tools.py')
 
 def get_alphabet( pwm ):
     alphabet = pwm[0].keys()[:]
@@ -33,7 +36,7 @@ def create_pwm_from_sequences( seqs, alphabet, pseudocounts=0.0 ):
         assert len(s) == L
         for pos in range(L):
             if s[pos] not in alphabet:
-                logging.error('logo_tools.create_pwm_from_sequences: skipping bad character %s\n'%(s[pos]))
+                logger.error('logo_tools.create_pwm_from_sequences: skipping bad character %s\n'%(s[pos]))
                 continue
             pwm[ pos ][ s[pos] ] += 1
 

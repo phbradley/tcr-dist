@@ -122,4 +122,4 @@ if __name__ == "__main__":
     for c in code:
         d = c.upper()
         if standard[d] != code[c] or gencode[d] != code[c]:
-            print code[c], standard.get(c.upper(),'?'), gencode.get(c.upper(),'?')
+            print(code[c], standard.get(c.upper(),'?'), gencode.get(c.upper(),'?'))

@@ -1,7 +1,11 @@
-from basic import *
-from amino_acids import amino_acids
-from tcr_distances_blosum import blosum
-from paths import path_to_db
+import logging
+import os.path as op
+
+from .amino_acids import amino_acids
+from .blosum import blosum
+from .paths import path_to_db
+
+logger = logging.getLogger('cdr3s_human.py')
 
 ## these are indexed by organism
 ## these are potentially used outside this python file #########################
@@ -20,9 +24,7 @@ gap_character = '.'
 #################################################################################
 
 
-fasta_dir = path_to_db+'/fasta/'
-
-verbose = ( __name__ == '__main__' )
+fasta_dir = op.join(path_to_db, 'fasta')
 
 ## these go out of date when we remove gaps from the alignment, below
 ##
@@ -99,8 +101,9 @@ for line in all_funny_jseq.split('\n'):
 for organism in [ 'mouse','human' ]:
 
     ## read the TR-V alignments
-    align_file = '{}imgt_{}_TR_protein_sequences_with_gaps.fasta'.format( fasta_dir, organism )
-    assert exists(align_file)
+    align_file = op.join(fasta_dir, 'imgt_{}_TR_protein_sequences_with_gaps.fasta'.format(organism))
+    logger.debug(align_file)
+    assert op.exists(align_file)
     align_fasta = {}
     tr_prefixes = ['TRBV','TRAV']
     for line in open( align_file,'r'):
@@ -115,15 +118,14 @@ for organism in [ 'mouse','human' ]:
         if id[3] == 'V' and id[:4] in tr_prefixes:
             cpos = alseq_C_pos[organism][id[2]]
             if len(align_fasta[id])<cpos:
-                if verbose:
-                    print 'short alseq:',organism,id,cpos,len(align_fasta[id])
+                logger.error('short alseq: %s %s %s %s',organism,id,cpos,len(align_fasta[id]))
                 align_fasta[id] += gap_character*(cpos - len(align_fasta[id]))
 
-            if align_fasta[id][cpos-1] != 'C' and verbose:
-                print 'bad cpos',id, align_fasta[id][cpos-1]
+            if align_fasta[id][cpos-1] != 'C':
+                logger.error('bad cpos: %s %s',id, align_fasta[id][cpos-1])
 
-    fastafile = '{}imgt_{}_TR_protein_sequences.fasta'.format( fasta_dir, organism )
-    assert exists(fastafile)
+    fastafile = op.join(fasta_dir, 'imgt_{}_TR_protein_sequences.fasta'.format(organism ))
+    assert op.exists(fastafile)
 
     ## read the fasta file
     fasta = {}
@@ -167,8 +169,7 @@ for organism in [ 'mouse','human' ]:
                     num_spaces += ( suffixlen - default_suffixlen )
                 ## there are 2 residues between the loop and the GXG
                 all_num_genome_j_positions_in_loop[organism][ab][id] = len(alseq) - suffixlen - 5
-                if verbose:
-                    print '%s %-20s %s%s   %s'%(organism,id,' '*num_spaces,alseq,'**********'*starred)
+                logger.debug('%s %-20s %s%s   %s' % (organism,id,' '*num_spaces,alseq,'**********'*starred))
 
     if True: ## show alignment columns in plain text ################################### and debugging
         col_len = 15000000
@@ -186,8 +187,7 @@ for organism in [ 'mouse','human' ]:
                 col = ''.join( [align_fasta[x][pos] for x in ids[:col_len] ] )
                 if pos == cpos:
                     assert col.count('C') > (95*len(col))/100
-                if verbose:
-                    print '%s TR%sV %s %4d %s'%(organism,ab,cdrtag,pos+1,col)
+                logger.debug('%s TR%sV %s %4d %s'%(organism,ab,cdrtag,pos+1,col))
 
 
 
@@ -239,8 +239,7 @@ for organism in [ 'mouse','human' ]:
             minlen = cpos+1
             if len(alseq1)<minlen:
                 alseq1 = align_fasta[id1] + 'X'*( minlen-len(alseq1))
-                if verbose:
-                    print 'short_align:',id1,len(alseq1),minlen,alseq1
+                logger.debug('short_align: %s %s %s %s',id1,len(alseq1),minlen,alseq1)
 
             all_loopseq_nbrs[id1] = []
             all_loopseq_nbrs_mm1[id1] = []
@@ -294,23 +293,22 @@ for organism in [ 'mouse','human' ]:
                             blscore = 100
                         if blscore>=1:
                             all_loopseq_nbrs_mm1[id1].append( id2 )
-                            if loop_mismatches>0 and verbose:
+                            if loop_mismatches>0:
                                 mmstring = ','.join(['%s/%s'%(x[0],x[1]) for x in loop_mismatch_seqs])
                                 gene1 = id1[:id1.index('*')]
                                 gene2 = id2[:id2.index('*')]
                                 if gene1 != gene2:
-                                    print 'v_mismatches:',organism,mmstring,blscore,id1,id2,\
-                                        loop_mismatches,loop_mismatches_cdrx,all_mismatches,seq1
-                                    print 'v_mismatches:',organism,mmstring,blscore,id1,id2,\
-                                        loop_mismatches,loop_mismatches_cdrx,all_mismatches,seq2
+                                    logger.error('v_mismatches: %s %s %s %s %s %s %s %s %s',organism,mmstring,blscore,id1,id2,\
+                                        loop_mismatches,loop_mismatches_cdrx,all_mismatches,seq1)
+                                    logger.error('v_mismatches: %s %s %s %s %s %s %s %s %s',organism,mmstring,blscore,id1,id2,\
+                                        loop_mismatches,loop_mismatches_cdrx,all_mismatches,seq2)
 
 
         for id in all_loopseq_nbrs:
             all_loopseq_representative[organism][id] = min( all_loopseq_nbrs[id] )
             assert org_merged_loopseqs[id] == org_merged_loopseqs[ all_loopseq_representative[organism][id] ]
-            if verbose:
-                print 'vrep %s %15s %15s %s'%(organism, id, all_loopseq_representative[organism][id],
-                                              org_merged_loopseqs[id])
+            logger.debug('vrep %s %15s %15s %s'%(organism, id, all_loopseq_representative[organism][id],
+                                              org_merged_loopseqs[id]))
             all_merged_loopseqs[ organism ][ id ] = org_merged_loopseqs[id][:]
 
 
@@ -323,24 +321,21 @@ for organism in [ 'mouse','human' ]:
                     for id3 in all_loopseq_nbrs_mm1[id2]:
                         if id3 not in all_loopseq_nbrs_mm1[id1]:
                             all_loopseq_nbrs_mm1[id1].append( id3 )
-                            if verbose:
-                                print 'new_nbr:',id1,id2,id3
+                            logger.debug('new_nbr: %s %s %s',id1,id2,id3)
                             new_id1_nbrs = True
                             break
                     if new_id1_nbrs:
                         break
                 if new_id1_nbrs:
                     new_nbrs = True
-            if verbose:
-                print 'new_nbrs:',ab,organism,new_nbrs
+            logger.debug('new_nbrs: %s %s %s',ab,organism,new_nbrs)
             if not new_nbrs:
                 break
 
         for id in all_loopseq_nbrs_mm1:
             all_loopseq_representative_mm1[organism][id] = min( all_loopseq_nbrs_mm1[id] )
-            if verbose:
-                print 'mm1vrep %s %15s %15s %s'%(organism, id, all_loopseq_representative_mm1[organism][id],
-                                                 org_merged_loopseqs[id])
+            logger.debug('mm1vrep %s %15s %15s %s'%(organism, id, all_loopseq_representative_mm1[organism][id],
+                                                 org_merged_loopseqs[id]))
 
 
     ## setup Jseq reps
@@ -363,9 +358,8 @@ for organism in [ 'mouse','human' ]:
         for id in all_jloopseq_nbrs:
             all_jseq_representative[organism][id] = min( all_jloopseq_nbrs[id] )
             assert jloopseqs[id] == jloopseqs[ all_jseq_representative[organism][id] ]
-            if verbose:
-                print 'jrep %s %15s %15s %15s'%(organism, id, all_jseq_representative[organism][id],
-                                                jloopseqs[id])
+            logger.debug('jrep %s %15s %15s %15s'%(organism, id, all_jseq_representative[organism][id],
+                                                jloopseqs[id]))
 
     ## setup core positions
     all_core_positions[ organism ] = {}
@@ -380,8 +374,7 @@ for organism in [ 'mouse','human' ]:
                 last_mapped_pos = 0
                 if align_pos_mapping: last_mapped_pos = max( align_pos_mapping.keys() )
                 align_pos_mapping[ last_mapped_pos + 1 ] = i
-                if False and verbose:
-                    print 'align_pos_mapping:',organism,ab,last_mapped_pos+1,i
+                logger.debug('align_pos_mapping: %s %s %s %s',organism,ab,last_mapped_pos+1,i)
 
             for generic_align_pos1 in core_positions_generic_1indexed:
                 align_pos = align_pos_mapping[ generic_align_pos1 ] - 1 ## now 0-indexed, shifted for extra columns
@@ -392,8 +385,7 @@ for organism in [ 'mouse','human' ]:
                     poslist.append( -1 )
                 poslist_seq += alseq[ align_pos ]
 
-            if verbose:
-                print 'core_poslist_seq:',organism,poslist_seq,id
+            logger.debug('core_poslist_seq: %s %s %s',organism,poslist_seq,id)
 
             all_core_positions[organism][id] = poslist
 
@@ -507,11 +499,11 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
     #print 'min_j_matchlen:',min_j_matchlen,'jatag:',jatag,'ntrim:',ntrim,'ja_seq:',ja_seq,'qseq',qseq
 
     if jatag not in aseq:
-        Log(`( 'whoah',ab,aseq,ja_seq )`)
+        logger.error(('whoah: %s %s %s',ab,aseq,ja_seq ))
         errors.append( 'j{}tag_not_in_aseq'.format(ab) )
         return '-',[100,0],errors
     elif ja_seq.count( jatag ) != 1:
-        Log(`( 'whoah2',ab,aseq,ja_seq )`)
+        logger.error(( 'whoah2: %s %s %s',ab,aseq,ja_seq ))
         errors.append( 'multiple_j{}tag_in_jseq'.format(ab) )
         return '-',[100,0],errors
     else:
@@ -521,7 +513,7 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
             aseq = aseq[3:]
             looplen -= 3 ## dont count CAX
         if len(aseq)<looplen:
-            Log(`( 'short',ab,aseq,ja_seq )`)
+            logger.error('short:  %s %s %s',ab,aseq,ja_seq)
             errors.append( ab+'seq_too_short' )
             return '-',[100,0],errors
 
@@ -530,7 +522,7 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
     ## now count mismatches in the J gene, beyond the cdrseq
     j_seq = fasta[ j_gene ]
     if qseq.count( cdrseq ) > 1:
-        Log('multiple cdrseq occurrences %s %s'%(qseq,cdrseq))
+        logger.debug('multiple cdrseq occurrences %s %s'%(qseq,cdrseq))
         errors.append('multiple_cdrseq_occ')
         return '-',[100,0],errors
     assert qseq.count(cdrseq) == 1
@@ -589,7 +581,7 @@ def parse_cdr3( organism, ab, qseq, v_gene, j_gene, q2v_align, extended_cdr3 = F
 
     if cpos_match<0 or qseq[ cpos_match ] != 'C':
         ## problemo
-        Log('failed to find blast match to C position')
+        logger.error('failed to find blast match to C position')
         errors.append('no_V{}_Cpos_blastmatch'.format(ab))
         return '-',[100,0],[100,0],errors
 
@@ -606,5 +598,5 @@ if __name__ == '__main__':
             for id in all_num_genome_j_positions_in_loop[org][ab]:
                 num = all_num_genome_j_positions_in_loop[org][ab][id]
                 jseq = all_fasta[org][id]
-                print 'jseq %10s %15s %10s %s'%(org,id,jseq[:num],jseq[num:])
+                print('jseq %10s %15s %10s %s'%(org,id,jseq[:num],jseq[num:]))
 

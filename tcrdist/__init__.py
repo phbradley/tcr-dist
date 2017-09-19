@@ -1,15 +1,17 @@
-from future import absolute_import
-import processing
-import utils
-import plotting
-from objects import TCRClone
-
+from __future__ import print_function
 import logging
 logging.basicConfig(filename='tcrdist.log',
-                    level=logging.INFO,
-                    format='%(asctime)s %(message)s',
-                    datefmt='%m/%d/%Y %I:%M:%S %p')
+                    level=logging.DEBUG,
+                    format='[%(asctime)s] [%(levelname)s] [%(name)s: %(lineno)s]\n\t%(message)s',
+                    datefmt='%m/%d/%Y %I:%M:%S %p',
+                    filemode='w')
+logger = logging.getLogger('__init__.py')
+logger.debug('Begining package imports')
 
+from . import processing
+from . import utils
+from . import plotting
+from .objects import TCRClone, TCRChain
 
 __all__ = ['processing',
            'utils',
