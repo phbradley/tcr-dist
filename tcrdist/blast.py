@@ -1,15 +1,22 @@
+import tempfile
+import logging
 
+from paths import path_to_db, path_to_blast_executables
 
 def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
                                         verbose, nocleanup, hide_nucseq,
                                         extended_cdr3,
-                                        return_all_good_hits = False,
-                                        max_bit_score_delta_for_good_hits = 50 ):
+                                        return_all_good_hits=False,
+                                        max_bit_score_delta_for_good_hits=50):
 
+    handle, blast_tmpfile = tempfile.mkstemp(suffix='fa', prefix='blasttmp', dir='./')
+    handle.close()
+    '''
     ## make this a little more unique
     blast_tmpfile = 'tmp%d%s%s%f%s.fa'%(len(blast_seq),organism,ab,random.random(),blast_seq[:3])
     #print 'blast_tmpfile:',blast_tmpfile
     #assert not exists(blast_tmpfile)
+    '''
 
     genes =  ( 'UNK', 'UNK', [100,0], 'UNK', 'UNK', [100,0], '-' )
 
@@ -26,21 +33,19 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
         status.append('short_{}_blast_seq_{}'.format(ab,len(blast_seq)))
     else:
 
-        out = open(blast_tmpfile,'w')
-        out.write('>tmp\n%s\n'%blast_seq)
-        out.close()
+        with open(blast_tmpfile, 'w') as out:
+            out.write('>tmp\n%s\n'%blast_seq)
 
         ## now blast against V and J
         top_hits = []
 
         for ivj,vj in enumerate('VJ'):
-            dbfile = path_to_db+'/fasta/imgt_%s_TR_nucleotide_sequences.fasta.TR%s%s.fasta'\
-                     %(organism,ab,vj)
+            dbfile = op.join(path_to_db, '/fasta/imgt_%s_TR_nucleotide_sequences.fasta.TR%s%s.fasta') % (organism,ab,vj)
             assert exists(dbfile)
-            blastall_exe = path_to_blast_executables+'/blastall'
+            blastall_exe = op.join(path_to_blast_executables, '/blastall')
             assert exists( blastall_exe )
-            cmd = '%s -F F -p blastn -i %s -d %s -v 100 -b 1 -o %s.blast'\
-                  %( blastall_exe, blast_tmpfile, dbfile, blast_tmpfile )
+            cmd = '%s -F F -p blastn -i %s -d %s -v 100 -b 1 -o %s.blast'
+            cmd =  cmd % ( blastall_exe, blast_tmpfile, dbfile, blast_tmpfile )
             #print cmd
             system(cmd)
 
@@ -52,7 +57,7 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
             ## try parsing the results
             evalue_threshold = 1e-1
             identity_threshold = 20
-            hits = blast.parse_blast_alignments( blast_tmpfile+'.blast', evalue_threshold, identity_threshold )
+            hits = parse_blast_alignments( blast_tmpfile + '.blast', evalue_threshold, identity_threshold )
             hits_scores = get_all_hits_with_evalues_and_scores( blast_tmpfile+'.blast' ) ## id,bitscore,evalue
             if hits and hits[ hits.keys()[0]]:
 
@@ -106,7 +111,7 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
 
 
             if v_hit.h_strand != j_hit.h_strand:
-                Log(`( 'ERR V/J strand mismatch:',v_hit.h_strand, v_hit.evalue, j_hit.h_strand, j_hit.evalue)`)
+                logging.error('ERR V/J strand mismatch: %s, %s, %s, %s' % (v_hit.h_strand, v_hit.evalue, j_hit.h_strand, j_hit.evalue))
                 genes = ( v_gene.replace('TRAV','TRaV' ).replace('TRBV','TRbV'),
                           v_rep .replace('TRAV','TRaV' ).replace('TRBV','TRbV'), [100,0],
                           j_gene.replace('TRAJ','TRaJ' ).replace('TRBJ','TRbJ'),
@@ -158,7 +163,7 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
                         q_protpos = ( qpos - q_vframe )/3
                         if q_protpos in q2v_align:
                             if q2v_align[ q_protpos ] != v_protpos:
-                                Log('indel?? {} {} {}'.format(organism,ab,info))
+                                logger.info('indel?? {} {} {}'.format(organism,ab,info))
 
                         q2v_align[ q_protpos ] = v_protpos
                         ## this could be aligning a position that's not actually in the translated protein
@@ -167,7 +172,7 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
 
 
                 if q_vframe != q_jframe: ## out of frame
-                    Log(`( 'ERR frame mismatch:',q_vframe, v_hit.evalue, q_jframe, j_hit.evalue)`)
+                    logger.info('ERR frame mismatch: {}, {}, {}, {}'.format(q_vframe, v_hit.evalue, q_jframe, j_hit.evalue))
                     if verbose:
                         print 'frame mismatch',q_vframe,q_jframe
                     # genes = ( v_gene.replace('TRAV','TRaV' ).replace('TRBV','TRbV'),
@@ -240,11 +245,9 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
                     cdr3aa = cdr3.split("-")[0]
                     if len(cdr3aa) < 5:
                         status.append('cdr3{}_len_too_short'.format(ab))
-
+    
     if not nocleanup:
-        files = glob(blast_tmpfile+'*')
-        for file in files:
-            remove( file )
+        os.remove(blast_tmpfile)
 
     assert len(genes) == 7
 
@@ -397,12 +400,6 @@ class BlastMatch:
         s.q2hmap = q2hmap ## 0-indexed numbering wrt to fullseq
         s.valid = True
 
-
-
-
-
-
-
 def parse_blast_alignments( blastfile, evalue_threshold, identity_threshold ):
     ## THIS WILL NOT WORK FOR PSIBLAST
 
@@ -460,3 +457,49 @@ def parse_blast_alignments( blastfile, evalue_threshold, identity_threshold ):
 
     return hits
 
+def parse_paired_dna_sequences( program, organism, aseq, bseq, info = '',
+                                verbose = False, nocleanup = False, hide_nucseq = False,
+                                extended_cdr3 = False, return_all_good_hits = False ):
+    if program == 'blastn':
+        if return_all_good_hits:
+            a_genes, a_evalues, a_status, a_hits \
+                = parse_unpaired_dna_sequence_blastn( organism, 'A', aseq, info,
+                                                      verbose, nocleanup, hide_nucseq,
+                                                      extended_cdr3, return_all_good_hits=True )
+
+            b_genes, b_evalues, b_status, b_hits \
+                = parse_unpaired_dna_sequence_blastn( organism, 'B', bseq, info,
+                                                      verbose, nocleanup, hide_nucseq,
+                                                      extended_cdr3, return_all_good_hits=True )
+        else:
+            a_genes, a_evalues, a_status = parse_unpaired_dna_sequence_blastn( organism, 'A', aseq, info,
+                                                                               verbose, nocleanup, hide_nucseq,
+                                                                               extended_cdr3, return_all_good_hits )
+
+            b_genes, b_evalues, b_status = parse_unpaired_dna_sequence_blastn( organism, 'B', bseq, info,
+                                                                               verbose, nocleanup, hide_nucseq,
+                                                                               extended_cdr3, return_all_good_hits )
+    elif program == 'blastx':
+        assert not return_all_good_hits
+        a_genes, a_evalues, a_status = parse_unpaired_dna_sequence_blastx( organism, 'A', aseq, info,
+                                                                           verbose, nocleanup, hide_nucseq,
+                                                                           extended_cdr3 )
+
+        b_genes, b_evalues, b_status = parse_unpaired_dna_sequence_blastx( organism, 'B', bseq, info,
+                                                                           verbose, nocleanup, hide_nucseq,
+                                                                           extended_cdr3 )
+    else:
+        logger.info('bad program: '+program)
+        raise('Bad program: %s' % program)
+
+    assert len(a_genes) == 7 ## v_gene, v_rep, v_mm, j_gene, j_rep, j_mm, cdr3
+    assert len(b_genes) == 7 ## ditto
+
+    ab_genes = {'A': a_genes, 'B': b_genes }
+    evalues = {}
+    for tag,evalue in a_evalues.iteritems():
+        evalues[tag] = evalue
+    for tag,evalue in b_evalues.iteritems():
+        evalues[tag] = evalue
+
+    return ab_genes, evalues, a_status+b_status, [a_hits,b_hits]
