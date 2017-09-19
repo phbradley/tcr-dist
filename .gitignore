@@ -1,2 +1,7 @@
 *.pyc
 *~
+.cache/
+datasets/
+db/
+external/
+testing_ref/
