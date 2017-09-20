@@ -3,6 +3,7 @@ import numpy as np
 
 from .blast import parse_unpaired_dna_sequence_blastn, get_qualstring
 from .objects import TCRChain, TCRClone
+from . import util
 
 __all__ = ['processNT',
            'readPairedSequences']
@@ -33,14 +34,32 @@ def processNT(organism, chain, nuc, quals):
     genes,evalues,status,all_good_hits_with_scores = res
     labels = ['v%s_gene','v%s_rep', 'v%s_mm', 'j%s_gene', 'j%s_rep', 'j%s_mm', 'cdr3%s_plus']
     tmp = {g:v for g,v in zip([lab % ch for lab in labels], genes)}
-    tmp.update({'%s_evalue' % k:evalues[k] for k in evalues.keys()})
+    tmp.update({'%s_evalue' % k.lower():evalues[k][0] for k in evalues.keys()})
+    tmp.update({'%s_bitscore_gap' % k.lower():evalues[k][1] for k in evalues.keys()})
+
     tmp['%s_status' % ch] = 'OK' if not status else status
     tmp['%s_good_hits' % ch] = all_good_hits_with_scores
 
     tmp['cdr3%s' % ch],tmp['cdr3%s_nucseq' % ch] = tmp['cdr3%s_plus' % ch].split('-')
     tmp['cdr3%s_quals' % ch] = get_qualstring( tmp['cdr3%s_plus' % ch], nuc, quals )
-    tmp['v%s_mm' % ch] = np.sum(tmp['v%s_mm' % ch])
-    tmp['j%s_mm' % ch] = np.sum(tmp['j%s_mm' % ch])
+    tmp['v%s_mismatches' % ch] = tmp['v%s_mm' % ch][0]
+    tmp['j%s_mismatches' % ch] = tmp['j%s_mm' % ch][0]
+    tmp['v%s_alignlen' % ch] = np.sum(tmp['v%s_mm' % ch])
+    tmp['j%s_alignlen' % ch] = np.sum(tmp['j%s_mm' % ch])
+
+    hits = tmp['%s_good_hits' % ch]
+    if  hits and len(hits) == 2 and hits[0] and ahits[1]:
+        tmp['v%s_blast_hits' % ch] = ';'.join( '{}:{}'.format(x[0],x[1]) for x in hits[0] )
+        tmp['j%s_blast_hits' % ch] = ';'.join( '{}:{}'.format(x[0],x[1]) for x in hits[1] )
+        tmp['v%s_genes' % ch] = util.get_top_genes( tmp['v%s_blast_hits' % ch] ) ## a set
+        tmp['j%s_genes' % ch] = util.get_top_genes( tmp['j%s_blast_hits' % ch] )
+        tmp['v%s_genes' % ch] = ';'.join( sorted( tmp['v%s_genes' % ch] ) )
+        tmp['j%s_genes' % ch] = ';'.join( sorted( tmp['j%s_genes' % ch] ) )
+        tmp['v%s_reps' % ch]  = ';'.join( sorted( util.get_top_reps( tmp['v%s_blast_hits' % ch], organism ) ) )
+        tmp['j%s_reps' % ch]  = ';'.join( sorted( util.get_top_reps( tmp['j%s_blast_hits' % ch], organism ) ) )
+        tmp['v%s_countreps' % ch] = ';'.join( sorted( set( (util.get_mm1_rep_gene_for_counting(x,organism) for x in tmp['v%s_genes' % ch] ))))
+        tmp['j%s_countreps' % ch] = ';'.join( sorted( set( (util.get_mm1_rep_gene_for_counting(x,organism) for x in tmp['j%s_genes' % ch] ))))
+
     chain = TCRChain(**tmp)
     return chain
 
