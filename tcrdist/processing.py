@@ -48,17 +48,17 @@ def processNT(organism, chain, nuc, quals):
     tmp['j%s_alignlen' % ch] = np.sum(tmp['j%s_mm' % ch])
 
     hits = tmp['%s_good_hits' % ch]
-    if  hits and len(hits) == 2 and hits[0] and ahits[1]:
+    if  hits and len(hits) == 2 and hits[0] and hits[1]:
         tmp['v%s_blast_hits' % ch] = ';'.join( '{}:{}'.format(x[0],x[1]) for x in hits[0] )
         tmp['j%s_blast_hits' % ch] = ';'.join( '{}:{}'.format(x[0],x[1]) for x in hits[1] )
-        tmp['v%s_genes' % ch] = util.get_top_genes( tmp['v%s_blast_hits' % ch] ) ## a set
-        tmp['j%s_genes' % ch] = util.get_top_genes( tmp['j%s_blast_hits' % ch] )
-        tmp['v%s_genes' % ch] = ';'.join( sorted( tmp['v%s_genes' % ch] ) )
-        tmp['j%s_genes' % ch] = ';'.join( sorted( tmp['j%s_genes' % ch] ) )
+        va_genes = util.get_top_genes( tmp['v%s_blast_hits' % ch] ) ## a set
+        ja_genes = util.get_top_genes( tmp['j%s_blast_hits' % ch] )
+        tmp['v%s_genes' % ch] = ';'.join( sorted( va_genes ) )
+        tmp['j%s_genes' % ch] = ';'.join( sorted( ja_genes ) )
         tmp['v%s_reps' % ch]  = ';'.join( sorted( util.get_top_reps( tmp['v%s_blast_hits' % ch], organism ) ) )
         tmp['j%s_reps' % ch]  = ';'.join( sorted( util.get_top_reps( tmp['j%s_blast_hits' % ch], organism ) ) )
-        tmp['v%s_countreps' % ch] = ';'.join( sorted( set( (util.get_mm1_rep_gene_for_counting(x,organism) for x in tmp['v%s_genes' % ch] ))))
-        tmp['j%s_countreps' % ch] = ';'.join( sorted( set( (util.get_mm1_rep_gene_for_counting(x,organism) for x in tmp['j%s_genes' % ch] ))))
+        tmp['v%s_countreps' % ch] = ';'.join( sorted( set( (util.get_mm1_rep_gene_for_counting(x,organism) for x in va_genes ))))
+        tmp['j%s_countreps' % ch] = ';'.join( sorted( set( (util.get_mm1_rep_gene_for_counting(x,organism) for x in ja_genes ))))
 
     chain = TCRChain(**tmp)
     return chain

@@ -567,7 +567,7 @@ def get_qualstring( cdr3seqtag, nucseq_in, quals_in ):
     if not cdr3nucseq: return ''
     if cdr3nucseq not in nucseq:
         nucseq = logo_tools.reverse_complement(nucseq)
-        quals[::-1]
+        quals = quals[::-1]
     if nucseq.count( cdr3nucseq ) == 0:
         # print cdr3nucseq
         # print nucseq
