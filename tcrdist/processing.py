@@ -4,9 +4,15 @@ import numpy as np
 from .blast import parse_unpaired_dna_sequence_blastn, get_qualstring
 from .objects import TCRChain, TCRClone
 from . import util
+from .compute_probs import *
 
 __all__ = ['processNT',
-           'readPairedSequences']
+           'readPairedSequences',
+           'filterOutRow',
+           'samplerProb',
+           'getMaskedSeqs',
+           'rearrangementProb',
+           'computeProbs']
 
 def processNT(organism, chain, nuc, quals):
     """Process one nucleotide TCR sequence (any chain).
@@ -79,11 +85,5 @@ def readPairedSequences(organism, paired_seqs_file):
     otherCols = [c for c in raw.columns if c.find('nucseq') == -1 and c.find('quals') == -1]
     out = [raw[otherCols]] + out
     psDf = pd.concat(out, axis=1)
+    psDf.loc[:, 'organism'] = organism
     return psDf
-    
-def computeProbs(psDf, filter=False):
-    pass
-
-
-
-

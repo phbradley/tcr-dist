@@ -1,7 +1,7 @@
 from __future__ import print_function
 import logging
 logging.basicConfig(filename='tcrdist.log',
-                    level=logging.DEBUG,
+                    level=logging.WARNING,
                     format='[%(asctime)s] [%(levelname)s] [%(name)s: %(lineno)s]\n\t%(message)s',
                     datefmt='%m/%d/%Y %I:%M:%S %p',
                     filemode='w')

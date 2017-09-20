@@ -23,16 +23,24 @@ def test_process_nt():
 def test_human_paired_dataset():
     df = td.processing.readPairedSequences('human', op.join(datasetsPath, 'test_human_pairseqs.tsv'))
     assert df.shape[0] == 20
-    """Only status allowe is ['OK']"""
-    assert df['a_status'].map(len).unique() == 1
-    assert df['b_status'].map(len).unique() == 1
+    """Only status allowed is ['OK']"""
+    assert df['a_status'].unique().shape[0] == 1
+    assert df['b_status'].unique().shape[0] == 1
 
 def test_mouse_paired_dataset():
     df = td.processing.readPairedSequences('mouse', op.join(datasetsPath, 'test_mouse_pairseqs.tsv'))
     assert df.shape[0] == 20
-    assert df['a_status'].map(len).unique() == 1
-    assert df['b_status'].map(len).unique() == 1
+    assert df['a_status'].unique().shape[0] == 1
+    assert df['b_status'].unique().shape[0] == 1
 
 def test_compute_probs():
     psDf = td.processing.readPairedSequences('mouse', op.join(datasetsPath, 'test_mouse_pairseqs.tsv'))
-    td.processing.computeProbs(psDf)
+    
+    probDf = td.processing.computeProbs(psDf,
+                                         add_masked_seqs=True,
+                                         filterOut=False,
+                                         max_cdr3_length=30,
+                                         allow_stop_codons=False,
+                                         allow_X=False)
+    assert probDf.shape[0] == psDf.shape[0]
+    
