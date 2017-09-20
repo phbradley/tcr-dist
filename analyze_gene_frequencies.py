@@ -139,8 +139,8 @@ else:
         segtype = g.region + g.chain
         if segtype in segtypes_uppercase:
             if segtype not in all_background_tuple_counts:
-                all_background_tuple_counts[segtype] = {}
-            tup = tuple( util.get_mm1_rep_gene_for_counting( id ) )
+                all_background_tuple_counts[segtype] = {logfile:{}}
+            tup = tuple( util.get_mm1_rep_gene_for_counting( id, organism ) )
             all_background_tuple_counts[segtype][logfile][ tup ] = 1 ## flat counts
 
 
@@ -174,6 +174,9 @@ for epitope,tcrs in all_tcrs.iteritems():
 
 
     for segtype in segtypes_uppercase:
+        region = segtype[0]
+        chain = segtype[1]
+        assert region in 'VJ' and chain in 'AB'
 
         tcr_counts = {}
         num_tcrs = len(tcrs)
@@ -240,7 +243,8 @@ for epitope,tcrs in all_tcrs.iteritems():
         l.sort()
         l.reverse()
 
-        countreps = sorted( ( x for x in all_countrep_pseudoprobs[organism].keys() if x[3]+x[2] == segtype ) )
+        countreps = sorted( set( g.count_rep for g in all_genes[organism].values() \
+                                 if g.chain == chain and g.region == region ) )
 
         num_tcrs = len(tcrs)
 
@@ -250,7 +254,7 @@ for epitope,tcrs in all_tcrs.iteritems():
             bg_prob = bg_freq.get(rep,0.)
             jsd_prob_enrich = 1.0 if bg_prob==0. else jsd_prob / bg_prob
             pseudoprob = float( tcr_pseudoprob_counts.get(rep,0))/num_tcrs
-            bg_pseudoprob = all_countrep_pseudoprobs[ organism ][ rep ]
+            bg_pseudoprob = all_countrep_pseudoprobs[ organism ][ chain ][ region ][ rep ]
             pseudoprob_enrich = 1 if bg_pseudoprob==0. else pseudoprob / bg_pseudoprob
             outl = { 'epitope':epitope,
                      'gene':rep,

@@ -118,7 +118,8 @@ for line in open(infile,'rU'):
     va_cdr3_protseq,codons = get_translation( va_cdr3_nucseq, '+1' )
     ja_cdr3_protseq,codons = get_translation( ja_cdr3_nucseq, '+{}'.format(1+len(ja_cdr3_nucseq)%3))
 
-    if no_probabilities: ##all probabilities will be set to 1 if this flag is set
+    if no_probabilities or not tcr_rearrangement.probs_data_exist( organism,'A'):
+        ##all probabilities will be set to 1 if this flag is set
         aprob_nucseq = 1
         aprob_protseq = 1
     else:
@@ -148,7 +149,8 @@ for line in open(infile,'rU'):
     vb_cdr3_protseq,codons = get_translation( vb_cdr3_nucseq, '+1' )
     jb_cdr3_protseq,codons = get_translation( jb_cdr3_nucseq, '+{}'.format(1+len(jb_cdr3_nucseq)%3))
 
-    if no_probabilities: ##all probabilities will be set to 1 if this flag is set
+    if no_probabilities or not tcr_rearrangement.probs_data_exist( organism,'B'):
+        ##all probabilities will be set to 1 if this flag is set
         bprob_nucseq = 1
         bprob_protseq = 1
     else:
@@ -197,16 +199,18 @@ for line in open(infile,'rU'):
         vals[ 'cdr3b_new_nucseq' ] = cdr3b_new_nucseq
 
     ## there's a little bit of a bias toward guys with more blast hits, ie shorted reads? since we take a max
-    if no_probabilities: ##all probabilities will be set to 1 if this flag is set
+    if no_probabilities or not ( tcr_rearrangement.probs_data_exist(organism,'A') and
+                                 tcr_rearrangement.probs_data_exist(organism,'B') ):
+        ##all probabilities will be set to 1 if this flag is set
         va_rep_prob = 1
         ja_rep_prob = 1
         vb_rep_prob = 1
         jb_rep_prob = 1
     elif new_probs:
-        va_rep_prob = max( [ tcr_rearrangement.all_countrep_pseudoprobs[organism][x] for x in va_countreps ] )
-        ja_rep_prob = max( [ tcr_rearrangement.all_countrep_pseudoprobs[organism][x] for x in ja_countreps ] )
-        vb_rep_prob = max( [ tcr_rearrangement.all_countrep_pseudoprobs[organism][x] for x in vb_countreps ] )
-        jb_rep_prob = max( [ tcr_rearrangement.all_countrep_pseudoprobs[organism][x] for x in jb_countreps ] )
+        va_rep_prob = max( [ tcr_rearrangement.all_countrep_pseudoprobs[organism]['A']['V'][x] for x in va_countreps ] )
+        ja_rep_prob = max( [ tcr_rearrangement.all_countrep_pseudoprobs[organism]['A']['J'][x] for x in ja_countreps ] )
+        vb_rep_prob = max( [ tcr_rearrangement.all_countrep_pseudoprobs[organism]['B']['V'][x] for x in vb_countreps ] )
+        jb_rep_prob = max( [ tcr_rearrangement.all_countrep_pseudoprobs[organism]['B']['J'][x] for x in jb_countreps ] )
     else:
         va_rep_prob = max( [ tcr_rearrangement.all_rep_probs[organism][x] for x in va_reps ] )
         ja_rep_prob = max( [ tcr_rearrangement.all_rep_probs[organism][x] for x in ja_reps ] )

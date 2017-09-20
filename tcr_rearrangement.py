@@ -265,5 +265,9 @@ def get_beta_trim_probs( organism, d_id, v_trim, d0_trim, d1_trim, j_trim, vd_in
     return total_prob
 
 
+def probs_data_exist( organism, chain ):
+    return True #legacy hack
+
+
 if __name__ == '__main__':
     pass

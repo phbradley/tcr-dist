@@ -3,7 +3,6 @@ from basic import *
 import tcr_sampler
 from amino_acids import amino_acids
 import re
-import cdr3s_human #debug
 from all_genes import all_genes
 import sys
 import util
@@ -268,15 +267,10 @@ for line in open( clones_file,'rU'):
     cdr3a = l['cdr3a']
     cdr3b = l['cdr3b']
 
-    old_va_rep = cdr3s_human.all_loopseq_representative_mm1[ organism ][ va ]
-    old_ja_rep = cdr3s_human.all_jseq_representative       [ organism ][ ja ]
-    old_vb_rep = cdr3s_human.all_loopseq_representative_mm1[ organism ][ vb ]
-    old_jb_rep = cdr3s_human.all_jseq_representative       [ organism ][ jb ]
     va_rep = all_genes[organism][va].mm1_rep
     ja_rep = all_genes[organism][ja].mm1_rep
     vb_rep = all_genes[organism][vb].mm1_rep
     jb_rep = all_genes[organism][jb].mm1_rep
-    assert old_va_rep == va_rep and old_ja_rep == ja_rep and old_vb_rep == vb_rep and old_jb_rep == jb_rep
 
     if epitopes and epitope not in epitopes: continue
 

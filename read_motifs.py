@@ -1,6 +1,5 @@
 from basic import *
 from amino_acids import amino_acids
-import cdr3s_human#debug
 from all_genes import all_genes
 import re
 import logo_tools
@@ -198,15 +197,10 @@ for epitope in epitopes:
 
         ## note-- we are using mm1 reps here, same as in find_cdr3_motifs.py
         ##
-        old_va_rep = cdr3s_human.all_loopseq_representative_mm1[ organism ][ va ]
-        old_ja_rep = cdr3s_human.all_jseq_representative       [ organism ][ ja ]
-        old_vb_rep = cdr3s_human.all_loopseq_representative_mm1[ organism ][ vb ]
-        old_jb_rep = cdr3s_human.all_jseq_representative       [ organism ][ jb ]
         va_rep = all_genes[organism][va].mm1_rep
         ja_rep = all_genes[organism][ja].rep
         vb_rep = all_genes[organism][vb].mm1_rep
         jb_rep = all_genes[organism][jb].rep
-        assert old_va_rep == va_rep and old_ja_rep == ja_rep and old_vb_rep == vb_rep and old_jb_rep == jb_rep
 
         a_junction_results = tcr_sampler.analyze_junction( organism, va_gene, ja_gene, cdr3a, cdr3a_nucseq,
                                                            return_cdr3_nucseq_src=True )

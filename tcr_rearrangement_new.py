@@ -2,7 +2,7 @@ from basic import *
 import sys
 from all_genes import all_genes
 from operator import add
-
+import util
 
 ## these guys are for external sharing, as well as
 ## get_alpha_trim_probs
@@ -128,21 +128,30 @@ for organism in all_genes:
             for k in ks:
                 trim_probs[avgtag][k] = sum( ( trim_probs[x].get(k,0) for x in tags ) ) / float(len(tags))
 
-    countrep_probs = {}
+    all_countrep_pseudoprobs[organism] = { 'A': { 'V':{}, 'J': {} },
+                                           'B': { 'V':{}, 'J': {} } }
     for ab in rep_freq_files:
         files = rep_freq_files[ab]
         for vj in 'VJ':
             probs ={}
-            for file in files:
-                assert exists(file)
-                for line in popen('grep "^{}{}_COUNTREP_FREQ" {}'.format(ab,vj,file)):
-                    l = line.split()
-                    assert len(l) == 3
-                    nonuniq_freq = float( l[1] ) / 100.0 ## now from 0 to 1
-                    rep = l[2]
-                    assert rep[2:4] == ab+vj
-                    if rep not in probs:probs[rep] = []
-                    probs[rep].append( nonuniq_freq )
+            if files:
+                for file in files:
+                    assert exists(file)
+                    for line in popen('grep "^{}{}_COUNTREP_FREQ" {}'.format(ab,vj,file)):
+                        l = line.split()
+                        assert len(l) == 3
+                        nonuniq_freq = float( l[1] ) / 100.0 ## now from 0 to 1
+                        rep = l[2]
+                        #assert rep[2:4] == ab+vj
+                        if rep not in probs:probs[rep] = []
+                        probs[rep].append( nonuniq_freq )
+            else:
+                #make up some fake probs
+                #ids = [ x for x,g in all_genes[organism].iteritems() if g.chain == ab and g.region == vj ]
+                reps = set( g.count_rep for g in all_genes[organism].values() if g.chain == ab and g.region == vj )
+                flatprob = 1.0/len(reps)
+                for rep in reps:
+                    probs[rep] = [ flatprob ]
 
             avg_probs = {}
             for rep in probs:
@@ -150,7 +159,7 @@ for organism in all_genes:
                 if len(vals) == 2:
                     avg_probs[rep] = sum( vals )/2.0
                 else:
-                    assert len(vals) == 3 ## hack
+                    #assert len(vals) == 3 ## hack
                     avg_probs[rep] = get_median( vals)
 
             ## probs may have gone slightly below 1.0 due to combination of multiple datasets
@@ -158,10 +167,17 @@ for organism in all_genes:
             if verbose:
                 print 'countrep_pseudoprobs total {:9.6f} actual_sum {:9.6f} {}{} {}'\
                     .format(total, sum(avg_probs.values()), vj, ab, organism )
-            for rep in probs:
-                countrep_probs[rep] = avg_probs[rep] / total
+            all_countreps = sorted( set( g.count_rep for g in all_genes[organism].values()
+                                         if g.chain == ab and g.region == vj ) )
+            #for rep in probs:
+            for rep in all_countreps:
+                if rep not in avg_probs and verbose:
+                    print 'WARNING: rep with 0.0 pseudoprob: {} {}'.format(organism,rep)
+                #countrep_probs[rep] = avg_probs[rep] / total
+                prob = avg_probs.get(rep,0.)/total
+                all_countrep_pseudoprobs[organism][ab][vj][rep] = prob
                 if verbose: # __name__ == '__main__' and len(sys.argv) == 1:
-                    print 'countrep_pseudoprobs: %12.6f %s %s'%(100.0*countrep_probs[rep],organism,rep)
+                    print 'countrep_pseudoprobs: %12.6f %s %s'%(100.0*prob, organism, rep )
 
     ## normalize trim_probs
     for tag,probs in trim_probs.iteritems():
@@ -180,11 +196,7 @@ for organism in all_genes:
             for i in range(len(probs)):
                 probs[i] = probs[i]/total
 
-
     all_trim_probs[organism] = trim_probs
-    #all_rep_probs[organism] = rep_probs
-    all_countrep_pseudoprobs[organism] = countrep_probs
-
 
 
 def get_alpha_trim_probs( organism, v_trim, j_trim, vj_insert ):
@@ -213,4 +225,8 @@ def get_beta_trim_probs( organism, d_id, v_trim, d0_trim, d1_trim, j_trim, vd_in
         total_prob *= probs[val]
     return total_prob
 
+
+def probs_data_exist( organism, chain ):
+    assert chain in 'AB'
+    return (organism,chain) not in organism_chains_with_missing_probs
 

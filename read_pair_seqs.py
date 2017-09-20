@@ -82,7 +82,23 @@ fake_nucseqs = {
     }
 
 
+def find_largest_substring_contained_in( seq, bigseq ):
+    best = [len(seq),len(seq)]
+    for ntrim in range(len(seq)):
+        for ctrim in range(len(seq)):
+            if ntrim+ctrim>=len(seq):
+                break
+            if seq[ntrim:len(seq)-ctrim] in bigseq:
+                if ntrim+ctrim < best[0]+best[1]:
+                    best = [ntrim,ctrim]
+                break # no sense increasing ctrim
+    return best[0],best[1],seq[best[0]:len(seq)-best[1]]
+
+
 def get_qualstring( cdr3seqtag, nucseq_in, quals_in ):
+    # the tricky part here (new: 09/19/17) is that we might not be getting the entire CDR3 sequence from the read
+    # We're now allowing a little to come from the gene
+    # also nucseq and quals may be in the opposite orientation
     nucseq = nucseq_in[:].upper()
     quals = quals_in[:]
 
@@ -90,9 +106,27 @@ def get_qualstring( cdr3seqtag, nucseq_in, quals_in ):
     if len( cdr3seqtag.split('-') )!= 2: return ''
     cdr3nucseq = cdr3seqtag.split('-')[1].upper()
     if not cdr3nucseq: return ''
+    revnucseq = logo_tools.reverse_complement(nucseq)
     if cdr3nucseq not in nucseq:
-        nucseq = logo_tools.reverse_complement(nucseq)
-        quals.reverse()
+        if cdr3nucseq in revnucseq:
+            nucseq = logo_tools.reverse_complement(nucseq)
+            quals.reverse()
+        else:
+            #doesn't match either
+            ntrimf,ctrimf,substring_f = find_largest_substring_contained_in( cdr3nucseq, nucseq    ) #fwd
+            ntrimr,ctrimr,substring_r = find_largest_substring_contained_in( cdr3nucseq, revnucseq ) #rev
+            if ntrimr+ctrimr < ntrimf+ctrimf:
+                # better in reverse direction
+                nucseq = revnucseq
+                quals.reverse()
+                ntrimf,ctrimf,substring_f = ntrimr,ctrimr,substring_r
+            assert substring_f in nucseq
+            pos = nucseq.find(substring_f)
+            good_quality = 60
+            cdr3quals = [good_quality]*ntrimf + quals[pos:pos+len(substring_f)] + [good_quality]*ctrimf
+            return '.'.join( [ '%d'%x for x in cdr3quals ] )
+
+
     if nucseq.count( cdr3nucseq ) == 0:
         # print cdr3nucseq
         # print nucseq

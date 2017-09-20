@@ -5,10 +5,10 @@ from scipy.spatial import distance
 import os
 import html_colors
 import parse_tsv
-import tcr_sampler
 
 verbose = __name__ == '__main__'
 
+# these helper functions used to do more work, now it's a little silly...
 
 def get_rep( gene, organism ):
     assert gene.startswith('TR')
@@ -23,6 +23,11 @@ def get_rep_ignoring_allele( gene, organism ):
     rep = rep[:rep.index('*')]
     return rep
 
+def get_mm1_rep_gene_for_counting( allele, organism ):
+    return all_genes[organism][allele].count_rep
+
+def countreps_from_genes( genes, organism ):
+    return set( ( all_genes[organism][x].count_rep for x in genes ) )
 
 
 def tree_sort( old_l, distances, return_leaves=True ): ## average linkage
@@ -51,29 +56,10 @@ def get_top_genes( blast_hits_string ):
 def get_top_reps( blast_hits_string, organism ):
     hits = dict( [ ( x.split(':')[0], int( x.split(':')[1] ) ) for x in blast_hits_string.split(';') ] )
     top_score = max( hits.values() )
-    # vj = hits.keys()[0][3]
-    # if vj == 'V':
-    #     rep_map = cdr3s_human.all_loopseq_representative[ organism ]
-    # else:
-    #     assert vj == 'J'
-    #     rep_map = cdr3s_human.all_jseq_representative[ organism ]
     return set( [ all_genes[organism][x].rep for x,y in hits.iteritems() if y >= top_score ] )
 
 
 def reps_from_genes( genes, organism, mm1=False, trim_allele=False ):
-    ## if genes is a set we can't index into it
-    # vj = [ x[3] for x in genes ][0]
-
-    # if vj == 'V':
-    #     if mm1:
-    #         rep_map = cdr3s_human.all_loopseq_representative_mm1[ organism ]
-    #     else:
-    #         rep_map = cdr3s_human.all_loopseq_representative[ organism ]
-    # else:
-    #     assert vj == 'J'
-    #     rep_map = cdr3s_human.all_jseq_representative[ organism ]
-
-    # reps = set( [ rep_map[x] for x in genes ] )
     reps = set( ( all_genes[organism][x].mm1_rep for x in genes ) ) if mm1 else \
            set( ( all_genes[organism][x].rep     for x in genes ) )
     if trim_allele:
@@ -102,80 +88,71 @@ def readme( pngfile, text ):
 
 ## setup a mapping that we can use for counting when allowing mm1s and also ignoring alleles
 
-allele2mm1_rep_gene_for_counting = {}
-def get_mm1_rep_ignoring_allele( gene, organism ): # helper fxn
-    rep = get_mm1_rep( gene, organism )
-    rep = rep[:rep.index('*')]
-    return rep
+# allele2mm1_rep_gene_for_counting = {}
+# def get_mm1_rep_ignoring_allele( gene, organism ): # helper fxn
+#     rep = get_mm1_rep( gene, organism )
+#     rep = rep[:rep.index('*')]
+#     return rep
 
-for organism in ['human','mouse']:
-    allele2mm1_rep_gene_for_counting[ organism ] = {}
+# for organism in ['human','mouse']:
+#     allele2mm1_rep_gene_for_counting[ organism ] = {}
 
-    for chain in 'AB':
+#     for chain in 'AB':
 
-        ## look at gene/allele maps
-        vj_alleles = { 'V': [ id for (id,g) in all_genes[organism].iteritems() if g.chain==chain and g.region=='V'],
-                       'J': [ id for (id,g) in all_genes[organism].iteritems() if g.chain==chain and g.region=='J'] }
+#         ## look at gene/allele maps
+#         vj_alleles = { 'V': [ id for (id,g) in all_genes[organism].iteritems() if g.chain==chain and g.region=='V'],
+#                        'J': [ id for (id,g) in all_genes[organism].iteritems() if g.chain==chain and g.region=='J'] }
 
-        for vj, alleles in vj_alleles.iteritems():
-            gene2rep = {}
-            gene2alleles = {}
-            rep_gene2alleles = {}
+#         for vj, alleles in vj_alleles.iteritems():
+#             gene2rep = {}
+#             gene2alleles = {}
+#             rep_gene2alleles = {}
 
-            for allele in alleles:
-                #assert allele[2] == chain
-                gene = allele[:allele.index('*')]
-                rep_gene = get_mm1_rep_ignoring_allele( allele, organism )
-                if rep_gene not in rep_gene2alleles:
-                    rep_gene2alleles[ rep_gene ] = []
-                rep_gene2alleles[ rep_gene ].append( allele )
+#             for allele in alleles:
+#                 #assert allele[2] == chain
+#                 gene = allele[:allele.index('*')]
+#                 rep_gene = get_mm1_rep_ignoring_allele( allele, organism )
+#                 if rep_gene not in rep_gene2alleles:
+#                     rep_gene2alleles[ rep_gene ] = []
+#                 rep_gene2alleles[ rep_gene ].append( allele )
 
-                if gene not in gene2rep:
-                    gene2rep[gene] = set()
-                    gene2alleles[gene] = []
-                gene2rep[ gene ].add( rep_gene )
-                gene2alleles[gene].append( allele )
+#                 if gene not in gene2rep:
+#                     gene2rep[gene] = set()
+#                     gene2alleles[gene] = []
+#                 gene2rep[ gene ].add( rep_gene )
+#                 gene2alleles[gene].append( allele )
 
-            merge_rep_genes = {}
-            for gene,reps in gene2rep.iteritems():
-                if len(reps)>1:
-                    assert vj=='V'
-                    if verbose:
-                        print 'multireps:',organism, gene, reps
-                        for allele in gene2alleles[gene]:
-                            print ' '.join(all_genes[organism][allele].cdrs), allele, \
-                                get_rep(allele,organism), get_mm1_rep(allele,organism)
+#             merge_rep_genes = {}
+#             for gene,reps in gene2rep.iteritems():
+#                 if len(reps)>1:
+#                     assert vj=='V'
+#                     if verbose:
+#                         print 'multireps:',organism, gene, reps
+#                         for allele in gene2alleles[gene]:
+#                             print ' '.join(all_genes[organism][allele].cdrs), allele, \
+#                                 get_rep(allele,organism), get_mm1_rep(allele,organism)
 
-                    ## we are going to merge these reps
-                    ## which one should we choose?
-                    l = [ (len(rep_gene2alleles[rep]), rep ) for rep in reps ]
-                    l.sort()
-                    l.reverse()
-                    assert l[0][0] > l[1][0]
-                    toprep = l[0][1]
-                    for (count,rep) in l:
-                        if rep in merge_rep_genes:
-                            assert rep == toprep and merge_rep_genes[rep] == rep
-                        merge_rep_genes[ rep ] = toprep
-
-
-            for allele in alleles:
-                count_rep = get_mm1_rep_ignoring_allele( allele, organism )
-                if count_rep in merge_rep_genes:
-                    count_rep = merge_rep_genes[ count_rep ]
-                allele2mm1_rep_gene_for_counting[ organism ][ allele] = count_rep
-                if verbose:
-                    print 'allele2mm1_rep_gene_for_counting:',organism, allele, count_rep
-
-def get_mm1_rep_gene_for_counting( allele, organism ):
-    global allele2mm1_rep_gene_for_counting
-    return allele2mm1_rep_gene_for_counting[ organism ][ allele ]
+#                     ## we are going to merge these reps
+#                     ## which one should we choose?
+#                     l = [ (len(rep_gene2alleles[rep]), rep ) for rep in reps ]
+#                     l.sort()
+#                     l.reverse()
+#                     assert l[0][0] > l[1][0]
+#                     toprep = l[0][1]
+#                     for (count,rep) in l:
+#                         if rep in merge_rep_genes:
+#                             assert rep == toprep and merge_rep_genes[rep] == rep
+#                         merge_rep_genes[ rep ] = toprep
 
 
-def countreps_from_genes( genes, organism ):
-    global allele2mm1_rep_gene_for_counting
-    reps = set( ( allele2mm1_rep_gene_for_counting[ organism ][ x ] for x in genes ) )
-    return reps
+#             for allele in alleles:
+#                 count_rep = get_mm1_rep_ignoring_allele( allele, organism )
+#                 if count_rep in merge_rep_genes:
+#                     count_rep = merge_rep_genes[ count_rep ]
+#                 allele2mm1_rep_gene_for_counting[ organism ][ allele] = count_rep
+#                 if verbose:
+#                     print 'allele2mm1_rep_gene_for_counting:',organism, allele, count_rep
+
 
 
 def assign_label_reps_and_colors_based_on_most_common_genes_in_repertoire( tcr_infos, organism ):
@@ -224,41 +201,6 @@ def detect_fake_chains( clones_file, Achain='A', Bchain='B' ):
     return fake_chains
 
 
-def add_masked_CDR3_sequences_to_tcr_dict( organism, vals ):
-    ## this code is mostly taken from compute_probs.py
-    va_gene = vals['va_gene']
-    ja_gene = vals['ja_gene']
-    vb_gene = vals['vb_gene']
-    jb_gene = vals['jb_gene']
-    cdr3a_protseq = vals['cdr3a']
-    cdr3a_nucseq  = vals['cdr3a_nucseq']
-    cdr3b_protseq = vals['cdr3b']
-    cdr3b_nucseq  = vals['cdr3b_nucseq']
-
-    a_junction_results = tcr_sampler.analyze_junction( organism, va_gene, ja_gene, cdr3a_protseq, cdr3a_nucseq )
-    b_junction_results = tcr_sampler.analyze_junction( organism, vb_gene, jb_gene, cdr3b_protseq, cdr3b_nucseq )
-
-    cdr3a_new_nucseq, cdr3a_protseq_masked, cdr3a_protseq_new_nucleotide_countstring,a_trims,a_inserts \
-        = a_junction_results
-    cdr3b_new_nucseq, cdr3b_protseq_masked, cdr3b_protseq_new_nucleotide_countstring,b_trims,b_inserts \
-        = b_junction_results
-
-    # from tcr_sampler.py:
-    # trims = ( v_trim, d0_trim, d1_trim, j_trim )
-    # inserts = ( best_d_id, n_vd_insert, n_dj_insert, n_vj_insert )
-
-    assert a_trims[1] + a_trims[2] + a_inserts[0] + a_inserts[1] + a_inserts[2] + b_inserts[3] == 0
-    assert a_inserts[3] == len( cdr3a_new_nucseq )
-
-    ita = '+%d-%d'%(sum(a_inserts[1:]),sum(a_trims))
-    itb = '+%d-%d'%(sum(b_inserts[1:]),sum(b_trims))
-
-    vals[ 'cdr3a_protseq_masked'] = cdr3a_protseq_masked
-    vals[ 'a_indels'] = ita
-    vals[ 'cdr3a_new_nucseq' ] = cdr3a_new_nucseq
-    vals[ 'cdr3b_protseq_masked'] = cdr3b_protseq_masked
-    vals[ 'b_indels'] = itb
-    vals[ 'cdr3b_new_nucseq' ] = cdr3b_new_nucseq
 
 
 

@@ -5,7 +5,6 @@
 
 from basic import *
 from util import get_top_genes
-import cdr3s_human #debug
 from all_genes import all_genes
 #from scipy import stats, optimize
 import tcr_distances
@@ -81,12 +80,8 @@ for clones_file, epitope_prefix in zip(clones_files,epitope_prefixes):
         va_genes = l['va_genes'].split(';')
         vb_genes = l['vb_genes'].split(';')
 
-        old_va_reps = frozenset( [ cdr3s_human.all_loopseq_representative[ organism ][ x] for x in va_genes ])
-        old_vb_reps = frozenset( [ cdr3s_human.all_loopseq_representative[ organism ][ x] for x in vb_genes ])
         va_reps = frozenset( ( all_genes[organism][x].rep for x in va_genes ))
         vb_reps = frozenset( ( all_genes[organism][x].rep for x in vb_genes ))
-        assert va_reps == old_va_reps
-        assert vb_reps == old_vb_reps
 
         all_info.append( l )
 

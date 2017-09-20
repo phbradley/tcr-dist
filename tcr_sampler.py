@@ -318,8 +318,6 @@ def alpha_cdr3_protseq_probability( theid, organism, v_gene, j_gene, cdr3_protse
                                     cdr3_nucseq = '', error_threshold = 0.05, verbose=False,
                                     allow_early_nucseq_mismatches = True,
                                     return_final_cdr3_nucseq = False ):
-    #assert organism == 'mouse' ## need new stats for human
-
     nucleotide_match = ( cdr3_nucseq != '' )
     if nucleotide_match:
         assert not cdr3_protseq
@@ -564,8 +562,12 @@ def beta_cdr3_protseq_probability( theid, organism, v_gene, j_gene, cdr3_protseq
 
         print 'min_insert:',min_insert,max_v_germline,max_j_germline
 
-    trbj_index = int( j_gene[4] ) ## to decide which d genes to allow
-    assert trbj_index in [1,2]
+    if organism in ['human','mouse'] and j_gene[3] == 'B':
+        trbj_index = int( j_gene[4] ) ## to decide which d genes to allow
+        assert trbj_index in [1,2]
+    else:
+        ## no D/J compatibility check
+        trbj_index=0
 
     total_prob = 0.0
     min_extra_trim = max(0,-1*min_insert)
@@ -871,6 +873,42 @@ def sample_tcr_sequences( organism, nsamples, v_gene, j_gene,
         return sample_beta_sequences( organism, nsamples, v_gene, j_gene, force_aa_length = force_aa_length,
                                       in_frame_only = in_frame_only, no_stop_codons = no_stop_codons,
                                       max_tries = max_tries, include_annotation = include_annotation )
+
+def add_masked_CDR3_sequences_to_tcr_dict( organism, vals ):
+    ## this code is mostly taken from compute_probs.py
+    va_gene = vals['va_gene']
+    ja_gene = vals['ja_gene']
+    vb_gene = vals['vb_gene']
+    jb_gene = vals['jb_gene']
+    cdr3a_protseq = vals['cdr3a']
+    cdr3a_nucseq  = vals['cdr3a_nucseq']
+    cdr3b_protseq = vals['cdr3b']
+    cdr3b_nucseq  = vals['cdr3b_nucseq']
+
+    a_junction_results = analyze_junction( organism, va_gene, ja_gene, cdr3a_protseq, cdr3a_nucseq )
+    b_junction_results = analyze_junction( organism, vb_gene, jb_gene, cdr3b_protseq, cdr3b_nucseq )
+
+    cdr3a_new_nucseq, cdr3a_protseq_masked, cdr3a_protseq_new_nucleotide_countstring,a_trims,a_inserts \
+        = a_junction_results
+    cdr3b_new_nucseq, cdr3b_protseq_masked, cdr3b_protseq_new_nucleotide_countstring,b_trims,b_inserts \
+        = b_junction_results
+
+    # from tcr_sampler.py:
+    # trims = ( v_trim, d0_trim, d1_trim, j_trim )
+    # inserts = ( best_d_id, n_vd_insert, n_dj_insert, n_vj_insert )
+
+    assert a_trims[1] + a_trims[2] + a_inserts[0] + a_inserts[1] + a_inserts[2] + b_inserts[3] == 0
+    assert a_inserts[3] == len( cdr3a_new_nucseq )
+
+    ita = '+%d-%d'%(sum(a_inserts[1:]),sum(a_trims))
+    itb = '+%d-%d'%(sum(b_inserts[1:]),sum(b_trims))
+
+    vals[ 'cdr3a_protseq_masked'] = cdr3a_protseq_masked
+    vals[ 'a_indels'] = ita
+    vals[ 'cdr3a_new_nucseq' ] = cdr3a_new_nucseq
+    vals[ 'cdr3b_protseq_masked'] = cdr3b_protseq_masked
+    vals[ 'b_indels'] = itb
+    vals[ 'cdr3b_new_nucseq' ] = cdr3b_new_nucseq
 
 
 ########################################################################################################################

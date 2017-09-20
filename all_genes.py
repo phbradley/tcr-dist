@@ -29,6 +29,9 @@ class TCR_Gene:
         if self.cdrs:
             assert self.cdrs == [ self.alseq[ x[0]-1 : x[1] ] for x in self.cdr_columns ]
 
+def trim_allele_to_gene( id ):
+    return id[: id.index('*') ] #will fail if id doesn't contain '*'
+
 ## need to make this a little more configurable (cmdline??)
 
 db_file = path_to_db+'/'+pipeline_params['db_file']
@@ -119,8 +122,8 @@ for organism,genes in all_genes.iteritems():
                             all_loopseq_nbrs_mm1[id1].append( id2 )
                             if loop_mismatches>0 and verbose:
                                 mmstring = ','.join(['%s/%s'%(x[0],x[1]) for x in loop_mismatch_seqs])
-                                gene1 = id1[:id1.index('*')]
-                                gene2 = id2[:id2.index('*')]
+                                gene1 = trim_allele_to_gene( id1 )
+                                gene2 = trim_allele_to_gene( id2 )
                                 if gene1 != gene2 and verbose:
                                     print 'v_mismatches:',organism,mmstring,blscore,id1,id2,\
                                         loop_mismatches,loop_mismatches_cdrx,all_mismatches,seq1
@@ -189,136 +192,69 @@ for organism,genes in all_genes.iteritems():
 
 
 
-def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen = 3,
-                                 extended_cdr3 = False ):
-    #fasta = all_fasta[organism]
-    jg = all_genes[organism][j_gene]
+    ## setup a mapping that we can use for counting when allowing mm1s and also ignoring alleles
 
-    errors = []
+    # allele2mm1_rep_gene_for_counting = {}
+    # def get_mm1_rep_ignoring_allele( gene, organism ): # helper fxn
+    #     rep = get_mm1_rep( gene, organism )
+    #     rep = rep[:rep.index('*')]
+    #     return rep
 
-    ## qseq starts at CA...
-    assert qseq[0] == 'C'
+    #allele2mm1_rep_gene_for_counting[ organism ] = {}
 
-    num_genome_j_positions_in_loop = len(jg.cdrs[0].replace(gap_character,''))-2
-    #num_genome_j_positions_in_loop = all_num_genome_j_positions_in_loop[organism][ab][j_gene]
+    for chain in 'AB':
 
-    if extended_cdr3: num_genome_j_positions_in_loop += 2 ## up to but not including GXG
+        for vj in 'VJ':
+            allele_gs = [ (id,g) for (id,g) in all_genes[organism].iteritems() if g.chain==chain and g.region==vj]
 
-    ## history: was only for alpha
-    aseq = qseq[:] ## starts at the C position
+            gene2rep = {}
+            gene2alleles = {}
+            rep_gene2alleles = {}
 
-    ja_gene = j_gene
-    assert ja_gene in fasta
-    ja_seq = jg.protseq #fasta[ ja_gene ]
+            for allele,g in allele_gs:
+                #assert allele[2] == chain
+                gene = trim_allele_to_gene( allele )
+                rep_gene = trim_allele_to_gene( g.mm1_rep )
+                if rep_gene not in rep_gene2alleles:
+                    rep_gene2alleles[ rep_gene ] = []
+                rep_gene2alleles[ rep_gene ].append( allele )
 
-    min_j_matchlen = min_min_j_matchlen+3
+                if gene not in gene2rep:
+                    gene2rep[gene] = set()
+                    gene2alleles[gene] = []
+                gene2rep[ gene ].add( rep_gene )
+                gene2alleles[gene].append( allele )
 
-    while min_j_matchlen >= min_min_j_matchlen:
-        ntrim =0
-        while ntrim+min_j_matchlen<len(ja_seq) and ja_seq[ntrim:ntrim+min_j_matchlen] not in aseq:
-            ntrim += 1
+            merge_rep_genes = {}
+            for gene,reps in gene2rep.iteritems():
+                if len(reps)>1:
+                    assert vj=='V'
+                    if verbose:
+                        print 'multireps:',organism, gene, reps
+                        for allele in gene2alleles[gene]:
+                            print ' '.join(all_genes[organism][allele].cdrs), allele, \
+                                all_genes[organism][allele].rep, \
+                                all_genes[organism][allele].mm1_rep
 
-        jatag = ja_seq[ntrim:ntrim+min_j_matchlen]
-        if jatag in aseq:
-            break
-        else:
-            min_j_matchlen -= 1
-
-    if jatag not in aseq:
-        Log(`( 'whoah',ab,aseq,ja_seq )`)
-        errors.append( 'j{}tag_not_in_aseq'.format(ab) )
-        return '-',[100,0],errors
-    elif ja_seq.count( jatag ) != 1:
-        Log(`( 'whoah2',ab,aseq,ja_seq )`)
-        errors.append( 'multiple_j{}tag_in_jseq'.format(ab) )
-        return '-',[100,0],errors
-    else:
-        pos = aseq.find( jatag )
-        looplen = pos - ntrim + num_genome_j_positions_in_loop
-        if not extended_cdr3:
-            aseq = aseq[3:]
-            looplen -= 3 ## dont count CAX
-        if len(aseq)<looplen:
-            Log(`( 'short',ab,aseq,ja_seq )`)
-            errors.append( ab+'seq_too_short' )
-            return '-',[100,0],errors
-
-        cdrseq = aseq[:looplen ]
-
-    ## now count mismatches in the J gene, beyond the cdrseq
-    j_seq = jg.protseq #fasta[ j_gene ] ## not sure why we do this again (old legacy code)
-    if qseq.count( cdrseq ) > 1:
-        Log('multiple cdrseq occurrences %s %s'%(qseq,cdrseq))
-        errors.append('multiple_cdrseq_occ')
-        return '-',[100,0],errors
-    assert qseq.count(cdrseq) == 1
-    start_counting_qseq = qseq.find(cdrseq)+len(cdrseq)
-    start_counting_jseq = num_genome_j_positions_in_loop
-    j_match_counts = [0,0]
-    #assert extended_cdr3 ## otherwise I think this count is not right?
-    #print 'here',start_counting_qseq,start_counting_jseq,len(qseq)
-    for qpos in range( start_counting_qseq, len(qseq)):
-        jpos = start_counting_jseq + (qpos-start_counting_qseq)
-        #print 'here',qpos,jpos
-        if jpos>= len(j_seq): break
-        if qseq[qpos] == j_seq[jpos]:
-            j_match_counts[1] += 1
-        else:
-            j_match_counts[0] += 1
-
-    return cdrseq, j_match_counts,errors
+                    ## we are going to merge these reps
+                    ## which one should we choose?
+                    l = [ (len(rep_gene2alleles[rep]), rep ) for rep in reps ]
+                    l.sort()
+                    l.reverse()
+                    assert l[0][0] > l[1][0]
+                    toprep = l[0][1]
+                    for (count,rep) in l:
+                        if rep in merge_rep_genes:
+                            assert rep == toprep and merge_rep_genes[rep] == rep
+                        merge_rep_genes[ rep ] = toprep
 
 
+            for allele,g in allele_gs:
+                count_rep = trim_allele_to_gene( g.mm1_rep ) #get_mm1_rep_ignoring_allele( allele, organism )
+                if count_rep in merge_rep_genes:
+                    count_rep = merge_rep_genes[ count_rep ]
+                g.count_rep = count_rep #allele2mm1_rep_gene_for_counting[ organism ][ allele] = count_rep
+                if verbose:
+                    print 'countrep:',organism, allele, count_rep
 
 
-def parse_cdr3( organism, ab, qseq, v_gene, j_gene, q2v_align, extended_cdr3 = False ):
-    ## v_align is a mapping from 0-indexed qseq positions to 0-indexed v_gene protseq positions
-    #fasta = all_fasta[ organism ]
-    #align_fasta = all_align_fasta[ organism ]
-    vg = all_genes[organism][v_gene]
-
-    errors = []
-
-    ## what is the C position in this v gene?
-    v_seq = vg.protseq #fasta[ v_gene ]
-    v_alseq = vg.alseq #align_fasta[ v_gene ]
-    assert v_seq == v_alseq.replace(gap_character,'')
-
-    alseq_cpos = vg.cdr_columns[-1][0] - 1 ## now 0-indexed
-    #alseq_cpos = alseq_C_pos[organism][ab] - 1 ## now 0-indexed
-    numgaps = v_alseq[:alseq_cpos].count(gap_character)
-
-    cpos = alseq_cpos - numgaps ## 0-indexed
-    cpos_match = -1
-
-    v_match_counts = [0,0]
-
-    qseq_len = len(qseq)
-    for (qpos,vpos) in sorted( q2v_align.iteritems() ):
-        #print 'q2v-align:',qpos, vpos, cpos
-        if qpos == len(qseq):
-            continue ## from a partial codon at the end
-        if vpos == cpos:
-            cpos_match = qpos
-        elif vpos <= cpos:
-            ## only count v mismatches here
-            if qseq[qpos] == v_seq[vpos]:
-                v_match_counts[1] += 1
-            else:
-                v_match_counts[0] += 1
-
-    if cpos_match<0 or qseq[ cpos_match ] != 'C':
-        ## problemo
-        Log('failed to find blast match to C position')
-        errors.append('no_V{}_Cpos_blastmatch'.format(ab))
-        return '-',[100,0],[100,0],errors
-
-    cdrseq, j_match_counts, other_errors = get_cdr3_and_j_match_counts( organism, ab, qseq[ cpos_match: ], j_gene,
-                                                                        extended_cdr3 = extended_cdr3 )
-
-    return cdrseq, v_match_counts, j_match_counts, errors+other_errors
-
-
-if __name__ == '__main__':
-    ## show J alignments
-    pass

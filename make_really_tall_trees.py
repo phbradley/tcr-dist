@@ -8,6 +8,7 @@ import scipy.stats
 import copy
 import random
 from operator import add
+import tcr_sampler
 #from mannwhitneyu import mannwhitneyu as mannwhitneyu_exact #too slow
 
 
@@ -185,7 +186,7 @@ class TCR:
         self.cdr3a = l['cdr3a']
         self.cdr3b = l['cdr3b']
         if 'cdr3a_protseq_masked' not in l or 'cdr3b_protseq_masked' not in l:
-            util.add_masked_CDR3_sequences_to_tcr_dict( organism, l )
+            tcr_sampler.add_masked_CDR3_sequences_to_tcr_dict( organism, l )
         self.cdr3a_masked = l['cdr3a_protseq_masked']
         self.cdr3b_masked = l['cdr3b_protseq_masked']
         self.a_indels = l['a_indels']

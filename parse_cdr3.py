@@ -3,7 +3,8 @@ from all_genes import all_genes, gap_character
 
 
 def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen = 3,
-                                 extended_cdr3 = False ):
+                                 extended_cdr3 = False,
+                                 max_missing_aas_at_cdr3_cterm = 2 ): # new (was 0)
     #fasta = all_fasta[organism]
     jg = all_genes[organism][j_gene]
 
@@ -54,10 +55,16 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
             aseq = aseq[3:]
             looplen -= 3 ## dont count CAX
         if len(aseq)<looplen:
-            Log(`( 'short',ab,aseq,ja_seq )`)
-            errors.append( ab+'seq_too_short' )
-            return '-',[100,0],errors
-
+            num_missing = looplen - len(aseq )
+            if num_missing > max_missing_aas_at_cdr3_cterm:
+                Log(`( 'short',ab,aseq,ja_seq )`)
+                errors.append( ab+'seq_too_short' )
+                return '-',[100,0],errors ## early return
+            suffix = ja_seq[num_genome_j_positions_in_loop-num_missing:num_genome_j_positions_in_loop]
+            ## NOTE -- changin qseq, aseq
+            print 'max_missing_aas_at_cdr3_cterm:',max_missing_aas_at_cdr3_cterm,'num_missing:',num_missing
+            aseq += suffix
+            qseq += suffix
         cdrseq = aseq[:looplen ]
 
     ## now count mismatches in the J gene, beyond the cdrseq
@@ -86,7 +93,8 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
 
 
 
-def parse_cdr3( organism, ab, qseq, v_gene, j_gene, q2v_align, extended_cdr3 = False ):
+def parse_cdr3( organism, ab, qseq, v_gene, j_gene, q2v_align,
+                extended_cdr3 = False, max_missing_aas_at_cdr3_cterm = 2 ):
     ## v_align is a mapping from 0-indexed qseq positions to 0-indexed v_gene protseq positions
     #fasta = all_fasta[ organism ]
     #align_fasta = all_align_fasta[ organism ]
@@ -128,8 +136,10 @@ def parse_cdr3( organism, ab, qseq, v_gene, j_gene, q2v_align, extended_cdr3 = F
         errors.append('no_V{}_Cpos_blastmatch'.format(ab))
         return '-',[100,0],[100,0],errors
 
-    cdrseq, j_match_counts, other_errors = get_cdr3_and_j_match_counts( organism, ab, qseq[ cpos_match: ], j_gene,
-                                                                        extended_cdr3 = extended_cdr3 )
+    cdrseq, j_match_counts, other_errors \
+        = get_cdr3_and_j_match_counts( organism, ab, qseq[ cpos_match: ], j_gene,
+                                       extended_cdr3 = extended_cdr3,
+                                       max_missing_aas_at_cdr3_cterm = max_missing_aas_at_cdr3_cterm )
 
     return cdrseq, v_match_counts, j_match_counts, errors+other_errors
 

@@ -1,7 +1,6 @@
 import sys
 from basic import *
 import tcr_distances
-import cdr3s_human #debug
 from all_genes import all_genes
 import parse_tsv
 
@@ -72,11 +71,8 @@ for epitope in all_tcrs:
     tcrs = []
     for l in all_tcrs[epitope]:
         ## ( va_reps, vb_reps, cdr3a, cdr3b )
-        old_va_reps = frozenset( [cdr3s_human.all_loopseq_representative[organism][x] for x in l[0].split(';') ] )
-        old_vb_reps = frozenset( [cdr3s_human.all_loopseq_representative[organism][x] for x in l[1].split(';') ] )
         va_reps = frozenset( ( all_genes[organism][x].rep for x in l[0].split(';') ) )
         vb_reps = frozenset( ( all_genes[organism][x].rep for x in l[1].split(';') ) )
-        assert va_reps == old_va_reps and vb_reps == old_vb_reps
         tcrs.append( ( va_reps, vb_reps, l[2], l[3] ) )
 
     print 'num_tcrs:',epitope,len(tcrs)

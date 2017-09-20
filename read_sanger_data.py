@@ -4,8 +4,7 @@ import sys
 import random
 import blast
 from genetic_code import genetic_code
-import cdr3s_human #debug
-from all_genes import all_genes
+from all_genes import all_genes, gap_character
 import parse_cdr3
 from paths import path_to_blast_executables
 from translation import get_translation
@@ -107,7 +106,8 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
                                         verbose, nocleanup, hide_nucseq,
                                         extended_cdr3,
                                         return_all_good_hits = False,
-                                        max_bit_score_delta_for_good_hits = 50 ):
+                                        max_bit_score_delta_for_good_hits = 50,
+                                        max_missing_aas_at_cdr3_cterm = 2 ):
 
     ## make this a little more unique
     blast_tmpfile = 'tmp%d%s%s%f%s.fa'%(len(blast_seq),organism,ab,random.random(),blast_seq[:3])
@@ -167,13 +167,7 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
                 assert top_hit.hit_id == top_id
                 ## figure out the score gap to the next non-equivalen
                 bit_score_gap = top_bit_score
-                if vj == 'V':
-                    old_rep_map = cdr3s_human.all_loopseq_representative[organism]
-                else:
-                    old_rep_map = cdr3s_human.all_jseq_representative[organism]
-                old_top_rep = old_rep_map[top_id]
                 top_rep = all_genes[ organism ][top_id].rep
-                assert old_top_rep == top_rep
                 for ( id, bit_score, evalue ) in hits_scores[1:]:
                     if all_genes[organism][id].rep != top_rep:
                         bit_score_gap = top_bit_score - bit_score
@@ -190,11 +184,8 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
 
             v_gene = v_hit.hit_id
             j_gene = j_hit.hit_id
-            old_v_rep = cdr3s_human.all_loopseq_representative[ organism ][ v_gene ]
-            old_j_rep = cdr3s_human.all_jseq_representative[ organism ][ j_gene ]
             v_rep = all_genes[organism][v_gene].rep
             j_rep = all_genes[organism][j_gene].rep
-            assert old_v_rep == v_rep and old_j_rep == j_rep
 
             v_nucseq = all_fasta[organism][ab]['V'][nuc][v_hit.hit_id]
             j_nucseq = all_fasta[organism][ab]['J'][nuc][j_hit.hit_id]
@@ -305,32 +296,49 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
 
 
                 qseq, codons = get_translation( blast_seq, '+%d'%(q_vframe+1) )
-                old_cdr3,v_mm,j_mm,errors = cdr3s_human.parse_cdr3( organism, ab, qseq, v_hit.hit_id, j_hit.hit_id,
-                                                                    q2v_align, extended_cdr3 = extended_cdr3 )
                 cdr3,v_mm,j_mm,errors = parse_cdr3.parse_cdr3( organism, ab, qseq, v_hit.hit_id, j_hit.hit_id,
-                                                               q2v_align, extended_cdr3 = extended_cdr3 )
-                assert cdr3 == old_cdr3
-
+                                                               q2v_align, extended_cdr3 = extended_cdr3,
+                                                               max_missing_aas_at_cdr3_cterm=max_missing_aas_at_cdr3_cterm )
                 if verbose:
                     print 'cdr3:',ab,cdr3,cdr3 in qseq,'q_vframe:',q_vframe
 
                 status.extend(errors)
 
-                if cdr3 in qseq:
+                if cdr3 != '-':
+                    ## the cdr3 sequence should be contained in qseq, unless qseq was missing 1-2 rsds at cterm
                     if not hide_nucseq:
-                        offset = qseq.find(cdr3)
-                        cdr3_codons = codons[ offset:offset+len(cdr3) ]
-                        cdr3 += '-'+''.join(cdr3_codons)
-                        if verbose:
-                            cdr3_nucseq = ''.join( cdr3_codons ).upper()
-                            nucseq_startpos = 3*offset + q_vframe
-                            alt_nucseq = blast_seq[ nucseq_startpos:nucseq_startpos+len(cdr3_nucseq) ]
-                            rc1 = logo_tools.reverse_complement(cdr3_nucseq)
-                            rc2 = logo_tools.reverse_complement(blast_seq)
-                            print 'cdr3_nucseq',ab,offset,cdr3_nucseq,cdr3_nucseq in blast_seq,\
-                                blast_seq.index(cdr3_nucseq),alt_nucseq,rc1 in rc2
-                else:
-                    assert cdr3 == '-'
+                        if cdr3 in qseq: ## the old way, without any missing C-term rsds of CDR3
+                            offset = qseq.find(cdr3)
+                            cdr3_codons = codons[ offset:offset+len(cdr3) ]
+                            cdr3 += '-'+''.join(cdr3_codons)
+                        else:
+                            num_missing_cterm_aas = 1
+                            while num_missing_cterm_aas < max_missing_aas_at_cdr3_cterm and \
+                                  cdr3[:-1*num_missing_cterm_aas] not in qseq:
+                                num_missing_cterm_aas += 1
+                            assert cdr3[:-1*num_missing_cterm_aas] in qseq
+                            ## this is a nuisance...
+                            assert extended_cdr3 # it's the new default anyhow
+                            jg = all_genes[organism][j_hit.hit_id]
+                            j_nucseq = jg.nucseq
+                            j_cdr3len = len( jg.cdrs[0].replace(gap_character,''))
+                            j_cdr3_nucseq = jg.nucseq[: jg.nucseq_offset + 3*j_cdr3len ]
+                            missing_nucseq = j_cdr3_nucseq[-3*num_missing_cterm_aas:]
+                            offset = qseq.find(cdr3[:-1*num_missing_cterm_aas])
+                            cdr3_codons = codons[ offset:offset+len(cdr3)-num_missing_cterm_aas ]
+                            cdr3_nucseq = ''.join(cdr3_codons)+missing_nucseq
+                            assert len(cdr3_nucseq) == 3 * len(cdr3)
+                            assert get_translation( cdr3_nucseq,'+1')[0] == cdr3
+                            cdr3 += '-'+cdr3_nucseq
+
+                        # if verbose:
+                        #     cdr3_nucseq = ''.join( cdr3_codons ).upper()
+                        #     nucseq_startpos = 3*offset + q_vframe
+                        #     alt_nucseq = blast_seq[ nucseq_startpos:nucseq_startpos+len(cdr3_nucseq) ]
+                        #     rc1 = logo_tools.reverse_complement(cdr3_nucseq)
+                        #     rc2 = logo_tools.reverse_complement(blast_seq)
+                        #     print 'cdr3_nucseq',ab,offset,cdr3_nucseq,cdr3_nucseq in blast_seq,\
+                        #         blast_seq.index(cdr3_nucseq),alt_nucseq,rc1 in rc2
                 if '#' in blast_seq: ## sign of out-of-frame
                     v_gene = v_gene.replace('TRAV','TRaV' ).replace('TRBV','TRbV')
                     v_rep  = v_rep .replace('TRAV','TRaV' ).replace('TRBV','TRbV')

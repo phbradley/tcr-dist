@@ -43,3 +43,10 @@ def get_translation( seq, frame ):
 
 if __name__ == '__main__':
     print genetic_code
+
+    for line in open( 'tmp','r'):
+        nucseq = line[:-1]
+        protseq1,codons = get_translation( nucseq, '+1')
+        protseq2,codons = get_translation( nucseq, '+2')
+        protseq3,codons = get_translation( nucseq, '+3')
+        print nucseq,protseq1,protseq2,protseq3

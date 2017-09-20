@@ -2,7 +2,6 @@ from basic import *
 import util
 from scipy import stats
 from tcr_distances import get_rank
-import cdr3s_human # just for debugging
 from all_genes import all_genes
 
 import numpy as np
@@ -137,18 +136,10 @@ for line in open( clones_file_with_nbrdists,'r'):
     vb_genes = set( l['vb_genes'].split(';') )
     jb_genes = set( l['jb_genes'].split(';') )
 
-    old_va_reps = set([ cdr3s_human.all_loopseq_representative[ organism ][ x] for x in va_genes ])
-    #old_ja_reps = set([ cdr3s_human.   all_jseq_representative[ organism ][ x] for x in ja_genes ])
-    #old_vb_reps = set([ cdr3s_human.all_loopseq_representative[ organism ][ x] for x in vb_genes ])
-    old_jb_reps = set([ cdr3s_human.   all_jseq_representative[ organism ][ x] for x in jb_genes ])
-
     va_reps = set(( all_genes[organism][x].rep for x in va_genes ))
     ja_reps = set(( all_genes[organism][x].rep for x in ja_genes ))
     vb_reps = set(( all_genes[organism][x].rep for x in vb_genes ))
     jb_reps = set(( all_genes[organism][x].rep for x in jb_genes ))
-
-    assert va_reps == old_va_reps
-    assert jb_reps == old_jb_reps ## etc.
 
     protprob = { 'A': float(l['a_protseq_prob']),
                  'B': float(l['b_protseq_prob']),
