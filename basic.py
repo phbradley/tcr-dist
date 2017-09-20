@@ -31,7 +31,7 @@ pipeline_params= {
     'distance_threshold_25': 25.0 / 1.298, ## now moving to a gap penalty in the CDR3 region of 12
 
     ## the database file
-    'db_file':'classic_db.tsv' # db file corresponding to original publication
+    'db_file':'alphabeta_db.tsv' # db file corresponding to original publication
     #'db_file':'gammadelta_db.tsv' # db file corresponding to gamma deltas
 }
 

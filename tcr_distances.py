@@ -1,5 +1,4 @@
 from basic import *
-import cdr3s_human#debug
 from all_genes import all_genes, gap_character
 from amino_acids import amino_acids
 from tcr_distances_blosum import blosum, bsd4
@@ -199,8 +198,6 @@ def compute_all_v_region_distances( organism, params ):
         for id,g in all_genes[organism].iteritems():
             if g.chain == chain and g.region == 'V':
                 merged_loopseq = ' '.join( g.cdrs[:-1])
-                if id in cdr3s_human.all_merged_loopseqs[organism]:
-                    assert merged_loopseq == cdr3s_human.all_merged_loopseqs[organism][id]
                 repseqs.append( ( id, merged_loopseq  ) )
                 rep_dists[ id ] = {}
 

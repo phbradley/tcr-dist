@@ -1,7 +1,6 @@
 from basic import *
 import sys
 import translation
-import cdr3s_human #debug -- this will be removed
 from all_genes import all_genes, gap_character
 from genetic_code import genetic_code, reverse_genetic_code
 import logo_tools
@@ -51,28 +50,24 @@ def get_v_cdr3_nucseq( organism, v_gene, paranoid = False ):
     alseq_cpos = vg.cdr_columns[-1][0] -1
     #print organism, v_gene, old_v_alseq
     #print organism, v_gene, v_alseq
-    if v_gene in cdr3s_human.all_align_fasta[organism]:
-        old_v_alseq = cdr3s_human.all_align_fasta[organism][ v_gene ]
-        old_alseq_cpos = cdr3s_human.alseq_C_pos[organism][ab]-1 ## 0-indexed
-        assert old_v_alseq[:alseq_cpos] == v_alseq[:alseq_cpos]
-        assert old_alseq_cpos == alseq_cpos
     numgaps = v_alseq[:alseq_cpos].count('.')
     v_cpos = alseq_cpos - numgaps
     v_nucseq = v_nucseq[3*v_cpos:] ## now v_nucseq starts with the 'C' codon
 
 
-    if organism == 'mouse':
-        if v_gene == 'TRAV13D-1*01':
-            #-----------------------------------
-            #../../../tmp.blat:mismatch: V 6 imgt: a genome: t TRAV13D-1*01
-            #tmp.whoah:whoah  6 act: t  98.7 exp: a   1.1 TRAV13D-1*01 TRAV13-1*01 620
-            #tmp.whoah:whoah: expected: caaggtatcgtgt consensus: caaggtttcgtgt TRAV13D-1*01 620
-            #tmp.3.whoah:whoah  6 act: t  97.4 exp: a   1.4 TRAV13D-1*01 TRAV13-1*01 642
-            #tmp.3.whoah:whoah: expected: caaggtatcgtgt consensus: caaggtttcgtgt TRAV13D-1*01 642
-            #tmp.la_mc.whoah:whoah  6 act: t  89.0 exp: a   7.0 TRAV13D-1*01 TRAV13-1*01 100
-            #tmp.la_mc.whoah:whoah: expected: caaggtatcgtgt consensus: caaggtttcgtgt TRAV13D-1*01 100
-            assert v_nucseq == 'tgtgctatggaac' ## CAM ## THIS WILL FAIL SINCE WE ADDED THIS TO THE DB...
-            v_nucseq         = 'tgtgctttggaac' ## CAL
+    # the following hacky adjustment is now incorporated in the dbfile
+    # if organism == 'mouse':
+    #     if v_gene == 'TRAV13D-1*01':
+    #         #-----------------------------------
+    #         #../../../tmp.blat:mismatch: V 6 imgt: a genome: t TRAV13D-1*01
+    #         #tmp.whoah:whoah  6 act: t  98.7 exp: a   1.1 TRAV13D-1*01 TRAV13-1*01 620
+    #         #tmp.whoah:whoah: expected: caaggtatcgtgt consensus: caaggtttcgtgt TRAV13D-1*01 620
+    #         #tmp.3.whoah:whoah  6 act: t  97.4 exp: a   1.4 TRAV13D-1*01 TRAV13-1*01 642
+    #         #tmp.3.whoah:whoah: expected: caaggtatcgtgt consensus: caaggtttcgtgt TRAV13D-1*01 642
+    #         #tmp.la_mc.whoah:whoah  6 act: t  89.0 exp: a   7.0 TRAV13D-1*01 TRAV13-1*01 100
+    #         #tmp.la_mc.whoah:whoah: expected: caaggtatcgtgt consensus: caaggtttcgtgt TRAV13D-1*01 100
+    #         assert v_nucseq == 'tgtgctatggaac' ## CAM ## THIS WILL FAIL SINCE WE ADDED THIS TO THE DB...
+    #         v_nucseq         = 'tgtgctttggaac' ## CAL
 
 
     return v_nucseq
@@ -86,56 +81,54 @@ def get_j_cdr3_nucseq( organism, j_gene, paranoid = False ):
     j_nucseq_offset = jg.nucseq_offset
 
     ## goes up to (but not including) GXG
-    num_genome_j_positions_in_loop = len( jg.cdrs[0].replace(gap_character,''))
-    if j_gene in cdr3s_human.all_num_genome_j_positions_in_loop[organism][ab]:
-        old_num_genome_j_positions_in_loop = cdr3s_human.all_num_genome_j_positions_in_loop[organism][ab][j_gene] + 2
-        assert old_num_genome_j_positions_in_loop == num_genome_j_positions_in_loop
+    num_genome_j_aas_in_loop = len( jg.cdrs[0].replace(gap_character,''))
 
     ## trim j_nucseq so that it extends up to the F/W position
-    j_nucseq = j_nucseq[:3*num_genome_j_positions_in_loop + j_nucseq_offset]
+    j_nucseq = j_nucseq[:3*num_genome_j_aas_in_loop + j_nucseq_offset]
 
 
-    if organism == 'mouse':
-        if j_gene == 'TRAJ47*01':
-            # -----------------------------------
-            # ../../../tmp.blat:mismatch: J 2 imgt: c genome: g TRAJ47*01
-            # ../../../tmp.blat:mismatch: J 24 imgt: g genome: t TRAJ47*01
-            # tmp.whoah:whoah  2 act: g  81.9 exp: c   4.7 TRAJ47*01 TRAJ47*01 1412
-            # tmp.whoah:whoah 24 act: t  82.7 exp: g  16.8 TRAJ47*01 TRAJ47*01 1412
-            # tmp.whoah:whoah: expected: tgcactatgcaaacaagatgatctgt consensus: tggactatgcaaacaagatgatcttt TRAJ47*01 1412
-            # tmp.3.whoah:whoah  2 act: g  81.6 exp: c   5.0 TRAJ47*01 TRAJ47*01 1362
-            # tmp.3.whoah:whoah 24 act: t  82.7 exp: g  16.6 TRAJ47*01 TRAJ47*01 1362
-            # tmp.3.whoah:whoah: expected: tgcactatgcaaacaagatgatctgt consensus: tggactatgcaaacaagatgatcttt TRAJ47*01 1362
-            # tmp.la_mc.whoah:whoah  2 act: g  79.6 exp: c   5.3 TRAJ47*01 TRAJ47*01 113
-            # tmp.la_mc.whoah:whoah 24 act: t  99.1 exp: g   0.9 TRAJ47*01 TRAJ47*01 113
-            # tmp.la_mc.whoah:whoah: expected: tgcactatgcaaacaagatgatctgt consensus: tggactatgcaaacaagatgatcttt TRAJ47*01 113
-            assert j_nucseq == 'tgcactatgcaaacaagatgatctgt' ## C at end
-            j_nucseq         = 'tggactatgcaaacaagatgatcttt' ## F at end
-        elif j_gene == 'TRAJ24*01':
-            # -----------------------------------
-            # ../../../tmp.blat:unaligned: J 0 TRAJ24*01
-            # ../../../tmp.blat:unaligned: J 1 TRAJ24*01
-            # ../../../tmp.blat:gapped: J 6 TRAJ24*01
-            # tmp.whoah:whoah  2 act: c  60.3 exp: a  15.3 TRAJ24*01 TRAJ24*01 464
-            # tmp.whoah:whoah  4 act: a  88.6 exp: c   2.8 TRAJ24*01 TRAJ24*01 464
-            # tmp.whoah:whoah  5 act: c  93.3 exp: t   1.5 TRAJ24*01 TRAJ24*01 464
-            # tmp.whoah:whoah  6 act: t  97.2 exp: g   1.1 TRAJ24*01 TRAJ24*01 464
-            # tmp.whoah:whoah: expected: tgaactggccagtttggggaaactgcagttt consensus: gacaactgccagtttggggaaactgcagttt TRAJ24*01 464
-            # tmp.3.whoah:whoah  2 act: c  60.8 exp: a  13.9 TRAJ24*01 TRAJ24*01 475
-            # tmp.3.whoah:whoah  4 act: a  86.3 exp: c   4.2 TRAJ24*01 TRAJ24*01 475
-            # tmp.3.whoah:whoah  5 act: c  94.5 exp: t   1.1 TRAJ24*01 TRAJ24*01 475
-            # tmp.3.whoah:whoah  6 act: t  98.1 exp: g   1.1 TRAJ24*01 TRAJ24*01 475
-            # tmp.3.whoah:whoah: expected: tgaactggccagtttggggaaactgcagttt consensus: gacaactgccagtttggggaaactgcagttt TRAJ24*01 475
-            # tmp.la_mc.whoah:whoah  2 act: c  75.3 exp: a   4.3 TRAJ24*01 TRAJ24*01 93
-            # tmp.la_mc.whoah:whoah  4 act: a  89.2 exp: c   2.2 TRAJ24*01 TRAJ24*01 93
-            # tmp.la_mc.whoah:whoah  5 act: c  97.8 exp: t   1.1 TRAJ24*01 TRAJ24*01 93
-            # tmp.la_mc.whoah:whoah  6 act: t  98.9 exp: g   0.0 TRAJ24*01 TRAJ24*01 93
-            # tmp.la_mc.whoah:whoah: expected: tgaactggccagtttggggaaactgcagttt consensus: gacaactgccagtttggggaaactgcagttt TRAJ24*01 93
-            assert j_nucseq == 'tgaactggccagtttggggaaactgcagttt'
-            j_nucseq         = 'gacaactgccagtttggggaaactgcagttt'
-            ## take the consensus
-            ## given that there's an indel (and the alignment to the genome starts at j sequence position 3)
-            ## it's hard to tell what to do at the beginning...
+    # the following hacky adjustments are now incorporated in the dbfile
+    # if organism == 'mouse':
+    #     if j_gene == 'TRAJ47*01':
+    #         # -----------------------------------
+    #         # ../../../tmp.blat:mismatch: J 2 imgt: c genome: g TRAJ47*01
+    #         # ../../../tmp.blat:mismatch: J 24 imgt: g genome: t TRAJ47*01
+    #         # tmp.whoah:whoah  2 act: g  81.9 exp: c   4.7 TRAJ47*01 TRAJ47*01 1412
+    #         # tmp.whoah:whoah 24 act: t  82.7 exp: g  16.8 TRAJ47*01 TRAJ47*01 1412
+    #         # tmp.whoah:whoah: expected: tgcactatgcaaacaagatgatctgt consensus: tggactatgcaaacaagatgatcttt TRAJ47*01 1412
+    #         # tmp.3.whoah:whoah  2 act: g  81.6 exp: c   5.0 TRAJ47*01 TRAJ47*01 1362
+    #         # tmp.3.whoah:whoah 24 act: t  82.7 exp: g  16.6 TRAJ47*01 TRAJ47*01 1362
+    #         # tmp.3.whoah:whoah: expected: tgcactatgcaaacaagatgatctgt consensus: tggactatgcaaacaagatgatcttt TRAJ47*01 1362
+    #         # tmp.la_mc.whoah:whoah  2 act: g  79.6 exp: c   5.3 TRAJ47*01 TRAJ47*01 113
+    #         # tmp.la_mc.whoah:whoah 24 act: t  99.1 exp: g   0.9 TRAJ47*01 TRAJ47*01 113
+    #         # tmp.la_mc.whoah:whoah: expected: tgcactatgcaaacaagatgatctgt consensus: tggactatgcaaacaagatgatcttt TRAJ47*01 113
+    #         assert j_nucseq == 'tgcactatgcaaacaagatgatctgt' ## C at end
+    #         j_nucseq         = 'tggactatgcaaacaagatgatcttt' ## F at end
+    #     elif j_gene == 'TRAJ24*01':
+    #         # -----------------------------------
+    #         # ../../../tmp.blat:unaligned: J 0 TRAJ24*01
+    #         # ../../../tmp.blat:unaligned: J 1 TRAJ24*01
+    #         # ../../../tmp.blat:gapped: J 6 TRAJ24*01
+    #         # tmp.whoah:whoah  2 act: c  60.3 exp: a  15.3 TRAJ24*01 TRAJ24*01 464
+    #         # tmp.whoah:whoah  4 act: a  88.6 exp: c   2.8 TRAJ24*01 TRAJ24*01 464
+    #         # tmp.whoah:whoah  5 act: c  93.3 exp: t   1.5 TRAJ24*01 TRAJ24*01 464
+    #         # tmp.whoah:whoah  6 act: t  97.2 exp: g   1.1 TRAJ24*01 TRAJ24*01 464
+    #         # tmp.whoah:whoah: expected: tgaactggccagtttggggaaactgcagttt consensus: gacaactgccagtttggggaaactgcagttt TRAJ24*01 464
+    #         # tmp.3.whoah:whoah  2 act: c  60.8 exp: a  13.9 TRAJ24*01 TRAJ24*01 475
+    #         # tmp.3.whoah:whoah  4 act: a  86.3 exp: c   4.2 TRAJ24*01 TRAJ24*01 475
+    #         # tmp.3.whoah:whoah  5 act: c  94.5 exp: t   1.1 TRAJ24*01 TRAJ24*01 475
+    #         # tmp.3.whoah:whoah  6 act: t  98.1 exp: g   1.1 TRAJ24*01 TRAJ24*01 475
+    #         # tmp.3.whoah:whoah: expected: tgaactggccagtttggggaaactgcagttt consensus: gacaactgccagtttggggaaactgcagttt TRAJ24*01 475
+    #         # tmp.la_mc.whoah:whoah  2 act: c  75.3 exp: a   4.3 TRAJ24*01 TRAJ24*01 93
+    #         # tmp.la_mc.whoah:whoah  4 act: a  89.2 exp: c   2.2 TRAJ24*01 TRAJ24*01 93
+    #         # tmp.la_mc.whoah:whoah  5 act: c  97.8 exp: t   1.1 TRAJ24*01 TRAJ24*01 93
+    #         # tmp.la_mc.whoah:whoah  6 act: t  98.9 exp: g   0.0 TRAJ24*01 TRAJ24*01 93
+    #         # tmp.la_mc.whoah:whoah: expected: tgaactggccagtttggggaaactgcagttt consensus: gacaactgccagtttggggaaactgcagttt TRAJ24*01 93
+    #         assert j_nucseq == 'tgaactggccagtttggggaaactgcagttt'
+    #         j_nucseq         = 'gacaactgccagtttggggaaactgcagttt'
+    #         ## take the consensus
+    #         ## given that there's an indel (and the alignment to the genome starts at j sequence position 3)
+    #         ## it's hard to tell what to do at the beginning...
 
 
 

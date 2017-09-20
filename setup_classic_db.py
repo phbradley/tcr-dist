@@ -22,7 +22,7 @@ gap_character = '.'
 #################################################################################
 
 
-fasta_dir = path_to_db+'/fasta/'
+fasta_dir = path_to_db+'/fasta_unused/'
 
 verbose = False
 #verbose = ( __name__ == '__main__' )
@@ -455,7 +455,7 @@ gggactgggggggc""".split('\n')
                 all_fastafile = {}
                 for np in [prot,nuc]:
                     myfasta[np] ={}
-                    fastafile = path_to_db+'/fasta/imgt_%s_TR_%s_sequences.fasta.TR%s%s.fasta'\
+                    fastafile = path_to_db+'/fasta_unused/imgt_%s_TR_%s_sequences.fasta.TR%s%s.fasta'\
                                 %( organism, np, ab, vj )
                     all_fastafile[np] = fastafile
                     assert exists( fastafile )
@@ -497,7 +497,7 @@ gggactgggggggc""".split('\n')
 
     cdrs_sep = ';'
 
-    outfile = 'db/classic_db.tsv'
+    outfile = 'db/alphabeta_db.tsv'
     out = open(outfile,'w')
     out.write('\t'.join( outfields )+'\n' )
 
@@ -617,12 +617,66 @@ gggactgggggggc""".split('\n')
                 region = 'J'
                 protseq = all_fasta[organism][id]
                 nucseq = all_fasta_sd[organism][chain][region][nuc][id]
-                protseq2 = all_fasta_sd[organism][chain][region][prot][id]
-                assert protseq == protseq2
+                assert protseq == all_fasta_sd[organism][chain][region][prot][id]
 
                 offset,num_after = all_offsets[organism][chain][region][id]
 
                 num_genome_positions_in_CDR3 = all_num_genome_j_positions_in_loop[organism][chain][id] + 2
+
+
+                if organism == 'mouse' and id == 'TRAJ47*01':
+                    # -----------------------------------
+                    # ../../../tmp.blat:mismatch: J 2 imgt: c genome: g TRAJ47*01
+                    # ../../../tmp.blat:mismatch: J 24 imgt: g genome: t TRAJ47*01
+                    # tmp.whoah:whoah  2 act: g  81.9 exp: c   4.7 TRAJ47*01 TRAJ47*01 1412
+                    # tmp.whoah:whoah 24 act: t  82.7 exp: g  16.8 TRAJ47*01 TRAJ47*01 1412
+                    # tmp.whoah:whoah: expected: tgcactatgcaaacaagatgatctgt consensus: tggactatgcaaacaagatgatcttt TRAJ47*01 1412
+                    # tmp.3.whoah:whoah  2 act: g  81.6 exp: c   5.0 TRAJ47*01 TRAJ47*01 1362
+                    # tmp.3.whoah:whoah 24 act: t  82.7 exp: g  16.6 TRAJ47*01 TRAJ47*01 1362
+                    # tmp.3.whoah:whoah: expected: tgcactatgcaaacaagatgatctgt consensus: tggactatgcaaacaagatgatcttt TRAJ47*01 1362
+                    # tmp.la_mc.whoah:whoah  2 act: g  79.6 exp: c   5.3 TRAJ47*01 TRAJ47*01 113
+                    # tmp.la_mc.whoah:whoah 24 act: t  99.1 exp: g   0.9 TRAJ47*01 TRAJ47*01 113
+                    # tmp.la_mc.whoah:whoah: expected: tgcactatgcaaacaagatgatctgt consensus: tggactatgcaaacaagatgatcttt TRAJ47*01 113
+                    old_cdr3_nucseq = 'tgcactatgcaaacaagatgatctgt' ## C at end
+                    new_cdr3_nucseq = 'tggactatgcaaacaagatgatcttt' ## F at end, SAME LENGTH!
+                    num_cdr3_nucs = offset + 3*num_genome_positions_in_CDR3
+                    assert nucseq[:num_cdr3_nucs] == old_cdr3_nucseq
+                    old_protseq = get_translation( nucseq, '+{}'.format( offset+1 ) )[0]
+                    assert old_protseq == protseq
+                    nucseq = new_cdr3_nucseq + nucseq[ num_cdr3_nucs: ]
+                    protseq = get_translation( nucseq, '+{}'.format( offset+1 ) )[0]
+
+                elif organism == 'mouse' and id == 'TRAJ24*01':
+                    # -----------------------------------
+                    # ../../../tmp.blat:unaligned: J 0 TRAJ24*01
+                    # ../../../tmp.blat:unaligned: J 1 TRAJ24*01
+                    # ../../../tmp.blat:gapped: J 6 TRAJ24*01
+                    # tmp.whoah:whoah  2 act: c  60.3 exp: a  15.3 TRAJ24*01 TRAJ24*01 464
+                    # tmp.whoah:whoah  4 act: a  88.6 exp: c   2.8 TRAJ24*01 TRAJ24*01 464
+                    # tmp.whoah:whoah  5 act: c  93.3 exp: t   1.5 TRAJ24*01 TRAJ24*01 464
+                    # tmp.whoah:whoah  6 act: t  97.2 exp: g   1.1 TRAJ24*01 TRAJ24*01 464
+                    # tmp.whoah:whoah: expected: tgaactggccagtttggggaaactgcagttt consensus: gacaactgccagtttggggaaactgcagttt TRAJ24*01 464
+                    # tmp.3.whoah:whoah  2 act: c  60.8 exp: a  13.9 TRAJ24*01 TRAJ24*01 475
+                    # tmp.3.whoah:whoah  4 act: a  86.3 exp: c   4.2 TRAJ24*01 TRAJ24*01 475
+                    # tmp.3.whoah:whoah  5 act: c  94.5 exp: t   1.1 TRAJ24*01 TRAJ24*01 475
+                    # tmp.3.whoah:whoah  6 act: t  98.1 exp: g   1.1 TRAJ24*01 TRAJ24*01 475
+                    # tmp.3.whoah:whoah: expected: tgaactggccagtttggggaaactgcagttt consensus: gacaactgccagtttggggaaactgcagttt TRAJ24*01 475
+                    # tmp.la_mc.whoah:whoah  2 act: c  75.3 exp: a   4.3 TRAJ24*01 TRAJ24*01 93
+                    # tmp.la_mc.whoah:whoah  4 act: a  89.2 exp: c   2.2 TRAJ24*01 TRAJ24*01 93
+                    # tmp.la_mc.whoah:whoah  5 act: c  97.8 exp: t   1.1 TRAJ24*01 TRAJ24*01 93
+                    # tmp.la_mc.whoah:whoah  6 act: t  98.9 exp: g   0.0 TRAJ24*01 TRAJ24*01 93
+                    # tmp.la_mc.whoah:whoah: expected: tgaactggccagtttggggaaactgcagttt consensus: gacaactgccagtttggggaaactgcagttt TRAJ24*01 93
+                    old_cdr3_nucseq = 'tgaactggccagtttggggaaactgcagttt'
+                    new_cdr3_nucseq = 'gacaactgccagtttggggaaactgcagttt' ## SAME LENGTH!
+                    ## take the consensus
+                    ## given that there's an indel (and the alignment to the genome starts at j sequence position 3)
+                    ## it's hard to tell what to do at the beginning...
+                    num_cdr3_nucs = offset + 3*num_genome_positions_in_CDR3
+                    assert nucseq[:num_cdr3_nucs] == old_cdr3_nucseq
+                    old_protseq = get_translation( nucseq, '+{}'.format( offset+1 ) )[0]
+                    assert old_protseq == protseq
+                    nucseq = new_cdr3_nucseq + nucseq[ num_cdr3_nucs: ]
+                    protseq = get_translation( nucseq, '+{}'.format( offset+1 ) )[0]
 
                 prefix = gap_character * ( max_in - num_genome_positions_in_CDR3 )
                 suffix = gap_character * ( max_out - ( len(protseq) - num_genome_positions_in_CDR3 ) )

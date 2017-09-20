@@ -239,6 +239,7 @@ def add_new_label_and_update_gridl( xy, minval, maxval, step, nx, ny, label_text
     else:
         plt.text( x0, y0, label_text, color=label_color, va = 'bottom', ha='left', fontsize=6 )
 
+jcmaxlen = 0
 
 kPCAset = set()
 for ii_epitope, epitope in enumerate( epitopes ):
@@ -431,10 +432,7 @@ for ii_epitope, epitope in enumerate( epitopes ):
                 for jx in tcr_infos[ji]:
                     templi.append(tcr_infos[ji][jx].strip())
                 tempstr = tcrs[ji][0] + "\t" +  tcr_infos[ji]["epitope"] + "\t" +  str(xs[ji]) + "\t" +  str(ys[ji]) + "\t" +  tcr_colors[ji] + "\t" + "\t".join(str(x) for x in jc_all_xys[epitope][ji])
-                try:
-                    jcmaxlen = max(jcmaxlen, len(tempstr.split("\t")))
-                except NameError:
-                    jcmaxlen = len(tempstr.split("\t"))
+                jcmaxlen = max(jcmaxlen, len(tempstr.split("\t")))
                 kPCAset.add(tempstr) #--JCC
             print '{} {} matched: {} {:.6f}'.format(epitope,motifchain,len(all_matched_ids),
                                                     float(len(all_matched_ids))/num_tcrs)

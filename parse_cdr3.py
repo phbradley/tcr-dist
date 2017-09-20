@@ -13,10 +13,8 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
     ## qseq starts at CA...
     assert qseq[0] == 'C'
 
-    num_genome_j_positions_in_loop = len(jg.cdrs[0].replace(gap_character,''))-2
-    #num_genome_j_positions_in_loop = all_num_genome_j_positions_in_loop[organism][ab][j_gene]
-
-    if extended_cdr3: num_genome_j_positions_in_loop += 2 ## up to but not including GXG
+    num_genome_j_aas_in_loop = len(jg.cdrs[0].replace(gap_character,''))-2
+    if extended_cdr3: num_genome_j_aas_in_loop += 2 ## up to but not including GXG
 
     ## history: was only for alpha
     aseq = qseq[:] ## starts at the C position
@@ -50,7 +48,7 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
         return '-',[100,0],errors
     else:
         pos = aseq.find( jatag )
-        looplen = pos - ntrim + num_genome_j_positions_in_loop
+        looplen = pos - ntrim + num_genome_j_aas_in_loop
         if not extended_cdr3:
             aseq = aseq[3:]
             looplen -= 3 ## dont count CAX
@@ -60,7 +58,7 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
                 Log(`( 'short',ab,aseq,ja_seq )`)
                 errors.append( ab+'seq_too_short' )
                 return '-',[100,0],errors ## early return
-            suffix = ja_seq[num_genome_j_positions_in_loop-num_missing:num_genome_j_positions_in_loop]
+            suffix = ja_seq[num_genome_j_aas_in_loop-num_missing:num_genome_j_aas_in_loop]
             ## NOTE -- changin qseq, aseq
             print 'max_missing_aas_at_cdr3_cterm:',max_missing_aas_at_cdr3_cterm,'num_missing:',num_missing
             aseq += suffix
@@ -75,7 +73,7 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
         return '-',[100,0],errors
     assert qseq.count(cdrseq) == 1
     start_counting_qseq = qseq.find(cdrseq)+len(cdrseq)
-    start_counting_jseq = num_genome_j_positions_in_loop
+    start_counting_jseq = num_genome_j_aas_in_loop
     j_match_counts = [0,0]
     #assert extended_cdr3 ## otherwise I think this count is not right?
     #print 'here',start_counting_qseq,start_counting_jseq,len(qseq)
