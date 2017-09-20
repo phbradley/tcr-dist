@@ -155,13 +155,18 @@ The tables in the .html results can be sorted thanks to `tablesorter`. See the l
 Sequence parsing relies on the BLAST suite, see info in `external/blast-2.2.16/`
 
 ---
-# VERSIONS
+# UPDATES
 
-## 0.0.2 (09/XX/2017):
+## Version 0.0.2 (09/XX/2017):
 
 - New sequence database system that makes it easier to work with alternate gene sets
 
-- Preliminary support for gamma-delta TCRs
+- Preliminary support for gamma-delta TCRs: edit the `db_file` field of the `pipeline_params` dictionary
+stored in `basic.py`. (This is a temporary hack; likely will move to switching by command line flag sometime soon).
 
-- New `all_genes` dictionary in `all_genes.py` indexed by organism that holds information on all the genes; read from the `db_file` stored in
-the `basic.py` dictionary 'pipeline_params`
+- New `all_genes` dictionary in `all_genes.py` indexed by organism that holds information on all the genes; it's
+read from the `db_file` pointed to by `basic.py`.
+
+- With new minor updates to the probability model and default sequence database we're no longer trying to preserve
+exact numerical identity with the results from the paper. To get the classic results, you can check out the
+`version_001` branch on github.
