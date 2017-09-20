@@ -695,10 +695,11 @@ for epitope in epitopes:
                         #arrow_length = min_height_for_labels
                         #arrow_width = 2.5
                         eg_sep = 14.0
-                        if 'A' in rep:
+                        if 'A' in r:
                             center = [ lower_left_ha[ha][0] + text_width + eg_sep, midpoint ]
                         else:
-                            assert 'B' in rep
+                            #print rep
+                            assert 'B' in r
                             center = [ lower_left_ha[ha][0] - eg_sep, midpoint ]
 
                         pairing_svg_cmds += svg_basic.enrichment_glyph_cmds( center, arrow_length, arrow_width,
@@ -1149,6 +1150,7 @@ plt.subplot(312)
 aspect = 'auto'
 
 if max_jsd_for_colorscale==0.0: #not set on cmdline
+    min_jsd_for_colorscale = 0.0
     max_jsd_for_colorscale = np.amax(A)
 
 plt.imshow( A, aspect = aspect, interpolation='nearest',

@@ -30,9 +30,10 @@ pipeline_params= {
     #'distance_threshold_25': 25.0 / 1.355,
     'distance_threshold_25': 25.0 / 1.298, ## now moving to a gap penalty in the CDR3 region of 12
 
-    ## the database file
+    ## the gene sets database file -- should move to make this commandline switchable
+    ## this is the file that has the sequences and alignments of all the TR genes
     'db_file':'alphabeta_db.tsv' # db file corresponding to original publication
-    #'db_file':'gammadelta_db.tsv' # db file corresponding to gamma deltas
+    #'db_file':'gammadelta_db.tsv' # db file corresponding to gamma deltas, uncomment to analyze them (and comment above)
 }
 
 

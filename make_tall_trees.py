@@ -58,6 +58,8 @@ for ch in fake_chains:
     if ch in ABs:
         del ABs[ ABs.index(ch)]
 
+gene_logo_name_trim = 2 if 'gammadelta' in pipeline_params['db_file'] else 4
+
 
 font_family = "Droid Sans Mono"
 
@@ -726,8 +728,8 @@ for epitope in epitopes:
                 # y1 = node_position[fake_ic] + pwm_height/2.
 
                 ## make a v-gene logo
-                vl = [(y,x[4:],rep_colors[x]) for x,y in v_count.iteritems()]
-                jl = [(y,x[4:],rep_colors[x]) for x,y in j_count.iteritems()]
+                vl = [(y,x[gene_logo_name_trim:],rep_colors[x]) for x,y in v_count.iteritems()]
+                jl = [(y,x[gene_logo_name_trim:],rep_colors[x]) for x,y in j_count.iteritems()]
                 #vl = [(y,x[4:x.index('*')]) for x,y in v_count.iteritems()]
                 #jl = [(y,x[4:x.index('*')]) for x,y in j_count.iteritems()]
 

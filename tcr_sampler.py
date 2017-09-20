@@ -776,8 +776,10 @@ def sample_beta_sequences( organism, nsamples, v_gene, j_gene, force_aa_length =
     # d_trim_probsl = { 1: setup_random_sampling_list( trim_probs['B_D1_d01_trim'] ),
     #                   2: setup_random_sampling_list( trim_probs['B_D2_d01_trim'] ) }
 
-    jno = int( j_gene[4] )
-    assert jno in [1,2]
+    jno = 0 # no D filtering
+    if organism in ['human','mouse'] and j_gene[2] == 'B':
+        jno = int( j_gene[4] )
+        assert jno in [1,2]
     if jno == 1:
         allowed_dgenes = [1]
     else:

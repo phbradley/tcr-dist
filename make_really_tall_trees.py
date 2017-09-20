@@ -84,11 +84,12 @@ def pad_to_middle( s, num ): ## with spaces
     return ' '*before + s + ' '*after
 
 def get_primary_number( gene_name ):
-    if gene_name.startswith('TR'):
-        tmp = gene_name[4:]
-    else:
-        assert gene_name[0] in 'AB'
-        tmp = gene_name[2:]
+    tmp = gene_name[:]
+    while tmp and not tmp[0].isdigit():
+        tmp = tmp[1:]
+    if not tmp:
+        ## for example, if gene_name=='TRGJP'
+        return 0
     assert tmp[0].isdigit()
     if tmp.isdigit():
         return int(tmp)
@@ -636,11 +637,24 @@ for epitope in epitopes:
                 ## gene segments
                 reps = tcr.single_reps
                 if 'A' in ab:
-                    text_columns[ icol ].append( ( 'AV{:02d}'.format( get_primary_number( reps[0] ) ), rep_colors[reps[0]] ) ) ; icol += 1
-                    text_columns[ icol ].append( ( 'AJ{:02d}'.format( get_primary_number( reps[1] ) ), rep_colors[reps[1]] ) ) ; icol += 1
+                    assert reps[0].startswith('TR') and reps[1].startswith('TR')
+                    text_columns[ icol ].append( ( '{}{:02d}'.format( reps[0][2:4], get_primary_number( reps[0] ) ),
+                                                   rep_colors[reps[0]] ) )
+                    icol += 1
+                    text_columns[ icol ].append( ( '{}{:02d}'.format( reps[1][2:4], get_primary_number( reps[1] ) ),
+                                                   rep_colors[reps[1]] ) )
+                    icol += 1
+                    # text_columns[ icol ].append( ( 'AV{:02d}'.format( get_primary_number( reps[0] ) ), rep_colors[reps[0]] ) ) ; icol += 1
+                    # text_columns[ icol ].append( ( 'AJ{:02d}'.format( get_primary_number( reps[1] ) ), rep_colors[reps[1]] ) ) ; icol += 1
                 if 'B' in ab:
-                    text_columns[ icol ].append( ( 'BV{:02d}'.format( get_primary_number( reps[2] ) ), rep_colors[reps[2]] ) ) ; icol += 1
-                    text_columns[ icol ].append( ( 'BJ{}'.format( reps[3][4:])                      , rep_colors[reps[3]] ) ) ; icol += 1
+                    text_columns[ icol ].append( ( '{}{:02d}'.format( reps[2][2:4], get_primary_number( reps[2] ) ),
+                                                   rep_colors[reps[2]] ) )
+                    icol += 1
+                    text_columns[ icol ].append( ( '{}{:02d}'.format( reps[3][2:4], get_primary_number( reps[3] ) ),
+                                                   rep_colors[reps[3]] ) )
+                    icol += 1
+                    # text_columns[ icol ].append( ( 'BV{:02d}'.format( get_primary_number( reps[2] ) ), rep_colors[reps[2]] ) ) ; icol += 1
+                    # text_columns[ icol ].append( ( 'BJ{}'.format( reps[3][4:])                      , rep_colors[reps[3]] ) ) ; icol += 1
 
                 text_columns[ icol ].append( ( my_color_scores_labels[old_index], get_tcr_score_color( old_index ) ) ) ; icol += 1
                 assert icol == num_columns

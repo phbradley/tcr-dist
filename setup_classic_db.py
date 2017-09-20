@@ -22,7 +22,7 @@ gap_character = '.'
 #################################################################################
 
 
-fasta_dir = path_to_db+'/fasta_unused/'
+fasta_dir = path_to_db+'/old/fasta/'
 
 verbose = False
 #verbose = ( __name__ == '__main__' )
@@ -455,7 +455,7 @@ gggactgggggggc""".split('\n')
                 all_fastafile = {}
                 for np in [prot,nuc]:
                     myfasta[np] ={}
-                    fastafile = path_to_db+'/fasta_unused/imgt_%s_TR_%s_sequences.fasta.TR%s%s.fasta'\
+                    fastafile = path_to_db+'/old/fasta/imgt_%s_TR_%s_sequences.fasta.TR%s%s.fasta'\
                                 %( organism, np, ab, vj )
                     all_fastafile[np] = fastafile
                     assert exists( fastafile )

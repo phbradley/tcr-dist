@@ -1,3 +1,15 @@
+#############################################################################################################
+##
+## NOTE:
+##
+## This is a legacy version of the TCR probability code which is going to be phased out.
+## Right now it doesn't get imported anywhere unless basic.pipeline_params[ 'new_probs' ] == False
+## (the default value is True)
+##
+## The updated version is called "tcr_rearrangement_new.py"
+##
+#############################################################################################################
+
 from basic import *
 import sys
 from paths import path_to_db
@@ -96,16 +108,16 @@ beta_trim_prob_lines = { 'mouse': beta_trim_prob_lines_mouse,
 
 
 ## legacy files for old probability model
-rep_freq_files = { 'mouse': { 'A':[ path_to_db+'/probs_files/old/tmp.read_sra_matches.alpha.log.N38469.U8750.arFalse.ubnTrue.dump_probs',
-                                    path_to_db+'/probs_files/old/scjobs_tcrseq_tmp3.read_sra_matches.log.N17930695.U204691.arFalse.ubnTrue.dump_probs',
+rep_freq_files = { 'mouse': { 'A':[ path_to_db+'/old/probs_files/old/tmp.read_sra_matches.alpha.log.N38469.U8750.arFalse.ubnTrue.dump_probs',
+                                    path_to_db+'/old/probs_files/old/scjobs_tcrseq_tmp3.read_sra_matches.log.N17930695.U204691.arFalse.ubnTrue.dump_probs',
                                 ],
-                              'B': [ path_to_db+'/probs_files/old/tmp1.read_sra_matches.log.N24046228.U1407106.arFalse.ubnTrue.dump_probs',
-                                     path_to_db+'/probs_files/old/tmp.read_sra_matches.beta.log.N20117.U9339.arFalse.ubnTrue.dump_probs',
-                                     path_to_db+'/probs_files/old/tmp.read_sra_matches.log.N284176.U142210.arFalse.ubnTrue.dump_probs',
+                              'B': [ path_to_db+'/old/probs_files/old/tmp1.read_sra_matches.log.N24046228.U1407106.arFalse.ubnTrue.dump_probs',
+                                     path_to_db+'/old/probs_files/old/tmp.read_sra_matches.beta.log.N20117.U9339.arFalse.ubnTrue.dump_probs',
+                                     path_to_db+'/old/probs_files/old/tmp.read_sra_matches.log.N284176.U142210.arFalse.ubnTrue.dump_probs',
                                  ],
                           },
-                   'human': { 'B': [ path_to_db+'/probs_files/old/tmp7.human_adaptive_beta.read_sra_matches.log.N5001894.U3967020.arFalse.ubnTrue.ssl25.fgdid.dump_probs' ],
-                              'A': [ path_to_db+'/probs_files/old/tmp8.human_adaptive_alpha.read_sra_matches.log.N4271464.U2700969.arFalse.ubnTrue.ssl25.dump_probs' ] } }
+                   'human': { 'B': [ path_to_db+'/old/probs_files/old/tmp7.human_adaptive_beta.read_sra_matches.log.N5001894.U3967020.arFalse.ubnTrue.ssl25.fgdid.dump_probs' ],
+                              'A': [ path_to_db+'/old/probs_files/old/tmp8.human_adaptive_alpha.read_sra_matches.log.N4271464.U2700969.arFalse.ubnTrue.ssl25.dump_probs' ] } }
 
 for org in rep_freq_files:
     for ab in rep_freq_files[org]:
