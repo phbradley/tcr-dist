@@ -157,7 +157,7 @@ Sequence parsing relies on the BLAST suite, see info in `external/blast-2.2.16/`
 ---
 # UPDATES
 
-## Version 0.0.2 (09/XX/2017):
+## Version 0.0.2 (09/21/2017):
 
 - New sequence database system that makes it easier to work with alternate gene sets
 
