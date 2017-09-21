@@ -31,6 +31,7 @@ with Parser(locals()) as p:
     p.flag('make_fake_alpha').described_as("Create a fictitious alpha chain sequence")
     p.flag('make_fake_beta').described_as("Create a fictitious beta chain sequence")
     p.flag('force')
+    p.flag('borderline_motifs').described_as("Option to relax the CDR3 motif finding significance thresholds; may be helpful for small datasets")
     p.flag('webstatus')
     p.flag('dry_run')
     p.flag('intrasubject_nbrdists').described_as('Include TCRs from the same subject when computing the nbrdist (aka NNdistance) score')
@@ -385,9 +386,13 @@ if 1: #force or not motifs_files:
 
         print 'num_clones:',ep,num_clones,'my_seed_threshold_for_motifs:',my_seed_threshold_for_motifs,'min_count:',min_count
 
+        if borderline_motifs:
+            min_count = 3
+            my_seed_threshold_for_motifs = 5.
 
         extra_args = ' --chi_squared_threshold_for_seeds {} '.format( my_seed_threshold_for_motifs ) \
                      if my_seed_threshold_for_motifs else ''
+
 
         cmd = 'python {}/find_cdr3_motifs.py {} --organism {} {} --clones_file {} --min_count {} --epitopes {} {} {} --verbose --big --nsamples {} --max_motif_len {} --max_ng_lines {} > {} 2> {}'\
             .format( path_to_scripts, constant_seed_args, organism, extra_args, clones_file, min_count, ep,
@@ -426,8 +431,11 @@ if 1: #force or not motifs_files:
 
 ## make motifs summary
 
-cmd = 'python {}/read_motifs.py {} --junction_bars --max_ng_lines {} --organism {} --clones_file {} > {}_rm.log 2> {}_rm.err'\
-      .format( path_to_scripts, constant_seed_args, max_ng_lines, organism, clones_file, clones_file, clones_file )
+extra_args = ' --min_chi_squared 30 --min_top_chi_squared 30 ' if borderline_motifs else ''
+
+cmd = 'python {}/read_motifs.py {} {} --junction_bars --max_ng_lines {} --organism {} --clones_file {} > {}_rm.log 2> {}_rm.err'\
+      .format( path_to_scripts, extra_args, constant_seed_args, max_ng_lines, organism,
+               clones_file, clones_file, clones_file )
 run(cmd)
 
 ## make kpca landscape plots
