@@ -1,18 +1,6 @@
-#import math
-#import sys
 from basic import *
-import cdr3s_human
 import util
-#from util import get_top_genes
 import logo_tools
-#import matplotlib
-#if make_png: matplotlib.use('Agg')
-#import matplotlib.pyplot as plt
-#import numpy as np
-#import tcr_sampler
-#import read_sanger_data
-#from amino_acids import amino_acids
-
 
 with Parser(locals()) as p:
     #p.str('args').unspecified_default().multiple().required()
@@ -377,14 +365,6 @@ for em in all_tcrs:
             tag = segtype+'_countreps'
             assert tag in outl # should already be there, now over-writing
             outl[tag] = ';'.join(countreps)
-
-
-            # if tag[0]=='v':
-            #     reps = [cdr3s_human.all_loopseq_representative[ organism ][ x] for x in genes]
-            # else:
-            #     reps = [cdr3s_human.   all_jseq_representative[ organism ][ x] for x in genes]
-            # outl['num_{}_reps'.format(tag[:2]) ] = len(reps)
-
 
         total_clones += 1
 

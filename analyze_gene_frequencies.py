@@ -5,11 +5,10 @@
 ## highly sequence-similar genes.
 
 from basic import *
-import cdr3s_human
 #from util import get_rep, get_mm1_rep, get_mm1_rep_gene_for_counting
 import util
 from tcr_rearrangement_new import all_countrep_pseudoprobs
-from paths import path_to_db
+from all_genes import all_genes
 
 with Parser(locals()) as p:
     #p.str('args').unspecified_default().multiple().required()
@@ -22,8 +21,6 @@ summary_fields = ['epitope']+[x+'_jsd_normed' for x in segtypes_lowercase ]
 
 probs_tsvfile = clones_file[:-4] + '_gene_probs.tsv'
 probs_fields = ['epitope','gene','label_prob','jsd_prob','jsd_prob_enrich','pseudoprob','pseudoprob_enrich']
-
-
 
 def get_freq_from_tuple_counts_and_bias( counts, bias ):
     reps = set()
@@ -102,29 +99,49 @@ def get_jsd_normed( P, Q ):
 # def get_relent( freq, base_freq ):
 #     return get_jsd_normed( freq, base_freq ) ## hacking!
 
+# since the files don't have info on chain/region, set up a mapping (note that the tuples are of genes not alleles)
+gene2segtype = {}
+for id,g in all_genes[organism].iteritems():
+    gene = id[:id.index('*')]
+    segtype = g.region + g.chain
+    if gene in gene2segtype:
+        assert gene2segtype[gene] == segtype
+    else:
+        gene2segtype[gene] = segtype
 
 
 ## read the background gene-tuple counts
-tuplecountsfile = path_to_db+'/nextgen_tuple_counts_v2_{}_max10M.log'.format(organism)
-assert exists( tuplecountsfile )
-
 all_background_tuple_counts = {}
 
-Log('reading {}'.format( tuplecountsfile ))
-for line in open( tuplecountsfile,'r'):
-    if line.startswith('TUPLE_COUNT'):
-        l = line.split()
-        count = int(l[1] )
-        tup = tuple( sorted( l[2].split(',') ) )
-        segtype = tup[0][3] + tup[0][2] ## go from 'TRAV*' to 'VA'
-        assert segtype in segtypes_uppercase
-        if segtype not in all_background_tuple_counts:
-            all_background_tuple_counts[segtype] = {}
-        logfile = l[-1]
-        if logfile not in all_background_tuple_counts[segtype]:
-            all_background_tuple_counts[segtype][logfile] = {}
-        assert tup not in all_background_tuple_counts[segtype][logfile] ## should not be any repeats in the output
-        all_background_tuple_counts[segtype][logfile][ tup ] = count
+tuplecountsfile = path_to_current_db_files()+'/nextgen_tuple_counts_v2_{}_max10M.log'.format(organism)
+
+if exists( tuplecountsfile ):
+    Log('reading {}'.format( tuplecountsfile ))
+    for line in open( tuplecountsfile,'r'):
+        if line.startswith('TUPLE_COUNT'):
+            l = line.split()
+            count = int(l[1] )
+            tup = tuple( sorted( l[2].split(',') ) )
+            segtype = gene2segtype[ tup[0] ]
+            #segtype = tup[0][3] + tup[0][2] ## go from 'TRAV*' to 'VA'
+            assert segtype in segtypes_uppercase
+            if segtype not in all_background_tuple_counts:
+                all_background_tuple_counts[segtype] = {}
+            logfile = l[-1]
+            if logfile not in all_background_tuple_counts[segtype]:
+                all_background_tuple_counts[segtype][logfile] = {}
+            assert tup not in all_background_tuple_counts[segtype][logfile] ## should not be any repeats in the output
+            all_background_tuple_counts[segtype][logfile][ tup ] = count
+else:
+    Log('WARNING: making up fake tuple counts since dbfile ({}) is missing'.format(tuplecountsfile))
+    logfile = 'fake_logfile'
+    for id,g in all_genes[organism].iteritems():
+        segtype = g.region + g.chain
+        if segtype in segtypes_uppercase:
+            if segtype not in all_background_tuple_counts:
+                all_background_tuple_counts[segtype] = {logfile:{}}
+            tup = tuple( util.get_mm1_rep_gene_for_counting( id, organism ) )
+            all_background_tuple_counts[segtype][logfile][ tup ] = 1 ## flat counts
 
 
 ## here we compute J-S divergences of the gene distributions to background
@@ -157,6 +174,9 @@ for epitope,tcrs in all_tcrs.iteritems():
 
 
     for segtype in segtypes_uppercase:
+        region = segtype[0]
+        chain = segtype[1]
+        assert region in 'VJ' and chain in 'AB'
 
         tcr_counts = {}
         num_tcrs = len(tcrs)
@@ -223,7 +243,8 @@ for epitope,tcrs in all_tcrs.iteritems():
         l.sort()
         l.reverse()
 
-        countreps = sorted( ( x for x in all_countrep_pseudoprobs[organism].keys() if x[3]+x[2] == segtype ) )
+        countreps = sorted( set( g.count_rep for g in all_genes[organism].values() \
+                                 if g.chain == chain and g.region == region ) )
 
         num_tcrs = len(tcrs)
 
@@ -233,7 +254,7 @@ for epitope,tcrs in all_tcrs.iteritems():
             bg_prob = bg_freq.get(rep,0.)
             jsd_prob_enrich = 1.0 if bg_prob==0. else jsd_prob / bg_prob
             pseudoprob = float( tcr_pseudoprob_counts.get(rep,0))/num_tcrs
-            bg_pseudoprob = all_countrep_pseudoprobs[ organism ][ rep ]
+            bg_pseudoprob = all_countrep_pseudoprobs[ organism ][ chain ][ region ][ rep ]
             pseudoprob_enrich = 1 if bg_pseudoprob==0. else pseudoprob / bg_pseudoprob
             outl = { 'epitope':epitope,
                      'gene':rep,

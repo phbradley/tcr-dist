@@ -1,5 +1,5 @@
 from basic import *
-import cdr3s_human
+from all_genes import all_genes, gap_character
 from amino_acids import amino_acids
 from tcr_distances_blosum import blosum, bsd4
 
@@ -44,8 +44,6 @@ class DistanceParams:
                      self.align_cdr3s, self.trim_cdr3s )
 
 default_distance_params = DistanceParams()
-
-gap_character = cdr3s_human.gap_character
 
 def blosum_character_distance( a, b, gap_penalty, params ):
     if a== gap_character and b == gap_character:
@@ -195,16 +193,19 @@ def weighted_cdr3_distance( seq1, seq2, params ):
 
 def compute_all_v_region_distances( organism, params ):
     rep_dists = {}
-    repseqs = []
-    for rep,seqs in cdr3s_human.all_merged_loopseqs[organism].iteritems():
-        repseqs.append( ( rep,seqs) )
-        rep_dists[rep] = {}
+    for chain in 'AB': # don't compute inter-chain distances
+        repseqs = []
+        for id,g in all_genes[organism].iteritems():
+            if g.chain == chain and g.region == 'V':
+                merged_loopseq = ' '.join( g.cdrs[:-1])
+                repseqs.append( ( id, merged_loopseq  ) )
+                rep_dists[ id ] = {}
 
-    for r1,s1 in repseqs:
-        for r2,s2 in repseqs:
-            if r1[2] != r2[2]: continue
-            rep_dists[r1][r2] = params.weight_v_region * \
-                                blosum_sequence_distance( s1, s2, params.gap_penalty_v_region, params )
+        for r1,s1 in repseqs:
+            for r2,s2 in repseqs:
+                #if r1[2] != r2[2]: continue
+                rep_dists[r1][r2] = params.weight_v_region * \
+                                    blosum_sequence_distance( s1, s2, params.gap_penalty_v_region, params )
 
     return rep_dists
 
@@ -340,6 +341,7 @@ if __name__ == '__main__':
 
     rep_dists = compute_all_v_region_distances( 'human', params )
 
+    ## this part only works with the classic db (getting chain from id[2] is bad for gammadelta)
     vb_genes = [ x for x in rep_dists.keys() if x[2] == 'B' ]
     vb_genes.sort()
 

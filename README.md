@@ -1,4 +1,4 @@
-# TCRdist pipeline, version 0.0.1 beta
+# TCRdist pipeline, version 0.0.2 beta
 
 Thanks for your interest in TCRdist! This software is very much a
 work in progress, so we welcome any/all feedback and will work to
@@ -153,3 +153,20 @@ The code uses the command line parsing toolkit `blargs`. See the license and inf
 The tables in the .html results can be sorted thanks to `tablesorter`. See the license and info in `external/tablesorter/`
 
 Sequence parsing relies on the BLAST suite, see info in `external/blast-2.2.16/`
+
+---
+# UPDATES
+
+## Version 0.0.2 (09/XX/2017):
+
+- New sequence database system that makes it easier to work with alternate gene sets
+
+- Preliminary support for gamma-delta TCRs: edit the `db_file` field of the `pipeline_params` dictionary
+stored in `basic.py`. (This is a temporary hack; likely will move to switching by command line flag sometime soon).
+
+- New `all_genes` dictionary in `all_genes.py` indexed by organism that holds information on all the genes; it's
+read from the `db_file` pointed to by `basic.py`.
+
+- With new minor updates to the probability model and default sequence database we're no longer trying to preserve
+exact numerical identity with the results from the paper. To get the classic results, you can check out the
+`version_001` branch on github.

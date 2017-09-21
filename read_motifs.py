@@ -1,12 +1,11 @@
 from basic import *
 from amino_acids import amino_acids
-import cdr3s_human
+from all_genes import all_genes
 import re
 import logo_tools
 import svg_basic
 import tcr_sampler
 import util
-from paths import path_to_db
 import parse_tsv
 from basic import *
 import random
@@ -198,10 +197,10 @@ for epitope in epitopes:
 
         ## note-- we are using mm1 reps here, same as in find_cdr3_motifs.py
         ##
-        va_rep = cdr3s_human.all_loopseq_representative_mm1[ organism ][ va ]
-        ja_rep = cdr3s_human.all_jseq_representative       [ organism ][ ja ]
-        vb_rep = cdr3s_human.all_loopseq_representative_mm1[ organism ][ vb ]
-        jb_rep = cdr3s_human.all_jseq_representative       [ organism ][ jb ]
+        va_rep = all_genes[organism][va].mm1_rep
+        ja_rep = all_genes[organism][ja].rep
+        vb_rep = all_genes[organism][vb].mm1_rep
+        jb_rep = all_genes[organism][jb].rep
 
         a_junction_results = tcr_sampler.analyze_junction( organism, va_gene, ja_gene, cdr3a, cdr3a_nucseq,
                                                            return_cdr3_nucseq_src=True )
@@ -245,8 +244,11 @@ ng_tcrs = { 'A':{}, 'B':{} }
 ## index these by the v_rep and the j_rep
 
 for ab in 'AB':
-    ng_logfile = '{}/new_nextgen_chains_{}_{}.tsv'.format( path_to_db, organism, ab )
-    assert exists(ng_logfile)
+    ng_logfile = '{}/new_nextgen_chains_{}_{}.tsv'.format( path_to_current_db_files(), organism, ab )
+    if not exists(ng_logfile):
+        Log('WARNING:: read_motifs.py: missing nextgen TCR chains file: {}'.format(ng_logfile))
+        continue
+
     counter=0
     num_chains=0
     ab_chains = {}

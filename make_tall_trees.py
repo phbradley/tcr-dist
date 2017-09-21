@@ -1,7 +1,6 @@
 from basic import *
 import score_trees_devel
 import svg_basic
-import cdr3s_human
 from amino_acids import amino_acids
 from tcr_distances import align_cdr3s
 #from tcr_distances_blosum import blosum
@@ -58,6 +57,8 @@ fake_chains = util.detect_fake_chains( clones_file )
 for ch in fake_chains:
     if ch in ABs:
         del ABs[ ABs.index(ch)]
+
+gene_logo_name_trim = 2 if 'gammadelta' in pipeline_params['db_file'] else 4
 
 
 font_family = "Droid Sans Mono"
@@ -727,8 +728,8 @@ for epitope in epitopes:
                 # y1 = node_position[fake_ic] + pwm_height/2.
 
                 ## make a v-gene logo
-                vl = [(y,x[4:],rep_colors[x]) for x,y in v_count.iteritems()]
-                jl = [(y,x[4:],rep_colors[x]) for x,y in j_count.iteritems()]
+                vl = [(y,x[gene_logo_name_trim:],rep_colors[x]) for x,y in v_count.iteritems()]
+                jl = [(y,x[gene_logo_name_trim:],rep_colors[x]) for x,y in j_count.iteritems()]
                 #vl = [(y,x[4:x.index('*')]) for x,y in v_count.iteritems()]
                 #jl = [(y,x[4:x.index('*')]) for x,y in j_count.iteritems()]
 

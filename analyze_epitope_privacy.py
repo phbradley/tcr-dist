@@ -1,13 +1,14 @@
 import sys
 from basic import *
 import tcr_distances
-import cdr3s_human
 import parse_tsv
 import numpy as np
 from scipy.cluster import hierarchy
 from scipy.spatial import distance
 import util
 import html_colors
+from all_genes import all_genes
+
 
 with Parser(locals()) as p:
     #p.str('args').unspecified_default().multiple().required()
@@ -144,9 +145,9 @@ for epitope in epitopes:
             ## ( va_reps, vb_reps, cdr3a, cdr3b )
             index = len( tcrs )
             mouse_indices[mouse].append( index )
-            tcrs.append( ( frozenset( [cdr3s_human.all_loopseq_representative[organism][x] for x in l[0].split(';') ] ),
-                           frozenset( [cdr3s_human.all_loopseq_representative[organism][x] for x in l[1].split(';') ] ),
-                           l[2], l[3] ) )
+            va_reps = frozenset( ( all_genes[organism][x].rep for x in l[0].split(';') ) )
+            vb_reps = frozenset( ( all_genes[organism][x].rep for x in l[1].split(';') ) )
+            tcrs.append( ( va_reps, vb_reps, l[2], l[3] ) )
             assert len(l) == 5
             dict_from_parse_tsv_line = l[4]
             tcr_infos.append( dict_from_parse_tsv_line )

@@ -3,11 +3,9 @@ from basic import *
 import tcr_sampler
 from amino_acids import amino_acids
 import re
-import cdr3s_human
+from all_genes import all_genes
 import sys
-from paths import path_to_db
 import util
-
 
 with Parser(locals()) as p:
     p.str('clones_file').required()
@@ -213,8 +211,11 @@ def extend_motif( oldmotif, oldshowmotif, old_chi_squared, seqs, seq_indices, ra
 ## index these by the v_rep and the j_rep
 ng_tcrs = { 'A':{}, 'B':{} }
 for ab in 'AB':
-    ng_logfile = '{}/new_nextgen_chains_{}_{}.tsv'.format(path_to_db,organism,ab)
-    assert exists(ng_logfile)
+    ng_logfile = '{}/new_nextgen_chains_{}_{}.tsv'.format(path_to_current_db_files(),organism,ab)
+    if not exists( ng_logfile ):
+        Log('WARNING:: find_cdr3_motifs.py: missing next-gen chains file {}'.format(ng_logfile))
+        continue
+
     counter=0
     num_chains=0
     ab_chains = {}
@@ -266,11 +267,10 @@ for line in open( clones_file,'rU'):
     cdr3a = l['cdr3a']
     cdr3b = l['cdr3b']
 
-    va_rep = cdr3s_human.all_loopseq_representative_mm1[ organism ][ va ]
-    ja_rep = cdr3s_human.all_jseq_representative       [ organism ][ ja ]
-    vb_rep = cdr3s_human.all_loopseq_representative_mm1[ organism ][ vb ]
-    jb_rep = cdr3s_human.all_jseq_representative       [ organism ][ jb ]
-
+    va_rep = all_genes[organism][va].mm1_rep
+    ja_rep = all_genes[organism][ja].mm1_rep
+    vb_rep = all_genes[organism][vb].mm1_rep
+    jb_rep = all_genes[organism][jb].mm1_rep
 
     if epitopes and epitope not in epitopes: continue
 

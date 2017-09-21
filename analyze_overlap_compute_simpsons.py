@@ -2,6 +2,7 @@ from basic import *
 import util
 from scipy import stats
 from tcr_distances import get_rank
+from all_genes import all_genes
 
 import numpy as np
 
@@ -96,7 +97,6 @@ def confidence_interval( k, N, interval_fraction ):
 
 
 
-import cdr3s_human
 
 all_tcrs = {}
 all_info = []
@@ -136,10 +136,10 @@ for line in open( clones_file_with_nbrdists,'r'):
     vb_genes = set( l['vb_genes'].split(';') )
     jb_genes = set( l['jb_genes'].split(';') )
 
-    va_reps = set([ cdr3s_human.all_loopseq_representative[ organism ][ x] for x in va_genes ])
-    ja_reps = set([ cdr3s_human.   all_jseq_representative[ organism ][ x] for x in ja_genes ])
-    vb_reps = set([ cdr3s_human.all_loopseq_representative[ organism ][ x] for x in vb_genes ])
-    jb_reps = set([ cdr3s_human.   all_jseq_representative[ organism ][ x] for x in jb_genes ])
+    va_reps = set(( all_genes[organism][x].rep for x in va_genes ))
+    ja_reps = set(( all_genes[organism][x].rep for x in ja_genes ))
+    vb_reps = set(( all_genes[organism][x].rep for x in vb_genes ))
+    jb_reps = set(( all_genes[organism][x].rep for x in jb_genes ))
 
     protprob = { 'A': float(l['a_protseq_prob']),
                  'B': float(l['b_protseq_prob']),
