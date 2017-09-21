@@ -1,7 +1,6 @@
 from basic import *
 import score_trees_devel
 import svg_basic
-import cdr3s_human
 import numpy as np
 import util
 import html_colors
@@ -9,6 +8,7 @@ import scipy.stats
 import copy
 import random
 from operator import add
+import tcr_sampler
 #from mannwhitneyu import mannwhitneyu as mannwhitneyu_exact #too slow
 
 
@@ -84,11 +84,12 @@ def pad_to_middle( s, num ): ## with spaces
     return ' '*before + s + ' '*after
 
 def get_primary_number( gene_name ):
-    if gene_name.startswith('TR'):
-        tmp = gene_name[4:]
-    else:
-        assert gene_name[0] in 'AB'
-        tmp = gene_name[2:]
+    tmp = gene_name[:]
+    while tmp and not tmp[0].isdigit():
+        tmp = tmp[1:]
+    if not tmp:
+        ## for example, if gene_name=='TRGJP'
+        return 0
     assert tmp[0].isdigit()
     if tmp.isdigit():
         return int(tmp)
@@ -186,7 +187,7 @@ class TCR:
         self.cdr3a = l['cdr3a']
         self.cdr3b = l['cdr3b']
         if 'cdr3a_protseq_masked' not in l or 'cdr3b_protseq_masked' not in l:
-            util.add_masked_CDR3_sequences_to_tcr_dict( organism, l )
+            tcr_sampler.add_masked_CDR3_sequences_to_tcr_dict( organism, l )
         self.cdr3a_masked = l['cdr3a_protseq_masked']
         self.cdr3b_masked = l['cdr3b_protseq_masked']
         self.a_indels = l['a_indels']
@@ -636,11 +637,24 @@ for epitope in epitopes:
                 ## gene segments
                 reps = tcr.single_reps
                 if 'A' in ab:
-                    text_columns[ icol ].append( ( 'AV{:02d}'.format( get_primary_number( reps[0] ) ), rep_colors[reps[0]] ) ) ; icol += 1
-                    text_columns[ icol ].append( ( 'AJ{:02d}'.format( get_primary_number( reps[1] ) ), rep_colors[reps[1]] ) ) ; icol += 1
+                    assert reps[0].startswith('TR') and reps[1].startswith('TR')
+                    text_columns[ icol ].append( ( '{}{:02d}'.format( reps[0][2:4], get_primary_number( reps[0] ) ),
+                                                   rep_colors[reps[0]] ) )
+                    icol += 1
+                    text_columns[ icol ].append( ( '{}{:02d}'.format( reps[1][2:4], get_primary_number( reps[1] ) ),
+                                                   rep_colors[reps[1]] ) )
+                    icol += 1
+                    # text_columns[ icol ].append( ( 'AV{:02d}'.format( get_primary_number( reps[0] ) ), rep_colors[reps[0]] ) ) ; icol += 1
+                    # text_columns[ icol ].append( ( 'AJ{:02d}'.format( get_primary_number( reps[1] ) ), rep_colors[reps[1]] ) ) ; icol += 1
                 if 'B' in ab:
-                    text_columns[ icol ].append( ( 'BV{:02d}'.format( get_primary_number( reps[2] ) ), rep_colors[reps[2]] ) ) ; icol += 1
-                    text_columns[ icol ].append( ( 'BJ{}'.format( reps[3][4:])                      , rep_colors[reps[3]] ) ) ; icol += 1
+                    text_columns[ icol ].append( ( '{}{:02d}'.format( reps[2][2:4], get_primary_number( reps[2] ) ),
+                                                   rep_colors[reps[2]] ) )
+                    icol += 1
+                    text_columns[ icol ].append( ( '{}{:02d}'.format( reps[3][2:4], get_primary_number( reps[3] ) ),
+                                                   rep_colors[reps[3]] ) )
+                    icol += 1
+                    # text_columns[ icol ].append( ( 'BV{:02d}'.format( get_primary_number( reps[2] ) ), rep_colors[reps[2]] ) ) ; icol += 1
+                    # text_columns[ icol ].append( ( 'BJ{}'.format( reps[3][4:])                      , rep_colors[reps[3]] ) ) ; icol += 1
 
                 text_columns[ icol ].append( ( my_color_scores_labels[old_index], get_tcr_score_color( old_index ) ) ) ; icol += 1
                 assert icol == num_columns

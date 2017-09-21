@@ -29,6 +29,11 @@ pipeline_params= {
     ## default parameters and give similar results.
     #'distance_threshold_25': 25.0 / 1.355,
     'distance_threshold_25': 25.0 / 1.298, ## now moving to a gap penalty in the CDR3 region of 12
+
+    ## the gene sets database file -- should move to make this commandline switchable
+    ## this is the file that has the sequences and alignments of all the TR genes
+    'db_file':'alphabeta_db.tsv' # db file corresponding to original publication
+    #'db_file':'gammadelta_db.tsv' # db file corresponding to gamma deltas, uncomment to analyze them (and comment above)
 }
 
 
@@ -39,6 +44,18 @@ segtypes_lowercase = ['va','ja','vb','jb']
 
 ############################################################################################
 ############################################################################################
+
+def path_to_current_db_files():
+    """Without the trailing /"""
+    db_file = paths.path_to_db+'/'+pipeline_params['db_file']
+    assert exists(db_file)
+    db_files_dir = db_file+'_files'
+    if not exists(db_files_dir):
+        mkdir(db_files_dir)
+    return db_files_dir
+
+
+
 
 ## you could modify this function if you have a different cmdline tool for converting svg to png
 ## like inkscape or cairosvg

@@ -1,7 +1,6 @@
 from basic import *
 import html_colors
 import util
-from paths import path_to_db
 
 with Parser(locals()) as p:
     p.str('clones_file').required()
@@ -456,25 +455,26 @@ for line in open(logfile,'r'):
         epitope_diversity[chains][epitope][2] = avg_nbrdist
 
 ## load the random values for avg_nbrdist
-randfile = '{}/{}_rand_divs_new.txt'.format(path_to_db,organism)
-assert exists(randfile)
 rand_divs = {}
 for chains in ['A','B','AB']: rand_divs[chains] = [[],[],[],[]]
-
-for line in open(randfile,'r'):
-    l = line.split()
-    if line.startswith("GAUSSDIV SM1 SE1"):
-        chains = l[5]
-        div = float(l[7])
-        rand_divs[chains][0].append( div )
-    elif line.startswith("GAUSSDIVSHANNON"):
-        chains = l[2]
-        div = float( l[4] )
-        rand_divs[chains][1].append( div )
-    elif line.startswith('avg_nbrdist:'):
-        fake_epitope,chains = l[1:3]
-        avg_nbrdist = float( l[3] )
-        rand_divs[chains][2].append( avg_nbrdist )
+randfile = '{}/{}_rand_divs_new.txt'.format(path_to_current_db_files(),organism)
+if not exists(randfile):
+    Log('WARNING:: plot_sharing.py: missing random divergences file: {}'.format(randfile))
+else:
+    for line in open(randfile,'r'):
+        l = line.split()
+        if line.startswith("GAUSSDIV SM1 SE1"):
+            chains = l[5]
+            div = float(l[7])
+            rand_divs[chains][0].append( div )
+        elif line.startswith("GAUSSDIVSHANNON"):
+            chains = l[2]
+            div = float( l[4] )
+            rand_divs[chains][1].append( div )
+        elif line.startswith('avg_nbrdist:'):
+            fake_epitope,chains = l[1:3]
+            avg_nbrdist = float( l[3] )
+            rand_divs[chains][2].append( avg_nbrdist )
 
 ## let's try to get epitope diversity information from the aucs for discrimination from random tcrs
 desired_nbrdist_tag_suffix = 'wtd_nbrdist10'
@@ -537,12 +537,10 @@ for chains in ['A','B','AB']:
         plt.title('{} {}'.format(chains, divtype))
 
         rdivs = rand_divs[chains][divindex]
-        rdivs.sort()
-        #if divindex==0:
-        #    rdivs = rdivs[:len(rdivs)/4] ## take bottom third
-
-        for val in rdivs:
-            plt.plot( [0,len(l)], [val,val], ':r' )
+        if rdivs:
+            rdivs.sort()
+            for val in rdivs:
+                plt.plot( [0,len(l)], [val,val], ':r' )
 
         locs,labels = plt.yticks()
         minval = min( ( x[0] for x in l ) )

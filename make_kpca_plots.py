@@ -1,7 +1,6 @@
 from basic import *
 import numpy as np
 from sklearn.decomposition import KernelPCA
-import cdr3s_human
 import html_colors
 import parse_tsv
 import util
@@ -240,6 +239,7 @@ def add_new_label_and_update_gridl( xy, minval, maxval, step, nx, ny, label_text
     else:
         plt.text( x0, y0, label_text, color=label_color, va = 'bottom', ha='left', fontsize=6 )
 
+jcmaxlen = 0
 
 kPCAset = set()
 for ii_epitope, epitope in enumerate( epitopes ):
@@ -426,16 +426,13 @@ for ii_epitope, epitope in enumerate( epitopes ):
                 plt.scatter( [ xs[i] for i in range(num_tcrs) if tcr_colors[i] == color ],
                              [ ys[i] for i in range(num_tcrs) if tcr_colors[i] == color ],
                              s=10, c=color, edgecolors='none' )
-             
+
             for ji in range(num_tcrs): #JCC--adding ability to output kPC info
                 templi = []
                 for jx in tcr_infos[ji]:
                     templi.append(tcr_infos[ji][jx].strip())
                 tempstr = tcrs[ji][0] + "\t" +  tcr_infos[ji]["epitope"] + "\t" +  str(xs[ji]) + "\t" +  str(ys[ji]) + "\t" +  tcr_colors[ji] + "\t" + "\t".join(str(x) for x in jc_all_xys[epitope][ji])
-                try:
-                    jcmaxlen = max(jcmaxlen, len(tempstr.split("\t")))
-                except NameError:
-                    jcmaxlen = len(tempstr.split("\t"))
+                jcmaxlen = max(jcmaxlen, len(tempstr.split("\t")))
                 kPCAset.add(tempstr) #--JCC
             print '{} {} matched: {} {:.6f}'.format(epitope,motifchain,len(all_matched_ids),
                                                     float(len(all_matched_ids))/num_tcrs)

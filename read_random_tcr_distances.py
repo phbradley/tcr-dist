@@ -6,7 +6,7 @@ import util
 #from tcr_distances_blosum
 import tcr_distances
 import html_colors
-import cdr3s_human
+from all_genes import all_genes
 
 with Parser(locals()) as p:
     #p.str('organism').required()
@@ -77,10 +77,10 @@ all_tcrs = parse_tsv.parse_tsv_file( clones_file_with_nbrdists, ['epitope'], tcr
 for e in all_tcrs:
     new_tcrs = []
     for l in all_tcrs[e]:
-        new_tcrs.append( [ (nbrdist_rescale * float(x)) for x in  l[:num_nbrdist_tags]] +
-                         [ frozenset( [cdr3s_human.all_loopseq_representative[organism][y] for y in l[-4].split(';')]),
-                           frozenset( [cdr3s_human.all_loopseq_representative[organism][y] for y in l[-3].split(';')]),
-                           l[-2], l[-1], False ] ) ## add X-reactive flag
+        va_reps = frozenset( ( all_genes[organism][x].rep for x in l[-4].split(';') ) )
+        vb_reps = frozenset( ( all_genes[organism][x].rep for x in l[-3].split(';') ) )
+        new_tcrs.append( [ (nbrdist_rescale * float(x)) for x in  l[:num_nbrdist_tags] ] +
+                         [ va_reps, vb_reps, l[-2], l[-1], False ] ) ## add X-reactive flag
     all_tcrs[e] = new_tcrs
 
 va_genes_index = num_nbrdist_tags

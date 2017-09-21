@@ -320,7 +320,7 @@ if not exists( random_nbrdists_file ):
     run(cmd)
 
 ## now read the output of the random nbrdists
-assert exists( random_nbrdists_file )
+#assert exists( random_nbrdists_file ) ## tmp hacking
 
 cmd = 'python {}/read_random_tcr_distances.py --organism {} --clones_file {} > {}_rrtd.log 2> {}_rrtd.err'\
       .format( path_to_scripts, organism, clones_file, clones_file, clones_file )
