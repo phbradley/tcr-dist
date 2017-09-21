@@ -155,9 +155,8 @@ if not isdir( blastdir ):
 
 ## download other db files
 # switching to dropbox as the default since some users networks don't like the port 7007 address
-address = 'http://xfiles.fhcrc.org:7007/bradley_p/pub/tcrdist_extras_v2.tgz'
-backup_address = 'https://www.dropbox.com/s/nnjm9015aewuc7f/tcrdist_extras_v2.tgz' #FIXME not updated
-
+address = 'https://www.dropbox.com/s/kivfp27gbz2m2st/tcrdist_extras_v2.tgz'
+backup_address = 'http://xfiles.fhcrc.org:7007/bradley_p/pub/tcrdist_extras_v2.tgz'
 
 tarfile = address.split('/')[-1]
 assert tarfile == backup_address.split('/')[-1]
