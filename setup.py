@@ -156,7 +156,7 @@ if not isdir( blastdir ):
 ## download other db files
 # switching to dropbox as the default since some users networks don't like the port 7007 address
 address = 'http://xfiles.fhcrc.org:7007/bradley_p/pub/tcrdist_extras_v2.tgz'
-#FIXME backup_address = 'https://www.dropbox.com/s/nnjm9015aewuc7f/tcrdist_extras_v2.tgz'
+backup_address = 'https://www.dropbox.com/s/nnjm9015aewuc7f/tcrdist_extras_v2.tgz' #FIXME not updated
 
 
 tarfile = address.split('/')[-1]
@@ -178,9 +178,9 @@ if not exists( tarfile ):
 lines = popen('md5sum '+tarfile).readlines()
 if lines and len(lines[0].split()) == 2:
     # rhino1 tcr-dist$ md5sum tcrdist_extras_v2.tgz
-    # 041dd77881026a1c0a8f03a5c09c7567  tcrdist_extras_v2.tgz
+    # 2705f3a79152cd0382aa6c5d4a81ad0b  tcrdist_extras_v2.tgz
     checksum = lines[0].split()[0]
-    expected_checksum = '041dd77881026a1c0a8f03a5c09c7567'
+    expected_checksum = '2705f3a79152cd0382aa6c5d4a81ad0b'
     if checksum == expected_checksum:
         print "\n[SUCCESS] md5sum checksum for tarfile matches expected, phew!\n"
     else:
