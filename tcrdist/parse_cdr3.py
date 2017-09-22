@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger('parse_cdr3.py')
+
 from .all_genes import all_genes, gap_character
 
 def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen = 3,
@@ -38,11 +41,11 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
     #print 'min_j_matchlen:',min_j_matchlen,'jatag:',jatag,'ntrim:',ntrim,'ja_seq:',ja_seq,'qseq',qseq
 
     if jatag not in aseq:
-        Log(`( 'whoah',ab,aseq,ja_seq )`)
+        logger.error('whoah %s %s %s',ab,aseq,ja_seq )
         errors.append( 'j{}tag_not_in_aseq'.format(ab) )
         return '-',[100,0],errors
     elif ja_seq.count( jatag ) != 1:
-        Log(`( 'whoah2',ab,aseq,ja_seq )`)
+        logger.error( 'whoah2 %s %s %s',ab,aseq,ja_seq )
         errors.append( 'multiple_j{}tag_in_jseq'.format(ab) )
         return '-',[100,0],errors
     else:
@@ -52,7 +55,7 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
             aseq = aseq[3:]
             looplen -= 3 ## dont count CAX
         if len(aseq)<looplen:
-            Log(`( 'short',ab,aseq,ja_seq )`)
+            logger.error('short %s %s %s',ab,aseq,ja_seq )
             errors.append( ab+'seq_too_short' )
             return '-',[100,0],errors
 
@@ -61,7 +64,7 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
     ## now count mismatches in the J gene, beyond the cdrseq
     j_seq = jg.protseq #fasta[ j_gene ] ## not sure why we do this again (old legacy code)
     if qseq.count( cdrseq ) > 1:
-        Log('multiple cdrseq occurrences %s %s'%(qseq,cdrseq))
+        logger.error('multiple cdrseq occurrences %s %s'%(qseq,cdrseq))
         errors.append('multiple_cdrseq_occ')
         return '-',[100,0],errors
     assert qseq.count(cdrseq) == 1
@@ -122,7 +125,7 @@ def parse_cdr3( organism, ab, qseq, v_gene, j_gene, q2v_align, extended_cdr3 = F
 
     if cpos_match<0 or qseq[ cpos_match ] != 'C':
         ## problemo
-        Log('failed to find blast match to C position')
+        logger.error('failed to find blast match to C position')
         errors.append('no_V{}_Cpos_blastmatch'.format(ab))
         return '-',[100,0],[100,0],errors
 

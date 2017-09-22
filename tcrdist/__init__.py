@@ -12,7 +12,9 @@ from . import processing
 from . import utils
 from . import plotting
 from .objects import TCRClone, TCRChain
+from . import datasets
 
 __all__ = ['processing',
            'utils',
-           'plotting']
+           'plotting',
+           'datasets']
