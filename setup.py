@@ -2,7 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, division
-from builtins import input
+
+# here's a python 2/3 compatible input funtion (2 uses raw_input)
+try:
+    input = raw_input
+except NameError:
+    pass
 
 ##
 ## Run this script in the main repository directory by typing
