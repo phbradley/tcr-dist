@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, division
+from builtins import input
 
 ##
 ## Run this script in the main repository directory by typing
