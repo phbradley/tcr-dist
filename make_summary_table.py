@@ -317,6 +317,7 @@ for ab in ['a','b','ab']:
 
             plt.plot( xs, ys, c=color,label=epitope)
         rn = mx-mn
+        plt.tight_layout()
         plt.xlim( (mn-rn/10,mx+rn/10))
         plt.legend(fontsize=6,frameon=False,loc='best')
         plt.title(scoretag)
