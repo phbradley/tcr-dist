@@ -1,19 +1,20 @@
 import numpy as np
 import pandas as pd
+import logging
+logger = logging.getLogger('objects.py')
 
 from . import translation
+from .blosum import bsd4,blosum
 
 class DotDict(dict):
     def __getattr__(self, item):
         if item in self:
             return self[item]
+        logger.error('No attribute %s!' % item)
         raise AttributeError
 
     def __setattr__(self, key, value):
-        if key in self:
-            self[key] = value
-            return
-        raise AttributeError
+        self[key] = value
     def __str__(self):
         return pd.Series(self).to_string()
     def to_series(self):
@@ -74,3 +75,37 @@ class TCR_Gene:
         # sanity check
         if self.cdrs:
             assert self.cdrs == [ self.alseq[ x[0]-1 : x[1] ] for x in self.cdr_columns ]
+
+class DistanceParams(DotDict):
+    def __init__(self, config_string=None):
+        self.gap_penalty_v_region = 4
+        self.gap_penalty_cdr3_region = 12 # same as gap_penalty_v_region=4 since weight_cdr3_region=3 is not applied
+        self.weight_v_region = 1
+        self.weight_cdr3_region = 3
+        self.distance_matrix = bsd4
+        self.align_cdr3s = False
+        self.trim_cdr3s = True
+        self.scale_factor = 1.0
+        if config_string:
+            l = config_string.split(',')
+            for tag,val in [x.split(':') for x in l ]:
+                if tag == 'gap_penalty_cdr3_region':
+                    self.gap_penalty_cdr3_region = float(val)
+                elif tag == 'gap_penalty_v_region':
+                    self.gap_penalty_v_region = float(val)
+                elif tag == 'weight_cdr3_region':
+                    self.weight_cdr3_region = float(val)
+                elif tag == 'weight_v_region':
+                    self.weight_v_region = float(val)
+                elif tag == 'scale_factor':
+                    self.scale_factor = float(val)
+                elif tag == 'align_cdr3s':
+                    assert val in ['True','False']
+                    self.align_cdr3s = ( val == 'True' )
+                elif tag == 'trim_cdr3s':
+                    assert val in ['True','False']
+                    self.trim_cdr3s = ( val == 'True' )
+                else:
+                    logger.error('unrecognized tag: %s' % tag)
+                    assert False
+            logger.info('config_string: {}\nself:\n{}'.format(config_string, self))

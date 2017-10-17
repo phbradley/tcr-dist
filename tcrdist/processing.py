@@ -14,7 +14,8 @@ __all__ = ['processNT',
            'getMaskedSeqs',
            'rearrangementProb',
            'computeProbs',
-           'identifyClones']
+           'identifyClones',
+           'getRepresentativeGenes']
 
 def processNT(organism, chain, nuc, quals):
     """Process one nucleotide TCR sequence (any chain).
@@ -189,3 +190,6 @@ def identifyClones(psDf, min_quality_for_singletons=20, average_clone_scores=[],
                           average_clone_scores=average_clone_scores,
                           none_score_for_averaging=none_score_for_averaging)
     return clonesDf
+
+def getRepresentativeGenes(organism, v_gene):
+    return util.get_rep(v_gene, organism)

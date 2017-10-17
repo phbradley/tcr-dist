@@ -13,8 +13,10 @@ from . import utils
 from . import plotting
 from .objects import TCRClone, TCRChain
 from . import datasets
+from . import distances
 
 __all__ = ['processing',
            'utils',
            'plotting',
-           'datasets']
+           'datasets',
+           'distances']
