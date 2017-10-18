@@ -26,7 +26,7 @@ def test_process_nt():
 
 @tempSkip
 def test_human_paired_dataset():
-    df = td.processing.readPairedSequences('human', op.join(datasetsPath, 'test_human_pairseqs.tsv'))
+    df = td.datasets.loadPSData('test_human_pairseqs')
     assert df.shape[0] == 20
     
     """Could be checkig that all the columns we expect are present in df"""
@@ -37,14 +37,14 @@ def test_human_paired_dataset():
 
 @tempSkip
 def test_mouse_paired_dataset():
-    df = td.processing.readPairedSequences('mouse', op.join(datasetsPath, 'test_mouse_pairseqs.tsv'))
+    df = td.datasets.loadPSData('test_mouse_pairseqs')
     assert df.shape[0] == 20
     assert df['a_status'].unique().shape[0] == 1
     assert df['b_status'].unique().shape[0] == 1
 
 @tempSkip
 def test_compute_probs():
-    psDf = td.processing.readPairedSequences('mouse', op.join(datasetsPath, 'test_mouse_pairseqs.tsv'))
+    psDf = td.datasets.loadPSData('test_mouse_pairseqs')
     
     probDf = td.processing.computeProbs(psDf,
                                          add_masked_seqs=True,
@@ -61,7 +61,7 @@ def test_datasets():
 
 @tempSkip
 def test_find_clones():
-    psDf = td.processing.readPairedSequences('human', op.join(datasetsPath, 'test_human_pairseqs.tsv'))
+    psDf = td.datasets.loadPSData('test_human_pairseqs')
     probDf = td.processing.computeProbs(psDf)
     psDf = psDf.join(probDf)
     clonesDf = td.processing.identifyClones(psDf)

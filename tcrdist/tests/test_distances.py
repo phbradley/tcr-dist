@@ -6,6 +6,9 @@ import itertools
 import numpy.testing as npt
 import pytest
 
+import matplotlib
+matplotlib.use('Agg')
+
 import tcrdist as td
 
 def exampleBetaChains():
@@ -28,7 +31,7 @@ def exampleBetaChains():
         tcr.cdr3b = l[1]
         tcr.vb_genes = l[0].split(',')
         tcr.organism = 'human'
-        tcr.vb_reps = [td.util.get_rep(vb_gene, 'human') for vb_gene in tcr.vb_genes]
+        tcr.vb_reps = ';'.join([td.util.get_rep(vb_gene, 'human') for vb_gene in tcr.vb_genes])
         tcrs.append(tcr)
     return tcrs
     
@@ -54,15 +57,65 @@ def test_chain():
             pwmat[i,j] = td.distances.basicDistance('B', tcrs[i], tcrs[j])
             pwmat[j,i] = pwmat[i,j]
     
-@tempSkip
-def test_compute_chain_distance():
-    psDf = td.processing.readPairedSequences('human', op.join(datasetsPath, 'test_human_pairseqs.tsv'))
-    
-@tempSkip
-def test_compute_distances():
-    psDf = td.processing.readPairedSequences('human', op.join(datasetsPath, 'test_human_pairseqs.tsv'))
+def test_compute_paired_chain_distance():
+    psDf = td.datasets.loadPSData('test_human_pairseqs')
+    d = td.distances.basicDistance('AB', psDf.iloc[0], psDf.iloc[-1])
+
+def test_compute_clones_distance():
+    psDf = td.datasets.loadPSData('test_human_pairseqs')
     probDf = td.processing.computeProbs(psDf)
     psDf = psDf.join(probDf)
     clonesDf = td.processing.identifyClones(psDf)
+    d = td.distances.basicDistance('AB', clonesDf.iloc[0], clonesDf.iloc[-1])
+    
+def test_compute_all_distances():
+    psDf = td.datasets.loadPSData('test_human_pairseqs')
+    probDf = td.processing.computeProbs(psDf)
+    psDf = psDf.join(probDf)
+    clonesDf = td.processing.identifyClones(psDf)
+    clonesDf = clonesDf.set_index('CLONEID')
+    pwDf = td.distances.computeBasicPWDistances('AB', clonesDf)
+    assert pwDf.shape[0] == pwDf.shape[1]
+    assert pwDf.shape[0] == clonesDf.shape[0]
 
-    pwDf = td.distances.computePWDistances(clonesDf)
+def test_nbr_dist():
+    psDf = td.datasets.loadPSData('test_human_pairseqs')
+    psDf = psDf.set_index('TCRID')
+    pwDf = td.distances.computeBasicPWDistances('AB', psDf)
+    params = pd.objects.DistanceParams()
+    VRegionDists = td.distance.computeVRegionDistances('human')
+    
+    d = nearestNeighborDistance(chains='AB',
+                                tcr=psDf.iloc[0],
+                                referenceTCRs=psDf,
+                                neighborTopN=5,
+                                pwDf=pwDf,
+                                weighted=False,
+                                VRegionDists=VRegionDists,
+                                params=params)
+    dw = nearestNeighborDistance(chains='AB',
+                                tcr=psDf.iloc[0],
+                                referenceTCRs=psDf,
+                                neighborTopN=5,
+                                pwDf=pwDf,
+                                weighted=True,
+                                VRegionDists=VRegionDists,
+                                params=params)
+    """Force recompute with pwDf = None"""
+    d2 = nearestNeighborDistance(chains='AB',
+                                tcr=psDf.iloc[0],
+                                referenceTCRs=psDf,
+                                neighborTopN=5,
+                                pwDf=None,
+                                weighted=False,
+                                VRegionDists=VRegionDists,
+                                params=params)
+    assert d == d2
+
+def test_embedding():
+    psDf = td.datasets.loadPSData('test_human_pairseqs')
+    psDf = psDf.set_index('TCRID')
+    pwDf = td.distances.computeBasicPWDistances('AB', psDf)
+
+    # xyDf = embedDistanceMatrix(pwDf, method='kpca', n_components=2)
+    xyDf = td.embedding.plotEmbedding(pwDf, labels=psDf.epitope, method='kpca')

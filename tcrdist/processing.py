@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from functools import partial
 
 from .blast import parse_unpaired_dna_sequence_blastn, get_qualstring
 from .objects import TCRChain, TCRClone
@@ -15,7 +16,8 @@ __all__ = ['processNT',
            'rearrangementProb',
            'computeProbs',
            'identifyClones',
-           'getRepresentativeGenes']
+           'getRepresentativeGenes',
+           'getTCRID']
 
 def processNT(organism, chain, nuc, quals):
     """Process one nucleotide TCR sequence (any chain).
@@ -89,6 +91,7 @@ def readPairedSequences(organism, paired_seqs_file):
     out = [raw[otherCols]] + out
     psDf = pd.concat(out, axis=1)
     psDf.loc[:, 'organism'] = organism
+    psDf.loc[:, 'TCRID'] = psDf.apply(partial(getTCRID, chains=''.join(chains).upper()), axis=1)
     return psDf
 
 def computeProbs(psDf, add_masked_seqs=True, filterOut=False, max_cdr3_length=30, allow_stop_codons=False, allow_X=False):
@@ -189,7 +192,32 @@ def identifyClones(psDf, min_quality_for_singletons=20, average_clone_scores=[],
                           min_quality_for_singletons=min_quality_for_singletons,
                           average_clone_scores=average_clone_scores,
                           none_score_for_averaging=none_score_for_averaging)
+    chains = [s.split('_')[0] for s in psDf.columns if 'nucseq' in s]
+    clonesDf.loc[:, 'CLONEID'] = clonesDf.apply(partial(getTCRID, chains=''.join(chains).upper()), axis=1)
     return clonesDf
 
 def getRepresentativeGenes(organism, v_gene):
     return util.get_rep(v_gene, organism)
+
+def getTCRID(tcr, chains):
+    """Generates a string that is unique for the TCR
+    useful for indexing pairwise distance calculations
+    and pd.DataFrames like psDf and clonesDf
+
+    Parameters
+    ----------
+    tcr : pd.Series or td.objects.TCRClone
+    chains : str
+        E.g. 'A' or 'AB' or 'GD'
+
+    Returns
+    -------
+    s : str
+        A string that is unique to the specified TCR"""
+    
+    chainSpecificCols = ['v%s_reps', 'cdr3%s', 'j%s_reps']
+
+    cols = [c % chain.lower() for chain in chains for c in chainSpecificCols] + ['organism']
+
+    s = '|'.join([tcr[c] for c in cols if c in tcr])
+    return s

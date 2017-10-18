@@ -14,9 +14,11 @@ from . import plotting
 from .objects import TCRClone, TCRChain
 from . import datasets
 from . import distances
+from . import embedding
 
 __all__ = ['processing',
            'utils',
            'plotting',
            'datasets',
-           'distances']
+           'distances',
+           'embedding']
