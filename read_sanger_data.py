@@ -184,18 +184,32 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
 
             v_gene = v_hit.hit_id
             j_gene = j_hit.hit_id
-            v_rep = all_genes[organism][v_gene].rep
-            j_rep = all_genes[organism][j_gene].rep
+            vg = all_genes[organism][v_gene]
+            jg = all_genes[organism][j_gene]
+            v_rep = vg.rep
+            j_rep = jg.rep
 
             v_nucseq = all_fasta[organism][ab]['V'][nuc][v_hit.hit_id]
             j_nucseq = all_fasta[organism][ab]['J'][nuc][j_hit.hit_id]
             v_protseq = all_fasta[organism][ab]['V'][prot][v_hit.hit_id]
 
+
+
             ## this might fail if these guys are pseudo-genes...
             ## so filter out the non-aa-matching j genes...
-            ##
+            ## Note that these "frames" are 0-indexed, ie in {0,1,2}
             v_hitseq_frame = all_offsets[organism][ab]['V'][ v_hit.hit_id ]
             j_hitseq_frame = all_offsets[organism][ab]['J'][ j_hit.hit_id ]
+
+            # figure out where the C codon is in the v gene
+            v_alseq = vg.alseq #align_fasta[ v_gene ]
+            assert v_protseq == v_alseq.replace(gap_character,'')
+            alseq_cpos = vg.cdr_columns[-1][0] - 1 ## now 0-indexed
+            numgaps = v_alseq[:alseq_cpos].count(gap_character)
+            v_cpos_protseq = alseq_cpos - numgaps ## 0-indexed
+            v_cpos_nucseq = 3*v_cpos_protseq + v_hitseq_frame
+            if verbose:
+                print 'v_cpos_nucseq:', v_nucseq[ v_cpos_nucseq: v_cpos_nucseq+3 ]
 
             ## tricky if the hits are on different strands!
             ##
@@ -226,12 +240,19 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
                         print 'reverse-comp blast_seq:',ab
 
 
-                q_vframes = {}
-                for qpos,(vpos,vna) in v_q2hmap.iteritems():
-                    if vpos>=0:
-                        f = ( qpos - vpos + v_hitseq_frame )%3
-                        q_vframes[f] = q_vframes.get(f,0)+1
-                q_vframe = max( [(count,x) for x,count in q_vframes.iteritems() ] )[1]
+                if True: # new logic: just take the first frame after the CDR3 start (ie, cpos)
+                    for qpos,(vpos,vna) in v_q2hmap.iteritems():
+                        if vpos>=0:
+                            q_vframe = ( qpos - vpos + v_hitseq_frame )%3
+                            if vpos >= v_cpos_nucseq:
+                                break
+                else: # this is the old way
+                    q_vframes = {}
+                    for qpos,(vpos,vna) in v_q2hmap.iteritems():
+                        if vpos>=0:
+                            f = ( qpos - vpos + v_hitseq_frame )%3
+                            q_vframes[f] = q_vframes.get(f,0)+1
+                    q_vframe = max( [(count,x) for x,count in q_vframes.iteritems() ] )[1]
 
                 q_jframes = {}
                 for qpos,(jpos,jna) in j_q2hmap.iteritems():
