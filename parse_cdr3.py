@@ -11,7 +11,9 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
     errors = []
 
     ## qseq starts at CA...
-    assert qseq[0] == 'C'
+    #assert qseq[0] == 'C'
+    if qseq[0] != 'C':
+        Log('CDR3 sequence does not start with Cys: {}'.format(qseq[0]))
 
     num_genome_j_aas_in_loop = len(jg.cdrs[0].replace(gap_character,''))-2
     if extended_cdr3: num_genome_j_aas_in_loop += 2 ## up to but not including GXG
@@ -128,7 +130,7 @@ def parse_cdr3( organism, ab, qseq, v_gene, j_gene, q2v_align,
             else:
                 v_match_counts[0] += 1
 
-    if cpos_match<0 or qseq[ cpos_match ] != 'C':
+    if cpos_match<0: # or qseq[ cpos_match ] != 'C':
         ## problemo
         Log('failed to find blast match to C position')
         errors.append('no_V{}_Cpos_blastmatch'.format(ab))
