@@ -19,7 +19,7 @@ with Parser(locals()) as p:
     p.str('outfile_prefix')
     p.float('min_chi_squared').default(200)
     p.float('max_expected_fraction_for_clustering').default(0.05)
-    p.float('min_top_chi_squared').default(25) ## allow lower chi-seq if we aren't going to see any otherwise
+    p.float('min_top_chi_squared').default(75) ## allow lower chi-seq if we aren't going to see any otherwise
     #p.float('distance_scale_factor').default(0.01)
     p.float('nbr_distance').default( nbr_distance_default ) ## single-chain nbr distance threshold
     p.float('motifs_clustering_threshold').default(0.3)
