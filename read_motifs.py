@@ -1007,7 +1007,7 @@ for epitope in epitopes:
         if not paper_figs and not paper_supp:
             font_family="Droid Sans Mono"
             expect_very_small = 0.001
-            messages = [ '{} {} #tcrs= {}'.format(epitope,ab,len(tcrs)),
+            messages = [ '{} {} #clones={}'.format(epitope,ab,len(tcrs)),
                          'chi-sq: {:.1f}'.format(chi_squared),
                          'motif: {}'.format(''.join(showmotif)),
                          'match-: {} {:.1f}%'.format(n,(100.0*n)/len(tcrs)),
