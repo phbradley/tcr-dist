@@ -191,6 +191,10 @@ for epitope in epitopes:
 
         assert len(intras) + len(inters) == ( num_tcrs * (num_tcrs-1) ) /2
 
+        if len(intras)==0:
+            Log('No intra-subject distances?')
+            continue
+
         avg_inter = sum(inters)/len(inters)
         avg_intra = sum(intras)/len(intras)
 

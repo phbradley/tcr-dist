@@ -4,7 +4,8 @@ from all_genes import all_genes, gap_character
 
 def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen = 3,
                                  extended_cdr3 = False,
-                                 max_missing_aas_at_cdr3_cterm = 2 ): # new (was 0)
+                                 max_missing_aas_at_cdr3_cterm = 2, # new (was 0)
+                                 verbose = False ):
     #fasta = all_fasta[organism]
     jg = all_genes[organism][j_gene]
 
@@ -13,6 +14,8 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
     ## qseq starts at CA...
     #assert qseq[0] == 'C'
     if qseq[0] != 'C':
+        if verbose:
+            print 'CDR3 sequence does not start with Cys',qseq
         Log('CDR3 sequence does not start with Cys: {}'.format(qseq[0]))
 
     num_genome_j_aas_in_loop = len(jg.cdrs[0].replace(gap_character,''))-2
@@ -38,7 +41,8 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
         else:
             min_j_matchlen -= 1
 
-    #print 'min_j_matchlen:',min_j_matchlen,'jatag:',jatag,'ntrim:',ntrim,'ja_seq:',ja_seq,'qseq',qseq
+    if verbose:
+        print 'min_j_matchlen:',min_j_matchlen,'jatag:',jatag,'ntrim:',ntrim,'ja_seq:',ja_seq,'qseq',qseq
 
     if jatag not in aseq:
         Log(`( 'whoah',ab,aseq,ja_seq )`)
@@ -94,7 +98,8 @@ def get_cdr3_and_j_match_counts( organism, ab, qseq, j_gene, min_min_j_matchlen 
 
 
 def parse_cdr3( organism, ab, qseq, v_gene, j_gene, q2v_align,
-                extended_cdr3 = False, max_missing_aas_at_cdr3_cterm = 2 ):
+                extended_cdr3 = False, max_missing_aas_at_cdr3_cterm = 2,
+                verbose = False):
     ## v_align is a mapping from 0-indexed qseq positions to 0-indexed v_gene protseq positions
     #fasta = all_fasta[ organism ]
     #align_fasta = all_align_fasta[ organism ]
@@ -118,9 +123,12 @@ def parse_cdr3( organism, ab, qseq, v_gene, j_gene, q2v_align,
 
     qseq_len = len(qseq)
     for (qpos,vpos) in sorted( q2v_align.iteritems() ):
-        #print 'q2v-align:',qpos, vpos, cpos
+        if verbose:
+            print 'q2v-align: qpos: {} vpos: {} cpos: {}'.format( qpos, vpos, cpos )
         if qpos == len(qseq):
             continue ## from a partial codon at the end
+        if vpos < cpos and vpos >= cpos-3: # try to guess cpos_match
+            cpos_match = qpos + cpos-vpos
         if vpos == cpos:
             cpos_match = qpos
         elif vpos <= cpos:
@@ -130,7 +138,10 @@ def parse_cdr3( organism, ab, qseq, v_gene, j_gene, q2v_align,
             else:
                 v_match_counts[0] += 1
 
-    if cpos_match<0: # or qseq[ cpos_match ] != 'C':
+    if verbose:
+        print 'cpos_match:',cpos_match
+
+    if cpos_match<0 or cpos_match >= len(qseq): # or qseq[ cpos_match ] != 'C':
         ## problemo
         Log('failed to find blast match to C position')
         errors.append('no_V{}_Cpos_blastmatch'.format(ab))
@@ -139,7 +150,8 @@ def parse_cdr3( organism, ab, qseq, v_gene, j_gene, q2v_align,
     cdrseq, j_match_counts, other_errors \
         = get_cdr3_and_j_match_counts( organism, ab, qseq[ cpos_match: ], j_gene,
                                        extended_cdr3 = extended_cdr3,
-                                       max_missing_aas_at_cdr3_cterm = max_missing_aas_at_cdr3_cterm )
+                                       max_missing_aas_at_cdr3_cterm = max_missing_aas_at_cdr3_cterm,
+                                       verbose = verbose )
 
     return cdrseq, v_match_counts, j_match_counts, errors+other_errors
 

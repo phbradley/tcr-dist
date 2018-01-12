@@ -584,6 +584,9 @@ for epitope in all_tcrs:
         else:
             p_this_mouse = 0
         print mouse, epitope, total_tcrs_this_mouse, same_pairs_this_mouse, total_pairs_this_mouse, p_this_mouse, clone_sizes
+    if not total_pairs:
+        Log('whoah-- no subject with multiple tcrs? {}'.format(epitope))
+        continue
     p = float( same_pairs )/total_pairs
 
     #inv_p = 1.0/p if p!=0 else 1000.0

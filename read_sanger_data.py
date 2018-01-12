@@ -143,7 +143,8 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
             assert exists( blastall_exe )
             cmd = '%s -F F -p blastn -i %s -d %s -v 100 -b 1 -o %s.blast'\
                   %( blastall_exe, blast_tmpfile, dbfile, blast_tmpfile )
-            #print cmd
+            if verbose:
+                print cmd
             system(cmd)
 
             if verbose:
@@ -241,9 +242,11 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
 
 
                 if True: # new logic: just take the first frame after the CDR3 start (ie, cpos)
-                    for qpos,(vpos,vna) in v_q2hmap.iteritems():
+                    for qpos,(vpos,vna) in sorted( v_q2hmap.iteritems() ):
                         if vpos>=0:
                             q_vframe = ( qpos - vpos + v_hitseq_frame )%3
+                            if verbose:
+                                print 'q_vframe:',q_vframe, qpos, vpos, vna
                             if vpos >= v_cpos_nucseq:
                                 break
                 else: # this is the old way
@@ -259,6 +262,8 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
                     if jpos>=0:
                         f = ( qpos - jpos + j_hitseq_frame )%3
                         q_jframes[f] = q_jframes.get(f,0)+1
+                        if verbose:
+                            print 'q_jframes:',f,q_jframes[f]
 
                 q_jframe = max( [(count,x) for x,count in q_jframes.iteritems() ] )[1]
 
@@ -319,9 +324,10 @@ def parse_unpaired_dna_sequence_blastn( organism, ab, blast_seq, info,
                 qseq, codons = get_translation( blast_seq, '+%d'%(q_vframe+1) )
                 cdr3,v_mm,j_mm,errors = parse_cdr3.parse_cdr3( organism, ab, qseq, v_hit.hit_id, j_hit.hit_id,
                                                                q2v_align, extended_cdr3 = extended_cdr3,
-                                                               max_missing_aas_at_cdr3_cterm=max_missing_aas_at_cdr3_cterm )
+                                                               max_missing_aas_at_cdr3_cterm=max_missing_aas_at_cdr3_cterm,
+                                                               verbose = verbose )
                 if verbose:
-                    print 'cdr3:',ab,cdr3,cdr3 in qseq,'q_vframe:',q_vframe
+                    print 'cdr3:',ab,cdr3,cdr3 in qseq,'q_vframe:',q_vframe,'q_jframe:',q_jframe
 
                 status.extend(errors)
 
