@@ -146,9 +146,9 @@ blastdir = './blast-2.2.16'
 
 if not isdir( blastdir ):
     if mac_osx:
-        address = 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy/2.2.16/blast-2.2.16-universal-macosx.tar.gz'
+        address = 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy.NOTSUPPORTED/2.2.16/blast-2.2.16-universal-macosx.tar.gz'
     else:
-        address = 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy/2.2.16/blast-2.2.16-x64-linux.tar.gz'
+        address = 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy.NOTSUPPORTED/2.2.16/blast-2.2.16-x64-linux.tar.gz'
 
     tarfile = address.split('/')[-1]
     if not exists( tarfile ):
