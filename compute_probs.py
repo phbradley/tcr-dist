@@ -36,6 +36,7 @@ with Parser(locals()) as p:
     p.flag('add_masked_seqs')       # --flag_arg  (no argument passed)
     p.flag('filter')       # --flag_arg  (no argument passed)
     p.int('max_cdr3_length_for_filtering').default(30)       # --flag_arg  (no argument passed)
+    p.int('min_cdr3_length_for_filtering').default(6) # otherwise compute_distances.py will fail...
     p.flag('no_probabilities').described_as('Assign a probability of 1 to all TCRs.')
     #p.flag('find_exact_matches')       # --flag_arg  (no argument passed)
     #p.range('range_arg')     # --range_arg 1:2
@@ -92,8 +93,10 @@ for line in open(infile,'rU'):
     if filter:
         if 'UNK' in va_gene+ja_gene or 'TRa' in va_gene+ja_gene: continue
         if 'UNK' in va_gene+ja_gene or 'TRa' in va_gene+ja_gene: continue
-        if len(cdr3a_protseq)>max_cdr3_length_for_filtering:continue
-        if len(cdr3b_protseq)>max_cdr3_length_for_filtering:continue
+        if ( len(cdr3a_protseq) > max_cdr3_length_for_filtering or
+             len(cdr3b_protseq) > max_cdr3_length_for_filtering or
+             len(cdr3a_protseq) < min_cdr3_length_for_filtering or
+             len(cdr3b_protseq) < min_cdr3_length_for_filtering ): continue
 
         ## check for stop codons
         skip_me = False
