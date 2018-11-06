@@ -135,9 +135,13 @@ blastdir = './blast-2.2.16'
 
 if not isdir( blastdir ):
     if mac_osx:
+        # need to host this elsewhere while updating to newer version!
         address = 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy.NOTSUPPORTED/2.2.16/blast-2.2.16-universal-macosx.tar.gz'
     else:
-        address = 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy.NOTSUPPORTED/2.2.16/blast-2.2.16-x64-linux.tar.gz'
+        # ack-- need to update to a newer version of blast! temp fix move to dropbox
+        #address = 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy.NOTSUPPORTED/2.2.16/blast-2.2.16-x64-linux.tar.gz'
+        address = 'https://www.dropbox.com/s/gurbwgcys6xcttm/blast-2.2.16-x64-linux.tar.gz'
+
 
     tarfile = address.split('/')[-1]
     if not exists( tarfile ):
