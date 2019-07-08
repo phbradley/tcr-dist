@@ -204,7 +204,7 @@ for line in open( infile,'rU'):
         aseq = fake_nucseqs[organism]['A']
         aquals = [60]*len(aseq)
     else:
-        aseq = l[ 'a_nucseq' ]
+        aseq = l[ 'a_nucseq' ].upper()
         if not aseq or aseq == '-':
             print 'skipping line with bad a_nucseq:',aseq,line[:-1]
             continue
@@ -217,7 +217,7 @@ for line in open( infile,'rU'):
         bseq = fake_nucseqs[organism]['B']
         bquals = [60]*len(bseq)
     else:
-        bseq = l[ 'b_nucseq' ]
+        bseq = l[ 'b_nucseq' ].upper()
         if not bseq or bseq == '-':
             print 'skipping line with bad b_nucseq:',bseq,line[:-1]
             continue
