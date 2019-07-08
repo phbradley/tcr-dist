@@ -26,6 +26,8 @@ with Parser(locals()) as p:
     p.flag('auto_ids').described_as('Auto-generate numbered TCR ids')
     p.str('id_base').described_as('If using --auto_ids, you can specify a base name for the IDs.')
     p.flag('clobber').shorthand('c')
+    p.flag('check_genes')
+    p.multiword('extra_fields').cast(lambda x:x.split())
     p.set_help_prefix("""
 
     This script is for converting old TCR-dist formats to the new format and for converted MIGEC output to an input format suitable for TCR-dist.
@@ -48,6 +50,9 @@ rep_warning = '[WARNING] Blast results do not seem to be specific to allele'
 if exists( output_file ) and not clobber:
     print output_file,'already exists, use --clobber or remove it'
     exit(1)
+
+if check_genes:
+    from all_genes import all_genes
 
 ## these are the fields we are going to include in the output file
 ##
@@ -96,6 +101,8 @@ all_required_fields = {
 assert output_format in all_required_fields
 
 outfields = all_required_fields[ output_format ]
+if extra_fields:
+    outfields += extra_fields
 
 if single_chain:
     assert single_chain in ['alpha','beta']
@@ -281,6 +288,9 @@ for inline in open( input_file,'rU'):
             line = line[1:]
         infields = line.split('\t')
         assert infields
+        if extra_fields:
+            for f in extra_fields:
+                assert f in infields
         ## we may want to add some fields to outfields
     else:
         l = parse_tsv_line( line, infields )
@@ -305,7 +315,8 @@ for inline in open( input_file,'rU'):
         badline = False
         for field in outfields:
             if field == "clone_id":
-                l['clone_id'] = l['id']
+                if 'clone_id' not in l:
+                    l['clone_id'] = l['id']
             val = reconstruct_field_from_data( field, l, organism )
             if val is None:
                 if single_chain:
@@ -341,6 +352,21 @@ for inline in open( input_file,'rU'):
                     outl[field] = "-"
                 continue
             outl[ field ] = l[ field ]
+
+        # check the genes
+        if check_genes:
+            bad_genes = False
+            for ab in 'ab':
+                for vj in 'vj':
+                    tag = '{}{}_gene'.format(vj,ab)
+                    if tag in outl:
+                        gene = outl[tag]
+                        if gene not in all_genes[organism]:
+                            print 'bad gene:',tag,gene
+                            bad_genes = True
+            if bad_genes:
+                print 'SKIPPING bad genes',outl
+                continue
 
         out.write( make_tsv_line( outl, outfields ) + '\n' )
 

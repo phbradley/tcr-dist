@@ -229,6 +229,10 @@ for epitope in epitopes:
                              'B': get_safe_log10( float(l['b_protseq_prob']) ),
                              'AB': get_safe_log10( float(l['a_protseq_prob']) * float( l['b_protseq_prob'] ) ) }
 
+        else:
+            cscore = float(l[color_scheme])
+            color_scores = { 'A': cscore, 'B': cscore, 'AB': cscore }
+
         all_color_scores[epitope].append( color_scores )
 
 
@@ -253,6 +257,10 @@ if color_scheme == 'probs':
         color_score_range[ 'A'] = (  -10.0,  -6.0 )
         color_score_range[ 'B'] = (  -10.5,  -6.5 )
         color_score_range['AB'] = ( -20.0, -14.0 )
+elif color_scheme == 'delta_sum':
+    color_score_range[ 'A'] = ( 0, 100 )
+    color_score_range[ 'B'] = ( 0, 100 )
+    color_score_range['AB'] = ( 0, 100 )
 
 
 

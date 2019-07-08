@@ -20,6 +20,7 @@ with Parser(locals()) as p:
     p.flag('only_clones')
     p.flag('constant_seed')
     p.str('extra_make_really_tall_trees_args').shorthand('mrtt_args')
+    p.str('make_tall_trees_color_scheme').default('probs')
     p.str('extra_find_clones_args').shorthand('fc_args')
     p.str('organism').required()
     p.str('webdir').described_as('Location where the index.html summary output file will be generated. Default is <clones_file>_web/')
@@ -341,8 +342,9 @@ run(cmd)
 
 
 ## make tall trees
-cmd = 'python {}/make_tall_trees.py {} --organism {} --clones_file {} --junction_bars > {}_mtt.log 2> {}_mtt.err'\
-      .format( path_to_scripts, constant_seed_args, organism, clones_file, clones_file, clones_file )
+cmd = 'python {}/make_tall_trees.py {} --organism {} --color_scheme {} --clones_file {} --junction_bars > {}_mtt.log 2> {}_mtt.err'\
+      .format( path_to_scripts, constant_seed_args, organism, make_tall_trees_color_scheme,
+               clones_file, clones_file, clones_file )
 run(cmd)
 
 ## analyze intra-subject privacy
