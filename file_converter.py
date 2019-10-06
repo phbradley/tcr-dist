@@ -353,6 +353,10 @@ for inline in open( input_file,'rU'):
                 continue
             outl[ field ] = l[ field ]
 
+            if field == 'cdr3a_nucseq' or field == 'cdr3b_nucseq':
+                outl[ field ] = outl[ field ].lower()
+
+
         # check the genes
         if check_genes:
             bad_genes = False

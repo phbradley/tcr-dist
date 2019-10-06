@@ -162,6 +162,8 @@ def get_amino_acid_consensus( seqs ):
 ## new approach
 all_tcr_infos = parse_tsv.parse_tsv_file( clones_file, ['epitope'], [], True )
 
+fake_chains = util.detect_fake_chains( clones_file )
+
 if epitopes is None:
     epitopes = all_tcr_infos.keys()[:]
     epitopes.sort()
@@ -192,8 +194,8 @@ for epitope in epitopes:
         jb = l['jb_rep']
         cdr3a = l['cdr3a']
         cdr3b = l['cdr3b']
-        cdr3a_nucseq = l['cdr3a_nucseq']
-        cdr3b_nucseq = l['cdr3b_nucseq']
+        cdr3a_nucseq = l['cdr3a_nucseq'].lower()
+        cdr3b_nucseq = l['cdr3b_nucseq'].lower()
 
         ## note-- we are using mm1 reps here, same as in find_cdr3_motifs.py
         ##
@@ -244,6 +246,8 @@ ng_tcrs = { 'A':{}, 'B':{} }
 ## index these by the v_rep and the j_rep
 
 for ab in 'AB':
+    if ab in fake_chains:
+        continue
     ng_logfile = '{}/new_nextgen_chains_{}_{}.tsv'.format( path_to_current_db_files(), organism, ab )
     if not exists(ng_logfile):
         Log('WARNING:: read_motifs.py: missing nextgen TCR chains file: {}'.format(ng_logfile))
@@ -313,7 +317,10 @@ for epitope in epitopes:
     all_distances = {}
     all_neighbors = {}
     for ab in 'AB':
+        if ab in fake_chains:
+            continue
         distfile = '{}_{}_{}.dist'.format(clones_file[:-4],ab,epitope)
+        print 'reading:',distfile
         assert exists(distfile)
         N=0
         all_nbrs = []
@@ -557,6 +564,7 @@ for epitope in epitopes:
         if target_num != None and target_num != num: continue
 
         if ABs != None and ab not in ABs: continue
+        if ab in fake_chains: continue
 
         expected_fraction = max(expect_random,expect_nextgen)/num_tcrs
 

@@ -21,9 +21,11 @@ with Parser(locals()) as p:
     p.str('organism')
     p.flag('intrasubject_nbrdists')
     p.multiword('clones_files').cast(lambda x:x.split())
+    p.multiword('dist_chains').cast(lambda x:x.split()).default('A B AB').described_as('The chains over which the distance calcn will be performed; default is all three ("A B AB")')
     p.multiword('epitope_prefixes').cast(lambda x:x.split())
     p.multiword('nbrdist_percentiles').cast(lambda x: [int(val) for val in x.split()]).default("5 10 25")#"5 10 25 -1 -5 -10")
     p.str('distance_params')
+
 
 #internal legacy hack
 new_nbrdists = not intrasubject_nbrdists
@@ -104,7 +106,7 @@ for f in all_infields[0]:
 
 
 
-for chains in ['A','B','AB']:
+for chains in dist_chains:
     epitopes = list( set( [x['epitope'] for x in all_info ] ) )
     epitopes.sort()
 

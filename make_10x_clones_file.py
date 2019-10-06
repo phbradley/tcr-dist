@@ -132,6 +132,9 @@ def make_clones_file( organism, outfile, clonotype2tcrs, clonotype2barcodes ):
     '''
 
     tmpfile = outfile+'.tmp' # a temporary intermediate file
+    bc_mapfile = outfile+'.barcode_mapping.tsv'
+    outmap = open(bc_mapfile,'w')
+    outmap.write('clone_id\tbarcodes\n')
 
     out = open(tmpfile,'w')
     outfields = 'clone_id subject clone_size va_gene ja_gene vb_gene jb_gene cdr3a cdr3a_nucseq cdr3b cdr3b_nucseq'\
@@ -169,7 +172,9 @@ def make_clones_file( organism, outfile, clonotype2tcrs, clonotype2barcodes ):
             outl['beta_umi']     = str(btcr_umi)
             outl['num_betas']    = str(len(btcrs))
             out.write( make_tsv_line(outl,outfields)+'\n' )
+            outmap.write('{}\t{}\n'.format(clonotype,','.join(clonotype2barcodes[clonotype])))
     out.close()
+    outmap.close()
 
 
     cmd = 'python {}/file_converter.py --input_format clones --output_format clones --input_file {} --output_file {}  --organism {} --clobber --epitope UNK_E --check_genes --extra_fields {} '\
