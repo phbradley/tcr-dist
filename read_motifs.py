@@ -515,6 +515,9 @@ for epitope in epitopes:
 
         if ng_lenseqs:
             ng_lenpwm = create_wtd_pwm_from_sequences( ng_lenseqs, amino_acids+['-'], matched_reps, ng_lenseq_reps )
+        else:
+            ng_lenpwm = 0
+
         ng_fwdpwm = create_wtd_pwm_from_sequences( ng_fwdseqs, amino_acids+['-'], matched_reps, ng_fwdseq_reps )
         ng_revpwm = create_wtd_pwm_from_sequences( ng_revseqs, amino_acids+['-'], matched_reps, ng_fwdseq_reps )
 
