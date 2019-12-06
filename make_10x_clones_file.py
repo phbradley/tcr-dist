@@ -136,7 +136,6 @@ def make_clones_file( organism, outfile, clonotype2tcrs, clonotype2barcodes ):
     outmap = open(bc_mapfile,'w')
     outmap.write('clone_id\tbarcodes\n')
 
-    out = open(tmpfile,'w')
     outfields = 'clone_id subject clone_size va_gene ja_gene vb_gene jb_gene cdr3a cdr3a_nucseq cdr3b cdr3b_nucseq'\
         .split()
     extra_fields = 'alpha_umi beta_umi num_alphas num_betas'.split()

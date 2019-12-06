@@ -14,6 +14,7 @@ with Parser(locals()) as p:
     #p.str('args').unspecified_default().multiple().required()
     p.str('clones_file').required()
     p.str('organism').required()
+    p.str('fake_tuple_counts_file')
 
 
 summary_tsvfile = clones_file[:-4] + '_JS_divergence.tsv'
@@ -113,7 +114,11 @@ for id,g in all_genes[organism].iteritems():
 ## read the background gene-tuple counts
 all_background_tuple_counts = {}
 
-tuplecountsfile = path_to_current_db_files()+'/nextgen_tuple_counts_v2_{}_max10M.log'.format(organism)
+if fake_tuple_counts_file:
+    tuplecountsfile = fake_tuple_counts_file
+    assert exists(fake_tuple_counts_file)
+else:
+    tuplecountsfile = path_to_current_db_files()+'/nextgen_tuple_counts_v2_{}_max10M.log'.format(organism)
 
 if exists( tuplecountsfile ):
     Log('reading {}'.format( tuplecountsfile ))
