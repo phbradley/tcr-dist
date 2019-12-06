@@ -20,6 +20,7 @@ with Parser(locals()) as p:
     p.flag('paper_figs')
     p.flag('vertical') ## each epitope is a vertical stack of scatter plots
     p.flag('showmotifs')
+    p.flag('use_tsne')
     p.multiword('epitopes').cast(lambda x: x.split())
 
 if pngfile_prefix is None:
@@ -92,9 +93,14 @@ for epitope,D in zip(epitopes,all_Ds):
     D = np.minimum( D, np.full( D.shape, Dmax ) )
     print 'true_Dmax:',old_Dmax,'using_Dmax:',Dmax,epitope
 
-    pca = KernelPCA(kernel='precomputed')
-    gram = 1 - ( D / Dmax )
-    xy = pca.fit_transform(gram)
+    if use_tsne:
+        from sklearn.manifold import TSNE
+        tsne = TSNE(n_components=2, metric='precomputed')
+        xy = tsne.fit_transform(D)
+    else:
+        pca = KernelPCA(kernel='precomputed')
+        gram = 1 - ( D / Dmax )
+        xy = pca.fit_transform(gram)
 
     xs = xy[:,0]
     ys = xy[:,1]

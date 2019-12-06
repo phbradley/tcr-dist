@@ -1,14 +1,14 @@
 
-def parse_tsv_line(line,infields):
+def parse_tsv_line(line,infields,sep='\t'):
     if line[-1]=='\n': line = line[:-1] #doh
-    l = line.split('\t')
+    l = line.split(sep)
     assert len(l) == len(infields)
     vals = {}
     for tag,val in zip(infields,l):
         vals[tag] = val
     return vals
 
-def make_tsv_line(vals,outfields,empty_string_replacement=''):
+def make_tsv_line(vals,outfields,empty_string_replacement='',sep='\t'):
     """Does not have the \n at the end"""
     l = []
     for tag in outfields:
@@ -20,11 +20,11 @@ def make_tsv_line(vals,outfields,empty_string_replacement=''):
                 l.append(val)
         else:
             l.append(str(val))
-    return '\t'.join( l )
+    return sep.join( l )
 
 
 
-def parse_tsv_file( filename, key_fields=[], store_fields=[], save_l=False ):
+def parse_tsv_file( filename, key_fields=[], store_fields=[], save_l=False, sep='\t' ):
     if not key_fields and not store_fields:
         save_l = True
     D = {}
@@ -34,9 +34,9 @@ def parse_tsv_file( filename, key_fields=[], store_fields=[], save_l=False ):
     for line in open( filename,'rU'):
         if not infields:
             if line[0] == '#':
-                infields = line[1:-1].split('\t')
+                infields = line[1:-1].split(sep)
             else:
-                infields = line[:-1].split('\t')
+                infields = line[:-1].split(sep)
             continue
         assert infields
 
@@ -70,3 +70,27 @@ def parse_tsv_file( filename, key_fields=[], store_fields=[], save_l=False ):
     else:
         return L
 
+# silly
+def safely_split_csv_line( line, text_encapsulator='"' ):
+    newcomma = "COMMA!!DUDE!!" # any string that's not present in line will work
+    assert newcomma not in line
+    l = list(line)
+    assert len(l) == len(line)
+    in_quote = False
+    newl = l[:]
+    for i,a in enumerate(l):
+        if a == text_encapsulator:
+            in_quote = not in_quote
+        else:
+            if in_quote and a == ',':
+                newl[i] = newcomma
+    assert not in_quote
+    #print ''.join(newl)
+
+    l = ( ''.join( newl ) ).split(',')
+    newl = l[:]
+    for i,a in enumerate(l):
+        if newcomma in a:
+            newl[i] = l[i].replace(newcomma,',')
+
+    return newl
