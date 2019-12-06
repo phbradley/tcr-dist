@@ -8,6 +8,7 @@ from basic import *
 import util
 import copy
 import sys
+from amino_acids import amino_acids
 #import matplotlib
 #if make_png: matplotlib.use('Agg')
 #import matplotlib.pyplot as plt
@@ -338,9 +339,17 @@ for inline in open( input_file,'rU'):
                     print 'bad line: length of ' + field + " is only " + str(len(l[field]))
                     badline = True
                     break
+                for aa in l[field]:
+                    if aa not in amino_acids:
+                        print 'bad cdr3 amino acid:',aa,l[field]
+                        badline = True
+                        break
+                if badline:
+                    break
             l[ field ] = val
 
         if badline:
+            print 'badline:',inline[:-1]
             continue
         outl = {}
         for field in outfields:
