@@ -103,7 +103,7 @@ def read_tcr_data( organism, contig_annotations_csvfile, consensus_annotations_c
                 print 'unrecognized V gene:', organism, vg
                 if not allow_unknown_genes:
                     continue
-            if vg not in expected_gene_names or jg not in expected_gene_names:
+            if jg not in expected_gene_names:
                 print 'unrecognized J gene:', organism, jg
                 if not allow_unknown_genes:
                     continue

@@ -26,7 +26,7 @@ with Parser(locals()) as p:
     p.flag('auto_ids').described_as('Auto-generate numbered TCR ids')
     p.str('id_base').described_as('If using --auto_ids, you can specify a base name for the IDs.')
     p.flag('clobber').shorthand('c')
-    p.flag('check_genes')
+    p.flag('dont_check_genes')
     p.multiword('extra_fields').cast(lambda x:x.split())
     p.set_help_prefix("""
 
@@ -39,6 +39,8 @@ python ../file_converter.py  --input_format cdrblast --output_format clones --in
 python ../file_converter.py --input_format parsed_seqs --output_format parsed_seqs --input_file JCC42_EpiMouse_AsEpi.tsv --output_file tmp.tsv --organism mouse -c
 
     """)
+
+check_genes = not dont_check_genes # now make check_genes the default
 
 warnings = set()
 
