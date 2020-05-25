@@ -260,7 +260,7 @@ def make_clones_file( organism, outfile, clonotype2tcrs, clonotype2barcodes ):
     outmap.close()
 
 
-    cmd = 'python {}/file_converter.py --input_format clones --output_format clones --input_file {} --output_file {}  --organism {} --clobber --epitope UNK_E --check_genes --extra_fields {} '\
+    cmd = 'python {}/file_converter.py --input_format clones --output_format clones --input_file {} --output_file {}  --organism {} --clobber --epitope UNK_E --extra_fields {} '\
         .format( paths.path_to_scripts, tmpfile, outfile, organism, ' '.join(extra_fields) )
     print cmd
     system(cmd)
