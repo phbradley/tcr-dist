@@ -2,7 +2,7 @@ from basic import *
 import parse_tsv
 from collections import Counter
 from itertools import chain
-
+import sys
 
 def show(tcr):
     "For debugging"
@@ -259,9 +259,10 @@ def make_clones_file( organism, outfile, clonotype2tcrs, clonotype2barcodes ):
     out.close()
     outmap.close()
 
+    python_exe = sys.executable
 
-    cmd = 'python {}/file_converter.py --input_format clones --output_format clones --input_file {} --output_file {}  --organism {} --clobber --epitope UNK_E --extra_fields {} '\
-        .format( paths.path_to_scripts, tmpfile, outfile, organism, ' '.join(extra_fields) )
+    cmd = '{} {}/file_converter.py --input_format clones --output_format clones --input_file {} --output_file {}  --organism {} --clobber --epitope UNK_E --extra_fields {} '\
+        .format( python_exe, paths.path_to_scripts, tmpfile, outfile, organism, ' '.join(extra_fields) )
     print cmd
     system(cmd)
 
