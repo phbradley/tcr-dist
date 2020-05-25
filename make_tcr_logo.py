@@ -283,9 +283,9 @@ def make_default_logo_svg_cmds(
         distance_params = tcr_distances.DistanceParams( config_string = None )
 
     if rep_dists is None:
-        print 'precomputing v-region distances'
+        #print 'precomputing v-region distances'
         rep_dists = tcr_distances.compute_all_v_region_distances( organism, distance_params )
-        print 'done precomputing v-region distances'
+        #print 'done precomputing v-region distances'
 
     util.assign_label_reps_and_colors_based_on_most_common_genes_in_repertoire( tcr_infos, organism )
 
@@ -380,7 +380,7 @@ def make_default_logo_svg_cmds(
 
 
     ## compute distances, used in logo construction for picking the center tcr for aligning against
-    print 'computing distances:',len(dist_tcrs)
+    #print 'computing distances:',len(dist_tcrs)
     chains = ab
     all_dists = np.zeros( ( len(dist_tcrs), len(dist_tcrs)) )
     for i,t1 in enumerate( dist_tcrs ):
@@ -434,6 +434,16 @@ if __name__ == '__main__':
         outfile_prefix = clones_file[:-4]
 
     infos = parse_tsv_file( clones_file )
+
+    for l in infos:
+        for vj in 'vj':
+            for ab in 'ab':
+                countreps_tag = '{}{}_countreps'.format(vj, ab)
+                if countreps_tag not in l:
+                    genes_tag = '{}{}_genes'.format(vj, ab)
+                    genes = l[genes_tag].split(';')
+                    l[countreps_tag] = ';'.join(util.countreps_from_genes(genes, organism))
+
 
     cmds = make_default_logo_svg_cmds( [xmargin,ymargin], default_width, default_height, organism, infos, ABs[0],
                                        add_fake_alleles = add_fake_alleles, show_full_cdr3 = show_full_cdr3 )

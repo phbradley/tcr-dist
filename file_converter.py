@@ -28,6 +28,7 @@ with Parser(locals()) as p:
     p.str('id_base').described_as('If using --auto_ids, you can specify a base name for the IDs.')
     p.flag('clobber').shorthand('c')
     p.flag('dont_check_genes')
+    p.flag('check_genes')
     p.multiword('extra_fields').cast(lambda x:x.split())
     p.set_help_prefix("""
 
@@ -41,7 +42,7 @@ python ../file_converter.py --input_format parsed_seqs --output_format parsed_se
 
     """)
 
-check_genes = not dont_check_genes # now make check_genes the default
+check_genes = ( check_genes or not dont_check_genes ) # now make check_genes the default
 
 warnings = set()
 
