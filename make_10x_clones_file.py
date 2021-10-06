@@ -71,8 +71,9 @@ def read_tcr_data(
         else:
             clonotype2barcodes[clonotype].append( bc )
 
+        print l['productive']
         ## experimenting here ########################################3
-        if l['productive'] != 'True':
+        if l['productive'].lower() != 'true':
             continue
         if l['cdr3'].lower() == 'none' or l['cdr3_nt'].lower() == 'none':
             continue
