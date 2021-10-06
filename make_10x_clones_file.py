@@ -71,7 +71,10 @@ def read_tcr_data(
         else:
             clonotype2barcodes[clonotype].append( bc )
 
-        print l['productive']
+        if not clonotype:
+            print 'empty clonotype id:', l
+            continue
+        assert clonotype
         ## experimenting here ########################################3
         if l['productive'].lower() != 'true':
             continue
